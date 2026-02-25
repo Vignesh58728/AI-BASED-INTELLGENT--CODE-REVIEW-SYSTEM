@@ -53,6 +53,7 @@ export default {
       "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
       marquee: "marquee var(--duration) linear infinite",
       "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
+      shine: "shine var(--duration) infinite linear",
    },
    keyframes: {
       "border-beam": {
@@ -67,6 +68,17 @@ export default {
       "marquee-vertical": {
          from: { transform: "translateY(0)" },
          to: { transform: "translateY(calc(-100% - var(--gap)))" },
+      },
+      shine: {
+         "0%": {
+            "background-position": "0% 0%",
+         },
+         "50%": {
+            "background-position": "100% 100%",
+         },
+         "to": {
+            "background-position": "0% 0%",
+         },
       },
    },
    plugins: [],

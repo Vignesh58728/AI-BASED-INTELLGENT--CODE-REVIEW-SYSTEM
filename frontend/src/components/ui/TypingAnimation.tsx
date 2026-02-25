@@ -44,8 +44,10 @@ export default function TypingAnimation({
       };
    }, [duration, i, delay, children]);
 
+   const CustomComponent = Component as any;
+
    return (
-      <Component
+      <CustomComponent
          className={cn(
             "font-display drop-shadow-sm whitespace-pre-wrap",
             className,
@@ -53,6 +55,6 @@ export default function TypingAnimation({
          style={style}
       >
          {displayedText ? displayedText : ""}
-      </Component>
+      </CustomComponent>
    );
 }

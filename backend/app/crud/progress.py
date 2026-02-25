@@ -1,36 +1,37 @@
 from typing import Any, Dict, Optional, Union
-from sqlalchemy.orm import Session
+from beanie import PydanticObjectId
 from app.models.progress import Progress
-from app.schemas.progress import ProgressCreate, ProgressUpdate
+from app.models.user import User
 
-def get_by_user_id(db: Session, user_id: int) -> Optional[Progress]:
-    return db.query(Progress).filter(Progress.user_id == user_id).first()
+async def get_by_user_id(user_id: str) -> Optional[Progress]:
+    return await Progress.find_one(Progress.user.id == PydanticObjectId(user_id))
 
-def create(db: Session, *, obj_in: ProgressCreate) -> Progress:
+async def create(*, obj_in: Dict[str, Any]) -> Progress:
+    user = await User.get(obj_in["user_id"])
+    if not user:
+        raise ValueError("User not found")
+        
     db_obj = Progress(
-        user_id=obj_in.user_id,
-        scores=obj_in.scores,
-        current_module=obj_in.current_module,
-        current_stage=obj_in.current_stage,
-        failed_stage=obj_in.failed_stage
+        user=user,
+        scores=obj_in.get("scores", {}),
+        current_module=obj_in.get("current_module", "school"),
+        current_stage=obj_in.get("current_stage", "beginner"),
+        failed_stage=obj_in.get("failed_stage")
     )
-    db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
+    await db_obj.insert()
     return db_obj
 
-def update(
-    db: Session, *, db_obj: Progress, obj_in: Union[ProgressUpdate, Dict[str, Any]]
+async def update(
+    *, db_obj: Progress, obj_in: Union[Dict[str, Any], Any]
 ) -> Progress:
     if isinstance(obj_in, dict):
         update_data = obj_in
     else:
+        # Assuming Pydantic model
         update_data = obj_in.model_dump(exclude_unset=True)
     
-    for field in update_data:
-        setattr(db_obj, field, update_data[field])
+    for field, value in update_data.items():
+        setattr(db_obj, field, value)
     
-    db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
+    await db_obj.save()
     return db_obj

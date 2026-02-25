@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BrandIcon } from "@/components/ui/BrandIcon";
-import Hyperspeed from "@/components/ui/Hyperspeed";
-import { hyperspeedPresets } from "@/components/ui/HyperspeedPresets";
 
 export function LogoSplashPage() {
    const navigate = useNavigate();
@@ -18,26 +16,47 @@ export function LogoSplashPage() {
 
    return (
       <div className="relative flex items-center justify-center min-h-screen w-full overflow-hidden bg-black">
-         {/* Background Effect */}
-         <div className="absolute inset-0 z-0 opacity-70">
-            <Hyperspeed effectOptions={hyperspeedPresets.three as any} />
-         </div>
-
          <div className="relative z-10 flex flex-col items-center">
             <motion.div
-               initial={{ scale: 0.5, opacity: 0 }}
+               initial={{ scale: 0.8, opacity: 0, filter: "blur(20px)" }}
                animate={{
-                  scale: [0.5, 1.2, 1],
+                  scale: 1,
                   opacity: 1,
-                  rotate: [0, -10, 10, 0]
+                  filter: "blur(0px)",
                }}
                transition={{
-                  duration: 1.5,
+                  duration: 2.5,
                   ease: "easeOut",
-                  times: [0, 0.6, 1]
                }}
+               className="relative"
             >
-               <BrandIcon size={200} className="drop-shadow-[0_0_50px_rgba(139,92,246,0.5)]" />
+               {/* Premium Glow Aura */}
+               <motion.div
+                  animate={{
+                     opacity: [0.3, 0.6, 0.3],
+                     scale: [1, 1.2, 1]
+                  }}
+                  transition={{
+                     duration: 4,
+                     repeat: Infinity,
+                     ease: "easeInOut"
+                  }}
+                  className="absolute inset-0 bg-primary/20 blur-[80px] rounded-full z-0"
+               />
+
+               <motion.div
+                  animate={{
+                     y: [0, -15, 0],
+                  }}
+                  transition={{
+                     duration: 5,
+                     repeat: Infinity,
+                     ease: "easeInOut"
+                  }}
+                  className="relative z-10"
+               >
+                  <BrandIcon size={220} className="drop-shadow-[0_0_40px_rgba(139,92,246,0.3)]" />
+               </motion.div>
             </motion.div>
 
             <motion.div
@@ -55,29 +74,6 @@ export function LogoSplashPage() {
                </p>
             </motion.div>
 
-            {/* Loading Indicator */}
-            <motion.div
-               className="mt-16 flex gap-2"
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               transition={{ delay: 1.2 }}
-            >
-               {[0, 1, 2].map((i) => (
-                  <motion.div
-                     key={i}
-                     animate={{
-                        scale: [1, 1.5, 1],
-                        opacity: [0.3, 1, 0.3]
-                     }}
-                     transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        delay: i * 0.2
-                     }}
-                     className="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_white]"
-                  />
-               ))}
-            </motion.div>
          </div>
       </div>
    );

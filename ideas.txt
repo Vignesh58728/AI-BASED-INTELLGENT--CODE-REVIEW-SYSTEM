@@ -1,217 +1,99 @@
-# CodeMentor AI: Future Roadmap & Feature Ideas
+ AI / Intelligence
+ 
+Feature	Description
+Smart Auto-Fix	AI படிச்சு bug-ஐ automatically fix பண்ணும்
+Code Spell Detection	Anti-patterns, dead code detect பண்ணும்
+Plagiarism Checker	GitHub-ல இருந்து copy-paste detect பண்ணும்
+Multi-Language AI	Python, Java, C++, JS எல்லாத்துக்கும் review
+Natural Language → Code	"Sort a list" சொன்னா code generate ஆகும்
+📊 Analytics & Gamification
+Feature	Description
+Skill Gap Map	"Arrays weak, Trees strong" visualize
+Weekly Progress Report	Email-ல PDF report
+Streak Rewards	7-day streak → badge unlock
+Global Leaderboard	Top coders ranking
+XP System	Questions solve → XP earn → Level up
+💬 Social & Collaboration
+Feature	Description
+Peer Code Review	User-to-user review system
+Discussion Forum	Problem-specific Q&A
+Live Mock Interview	1v1 video + code session
+Team Challenges	Group coding competitions
+🎓 Learning Features
+Feature	Description
+Personalized Roadmap	Weakness-based learning path
+Video Explanation	Problem solution video link
+Interview Question Bank	Amazon, Google, Meta specific questions
+Resume Code Portfolio	Best submissions → auto portfolio
+🔧 Developer Experience
+Feature	Description
+VS Code Extension	IDE-ல directly AI review
+GitHub Integration	PR-ல automatic review comment
+Real Compiler	Browser-ல run + test cases check
+Dark/Light Mode	Theme toggle
 
-## 🚀 50 Innovative Feature Ideas
 
-### 🤖 1. AI & Intelligent Features
-1. AI Code Predictor: Suggests the next 5-10 lines of code as the user types.
-2. Semantic Search: Search for problems using natural language.
-3. Efficiency Bot: AI calculates time and space complexity (O(N)).
-4. Auto-Refactor: One-click button to rewrite code to "Clean Code" standards.
-5. Language Translator: Instantly convert code between programming languages.
-6. AI Debugging Assistant: Highlights logic errors and suggests specific fixes.
-7. Skill Gap Analysis: AI identifies weak topics (e.g., Recursion).
-8. Automated Documentation: AI generates professional README/Comments.
-9. AI Interview Coach: Real-time voice interview simulation.
-10. Plagiarism Checker: AI-based similarity detection for submissions.
+1. Smart Auto-Fix          ← Most impressive
+2. Skill Gap Map           ← Most useful  
+3. Real Compiler           ← Most practical
+4. GitHub Integration      ← Most marketable
+5. VS Code Extension       ← Professional grade
 
-### 🎮 2. Gamification & Engagement
-11. XP & Leveling System: Earn XP for every problem solved.
-12. Daily Streaks: Rewards for consecutive days of coding.
-13. Skill Badges: "Recursion Master," "SQL Pro," etc.
-14. Global Leaderboard: Monthly rankings with reward points.
-15. Coding Avatars: Unlockable 3D characters based on rank.
-16. Battle Mode: Real-time 1v1 coding duals.
-17. Team Clans: Join clans and compete together.
-18. Achievement Unlock Popups: Visual celebrations for milestones.
-19. Code-Mentor Shop: Spend coins on UI themes or customizations.
-20. Weekly Tournaments: Scheduled contests with prizes.
 
-### 📚 3. Learning & Progression
-21. Personalized Learning Paths: Custom roadmaps based on goals.
-22. Interactive Flashcards: Learn via space-repetition cards.
-23. Video Summaries: 60-second AI-generated video explainers.
-24. Failure Analysis: Reports on why a user failed a stage.
-25. Cheat Sheets: Quick-access PDF guides for languages.
-26. Concept Maps: Visual graph of interconnected topics.
-27. Mock Exams: Assessments mimicking actual company tests.
-28. Interview Prep Kits: Top 100 questions for specific companies.
-29. Peer Review System: Users review each other's code for points.
-30. Code-Along Mode: Live sessions following a mentor's build.
+Thought for <1s
 
-### ☁️ 4. Cloud & DevOps
-31. Cloud Sandbox: One-click execution environment.
-32. GitHub Integration: Automatic push of solved problems.
-33. Cloud Code Storage: Instant S3 backup of submissions.
-34. Serverless Execution: AWS Lambda for fast code running.
-35. Multi-Region Sync: Low latency globally.
-36. API Access: 3rd party tool development.
-37. Instance Monitoring: Real-time CPU/Memory usage tracking.
-38. Edge Computing: Faster AI response times globally.
-39. Secret Management: Secure handling of API keys.
-40. Automatic Scaling: Maintenance of performance under heavy load.
+இந்த project-க்கு specifically தேவையான API keys இங்க இருக்கு:
 
-### ✨ 5. Advanced UI/UX & Miscellaneous
-41. Pure Black "OLED" Mode: Sleek, high-contrast aesthetic.
-42. Keyboard Shortcuts: Vim or VS Code keybinding support.
-43. Accessibility Mode: Screen reader and high-contrast support.
-44. Mobile App: Native learning on the go.
-45. Multi-Tab Editor: Simultaneous problem solving.
-46. Collaboration Rooms: Private group solving rooms.
-47. Code Player: Animate a replay of code construction.
-48. Custom Theme Builder: Create and share editor themes.
-49. Offline Mode: Practice without internet access.
-50. Resume Exporter: Shareable CodeMentor professional profile.
+🔑 இப்போ உடனே தேவையானவை (Core)
+API Key	Service	எங்கிருந்து பெறலாம்
+GROQ_API_KEY	Groq (Llama 3.3 AI) ✅ Already using	console.groq.com — Free!
+SECRET_KEY	JWT Auth ✅ Already set	Just a random string — generate any
+🆕 Add பண்ண வேண்டியவை (Recommended)
+API Key	Purpose	Source
+MONGODB_URI	Chat history, user data store	mongodb.com/atlas — Free tier
+AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY	File uploads (S3), Secrets Manager	aws.amazon.com — Free tier
+OPENAI_API_KEY	GPT-4o direct (optional, Groq already does it)	platform.openai.com — Paid
+GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET	Google Social Login	console.cloud.google.com — Fr
 
----
+2 features (Teacher Creation Controls and Tamil language support) are currently missing and would require further development
+Undoubtedly, to make the AI Page fully functional and professional, we need a few more things in addition to the 6 API keys.
 
-## 🤖 30 Specialized AI Features for CodeMentor AI
+Based on my audit and the current state of the code, here is what we need to tackle tomorrow:
 
-> **Core Philosophy**: The AI should **never** provide the direct solution/code. Instead, it must act as a Socratic Mentor, asking guiding questions and giving subtle hints to make the user think and solve it themselves.
+1. 🔑 The 6 API Keys
+Since your AI page currently lists several models, you'll likely need keys for:
 
-1.  **AI Pair Programmer**: Real-time code suggestions while typing (Logic only, no full solutions).
-2.  **Automated Unit Test Generation**: AI generates test cases for user code.
-3.  **Explain My Code**: AI provides a human-readable summary of logic.
-4.  **AI Code Linting**: Intelligent style and convention enforcement.
-5.  **Complexity Analysis**: Automated Big-O notation calculation (O(N), O(Log N)).
-6.  **AI Debugger**: Predicts likely locations of crashes or logical bugs.
-7.  **Auto-Fix Suggestions**: One-click "Apply Fix" for found bugs.
-8.  **Vulnerability Detection**: AI checks for SQL injection, XSS, and security flaws.
-9.  **AI Language Converter**: Instantly migrate code between languages (e.g., Python to Go).
-10. **Intelligent Refactoring**: Suggests cleaner ways to write complex logic.
-11. **AI Interviewer (Text)**: Asks follow-up technical questions after a submission.
-12. **AI Voice Mentor**: Natural language voice feedback on code quality.
-13. **Plagiarism AI**: Deep structural analysis to detect copied/stolen solutions.
-14. **Custom AI Training**: Users can "teach" the AI their specific project style/rules.
-15. **Dataset Generator**: AI generates mock data (JSON/CSV) for testing code.
-16. **AI Skill Pathing**: Dynamically adjusts curriculum based on user mistakes.
-17. **Semantic Problem Search**: Find problems using concepts vs keywords.
-18. **AI Documentation Generator**: Automatically writes Docstrings and professional READMEs.
-19. **Edge Case Predictor**: Suggests missed inputs (e.g., empty strings, nulls, overflows).
-20. **AI Code Reviewer**: Gives comments line-by-line like a Senior Software Engineer.
-21. **Performance Bottleneck AI**: Identifies slow functions and suggests optimizations.
-22. **Interactive AI Tutorials**: Step-by-step guidance where AI gives hints, not answers.
-23. **AI Resume Parser**: Tailors user profile highlights based on coding performance.
-24. **SQL Query Optimizer**: AI interprets SQL and suggests indexing or join improvements.
-25. **AI Regex Generator**: Convert natural language descriptions to complex Regex patterns.
-26. **Accessibility AI**: Suggests UI improvements for accessibility standards.
-27. **AI Error Stack Decoder**: Simplifies complex compiler/runtime errors into plain English.
-28. **Predictive Analytics**: Forecasts when a user will reach "Ready for Hire" status.
-29. **Code Simplifier**: Automatically reduces bloated code without changing behavior.
----
+Groq (Already in 
+.env
+)
+OpenAI (for GPT-4o)
+Anthropic (for Claude 3.5)
+DeepSeek
+Google Gemini (Optional alternative)
+Perplexity (For web search capabilities)
+2. 🛢️ Database Connection (Priority #1)
+The AI page cannot "fully work" (save history, remember sessions) until the MongoDB Atlas connection is fixed.
 
-## 🧠 15 Socratic AI Mentoring Strategies (Thinking > Answers)
+Action: Please whitelist your current IP Address in the MongoDB Atlas dashboard. Without this, the backend will keep timing out.
+3. 🧠 Multi-Model Backend Logic
+Currently, the backend mostly uses Groq. I need to:
 
-1.  **The "Question Over Answer" Rule**: Any AI response must lead with a question (e.g., "What happens to your variable after the loop finishes?").
-2.  **Progressive Hinting System**:
-    - *Hint 1*: Broad conceptual clue (e.g., "Think about how you store data").
-    - *Hint 2*: Logical step (e.g., "Would a Hash Map help you find elements faster?").
-    - *Hint 3*: Pseudo-code (No actual code, just logic steps).
-3.  **The "Find the Bug" Challenge**: Instead of fixing a bug, the AI highlights a line and says, "There's a logical flaw here. Can you spot why it fails for negative numbers?"
-4.  **Concept Mapping**: AI mentions a related concept the user already knows (e.g., "This is just like the 'Array' logic we used in the School module").
-5.  **Analogy-Based Learning**: Explaining complex code via real-world analogies (e.g., "Sorting is like organizing a library with only one empty shelf").
-6.  **The "Why" Prompt**: If a user writes something inefficient, the AI asks, "I see you used a nested loop. What made you choose that over a single pass?"
-7.  **Edge Case Puzzler**: AI provides a specific input that will break the user's code and asks, "How would your code handle 'None' or an empty list?"
-8.  **Visual Logic Builder**: AI asks the user to describe the algorithm's flow in 3 text-based steps before they start typing.
-9.  **The "One Thing at a Time" Focus**: AI ignores 5 bugs and focuses on the most fundamental one first to avoid overwhelming the user.
-10. **Refactoring Quiz**: After a user solves it, the AI asks, "Great job! Now, how can we remove 3 lines from this while keeping the same logic?"
-11. **Complexity Predictor**: Ask the user: "Before I calculate it, what do you think the Time Complexity of your solution is?"
-12. **The "Missing Piece" Hint**: AI shows a 5-step logic list and leaves Step 3 blank for the user to figure out.
-13. **Comparative Analysis**: "User B solved this using a Stack. How would a Stack change the way you access your items compared to your current Array?"
-14. **Silent Observer Mode**: The AI only speaks if the user has been idle or deleting code for more than 3 minutes.
----
+Create a Model Router that switches between different providers based on the user's selection in the frontend.
+Implement specialized System Prompts for each model so they act like expert tutors.
+4. 📂 File/Code Context Uploads
+To make it a true "AI Code Reviewer," students should be able to upload a 
+.py
+ file or a snippet for the AI to analyze.
 
-## 🎨 50 Advanced Frontend UI/UX Features
+Need: We might need some frontend logic to handle file reading and sending it to the AI.
+5. 🌐 Web Search Integration
+If you want the "Sources" section (like Perplexity) to work, we need an API that can browse the web (like Tavily or Serper).
 
-1.  **Multi-Theme Support**: Choice between OLED Black, Cyberpunk, Solarized, and Dracula.
-2.  **Interactive Code Flow Visualization**: Canvas-based graph showing how data flows through variables.
-3.  **Command Palette (Ctrl+K)**: Global search for problems, settings, and navigation.
-4.  **Drag-and-Drop Workspace**: Resizable and rearrangeable panels (Editor, Console, AI, Problems).
-5.  **Ghost Text Suggestions**: Low-opacity "ghost" code snippets that appear as the user types.
-6.  **Code-to-Speech**: Accessibility feature to read code aloud for visually impaired users.
-7.  **Real-Time Collaborative Cursor**: See where other peers are typing in shared rooms.
-8.  **Split-Diff Viewer**: Side-by-side comparison of local code vs. previous versions.
-9.  **Animated Skill Hexagons**: 3D hexagonal grid visualizing proficiency in different languages.
-10. **Zen Mode**: Hides all UI elements except the editor and a minimalist timer.
-11. **Skeleton Loaders**: Harmonious shimmer effects for all data-fetching states.
-12. **Micro-interaction Feedback**: Subtle haptic-like animations on button clicks and hover.
-13. **Progressive Web App (PWA)**: Installable app with offline problem-solving support.
-14. **Custom Scrollbar Themes**: Styled scrollbars that match the active editor theme.
-15. **Breadcrumb Navigation**: Path-based navigation (e.g., School > Beginner > Loop Stage).
-16. **Toast Notification Stack**: Beautifully categorized alerts for system updates and achievements.
-17. **Code Execution Playback**: Slider to rewind/fast-forward through your coding session.
-18. **Achievement Confetti**: Layered particle effects when a difficult problem is solved.
-19. **Interactive Onboarding Walkthrough**: Step-by-step guided tour for new users.
-20. **Heatmap Contributions**: GitHub-style activity grid on the user profile.
-21. **Markdown + LaTeX Support**: High-fidelity rendering for problem statements and math.
-22. **Floating Feedback Bubble**: Draggable component to summon AI Mentor anywhere on screen.
-23. **Video Integration**: Picture-in-picture video tutorials for specific problem sets.
-24. **Gooey Navigation Bar**: Liquid-style transition animations for main menu items.
-25. **Auto-Save Status Glow**: Subtle pulsing glow when code is being synced to the cloud.
-26. **Global Search Highlight**: Instant search with text highlighting across the entire portal.
-27. **File Tree Explorer**: Sidebar to manage multiple project files (for IT/Project levels).
-28. **Tabbed Editor Interface**: Working on multiple programming tasks simultaneously.
-29. **Contextual Tooltips**: Hover over keywords to see definitions and usage examples.
-30. **Responsive Design Engine**: Fluid layouts optimized for 4K down to mobile devices.
-31. **Custom Font Picker**: Choice of fonts (Fira Code, Cascadia, JetBrains Mono, etc.).
-32. **Ligature Support**: Full support for programming ligatures in the editor.
-33. **Visual Debugger**: Gutter-based breakpoints and value-hovering on lines.
-34. **Code Snippet Manager**: Save and tag frequently used code blocks for quick access.
-35. **Dynamic Dashboard Widgets**: Drag-and-drop widgets (Statistics, Friends, Next Problem).
-36. **Dark/Light Mode Transition**: Smooth cross-fade animation when toggling themes.
-37. **Glassmorphism Overlays**: Modern transparent frosted-glass effect for all modals.
-38. **Achievement Badges Carousel**: Interactive showcase of earned technical skills.
-39. **Real-Time Leaderboard Rolling**: Live updates to rankings without page refresh.
-40. **Contest Countdown Timer**: Sticky header timer for active coding competitions.
-41. **Social Login Icons Integration**: Animated Google/GitHub/LinkedIn login buttons.
-42. **Keyboard Shortcuts Cheat-Sheet**: Instant overlay (Shift+?) showing all hotkeys.
-43. **Language Detection**: Automatically switches syntax highlighting based on content.
-44. **History Versioning Sidebar**: Quickly revert to any previous 10-minute snapshot.
-45. **Multi-Cursor Editing**: Standard VS-Code style multi-edit capabilities.
-46. **Interactive Graph of Progress**: SVG-based spider chart for multi-module scores.
-47. **Code-Performance Overlay**: Real-time memory and CPU usage bars inside the console.
-48. **Minimap Sidebar**: High-level visual map of the entire code file for navigation.
-49. **Folding Regions**: Collapse/Expand code blocks (functions, classes) for clarity.
----
+6. 🎨 Final UI Polish
+Connecting the "Ask anything" box to the real backend endpoints we fixed today.
+Implementing the Tamil/English toggle for the School level hints if you want to proceed with that feature.
+Recommendation: Tomorrow, once you have the API keys ready and the MongoDB IP whitelisted, we can start by wiring up the Multi-Model Support so the selector actually changes the AI's behavior.
 
-## ⚙️ 40 Advanced Backend Architecture Features
-
-1.  **Microservices Transition**: Move from monolith to decoupled services for Auth, Problems, and AI.
-2.  **Real-time WebSockets**: Live leaderboard updates and collaborative coding sessions.
-3.  **Advanced Redis Caching**: Multi-level cache for problems and user progress to reduce latency.
-4.  **GraphQL Integration**: Allow frontend to request exactly the data it needs.
-5.  **Rate Limiting & Throttling**: Protect API from abuse with per-user/IP limits.
-6.  **Database Sharding**: Distribute data across multiple instances for horizontal scaling.
-7.  **Event-Driven Architecture**: Use message queues (AWS SQS/Kafka) for async processing.
-8.  **RBAC (Role-Based Access Control)**: Granular permissions for Students, Mentors, and Admins.
-9.  **Audit Logging API**: Track every change to user data for security compliance.
-10. **Multi-Tenant Architecture**: Support isolated environments for different schools/orgs.
-11. **OAuth2 & MFA Support**: Enhanced security with social logins and 2-factor authentication.
-12. **API Versioning Strategy**: Support for v1, v2, etc., for backward compatibility.
-13. **CDN Integration**: Serve static assets and AI review artifacts via global edge locations.
-14. **Elasticsearch/Algolia**: Sub-second search capabilities across large problem banks.
-15. **Advanced Load Balancing**: Intelligent traffic routing based on server health.
-16. **Auto-Scaling Logic**: Spin up workers dynamically based on queue size (Celery/KEDA).
-17. **Alembic Migration Management**: Automated, version-controlled database schema updates.
-18. **Health Check Endpoints**: Detailed vitals for DB, Redis, and external AI services.
-19. **Sentry Error Tracking**: Instant notification for any backend exceptions.
-20. **APM (Application Performance Monitoring)**: Identify and optimize slow database queries.
-21. **Pre-signed S3 URLs**: Secure, direct-to-cloud file uploads for user projects.
-22. **Lambda@Edge Logic**: Run simple validation logic closer to the user.
-23. **Infrastructure as Code (Terraform)**: Fully automated deployment of the entire AWS stack.
-24. **Container Orchestration (Fargate)**: Serverless container management for the FastAPI app.
-25. **ELK Stack Logging**: Centralized, searchable logs for all backend services.
-26. **Prometheus & Grafana**: Visualization of technical and business KPIs.
-27. **Scheduled Background Jobs**: Automated daily backups and weekly user reports.
-28. **Secure Session Store**: Encrypted cookie-based or Redis-backed sessions.
-29. **CORS Security Policy**: Strict whitelist control for frontend cross-origin requests.
-30. **Auto-Generated Swagger Docs**: Interactive API playground for internal development.
-31. **Integration Test Suite**: Automated verification of interconnected backend systems.
-32. **Mocking Infrastructure**: Fast testing by mocking AWS and AI provider APIs.
-33. **Outgoing Webhooks**: Notify external apps when a user completes a major module.
-34. **Database Connection Pooling**: Optimized resource sharing for high-concurrency.
-35. **Distributed Tracing (Jaeger)**: Follow requests across multiple microservices.
-36. **Feature Flag System**: Roll out new logic to specific users without redeploying.
-37. **AWS API Gateway Setup**: Enhanced security and management for all endpoints.
-38. **Disaster Recovery Plan**: Automated cross-region backups and failover.
-39. **Statical Code Analysis (SonarQube)**: Continuous quality checks for the Python codebase.
-40. **Serverless AI Triggers**: Trigger AI analysis immediately upon S3 file upload.
+Should I prepare the 
+.env
+ template for you to fill in the keys tomorrow?

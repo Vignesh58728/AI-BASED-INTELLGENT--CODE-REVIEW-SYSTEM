@@ -1,5 +1,4 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Card, CardHeader, CardTitle, CardFooter } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Problem } from "@/types/problem";
 import { CheckCircle2 } from "lucide-react";
@@ -11,25 +10,34 @@ interface ProblemCardProps {
 }
 
 export function ProblemCard({ problem, isCompleted, onClick }: ProblemCardProps) {
-   const difficultyColor = {
-      easy: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-      medium: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-      hard: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-   }[problem.difficulty];
-
    return (
-      <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={onClick}>
-         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-medium">
+      <Card
+         className="group relative overflow-hidden transition-all duration-500 cursor-pointer bg-black/90 border border-zinc-800/50 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] rounded-2xl"
+         onClick={onClick}
+      >
+         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
+            <CardTitle className="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors">
                {problem.title}
             </CardTitle>
-            {isCompleted && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+            {isCompleted && (
+               <div className="p-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+               </div>
+            )}
          </CardHeader>
-         <CardDescription className="px-6 py-2">
-            <Badge variant="outline" className={difficultyColor}>{problem.difficulty}</Badge>
-         </CardDescription>
-         <CardFooter>
-            <Button variant="ghost" className="w-full justify-start pl-0">Solve Challenge &rarr;</Button>
+
+         <CardFooter className="pt-4 pb-6 relative z-10">
+            <Button
+               variant="ghost"
+               className="w-full justify-between px-0 text-zinc-400 group-hover:text-white transition-all hover:bg-transparent"
+            >
+               <span className="text-xs font-semibold uppercase tracking-wider">Solve Challenge</span>
+               <div className="transform transition-all duration-300 group-hover:translate-x-1 flex items-center gap-1">
+                  <span className="text-lg">&rarr;</span>
+               </div>
+            </Button>
          </CardFooter>
       </Card>
    );

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Sparkles } from "lucide-react";
+import { } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +34,7 @@ export const Compare = ({
 
    const sliderRef = useRef<HTMLDivElement>(null);
 
-   const [isMouseOver, setIsMouseOver] = useState(false);
+   // Unused state removed
 
    const autoplayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -67,12 +67,10 @@ export const Compare = ({
    }, [startAutoplay, stopAutoplay]);
 
    function mouseEnterHandler() {
-      setIsMouseOver(true);
       stopAutoplay();
    }
 
    function mouseLeaveHandler() {
-      setIsMouseOver(false);
       if (slideMode === "hover") {
          setSliderXPercent(initialSliderPercentage);
       }
@@ -83,7 +81,7 @@ export const Compare = ({
    }
 
    const handleStart = useCallback(
-      (clientX: number) => {
+      (_clientX: number) => {
          if (slideMode === "drag") {
             setIsDragging(true);
          }
@@ -186,7 +184,7 @@ export const Compare = ({
                      transition={{ duration: 0 }}
                      style={{
                         clipPath: `inset(0 ${100 - sliderXPercent}% 0 0)`,
-                     }}
+                     } as any}
                   />
                )}
             </AnimatePresence>
@@ -207,6 +205,6 @@ export const Compare = ({
 
 const MemoizedSparklesCore = React.memo(SparklesCore);
 
-function SparklesCore(props: any) {
-   return null; // Placeholder or minimal implementation if we don't have the full Aceternity component
+function SparklesCore(_props: any) {
+   return null;
 }

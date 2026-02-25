@@ -4,7 +4,7 @@ import axios from 'axios';
 // Create an axios instance
 const api = axios.create({
    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api', // Adjust default as needed
-   timeout: 10000,
+   timeout: 30000,
    headers: {
       'Content-Type': 'application/json',
    },
@@ -13,7 +13,7 @@ const api = axios.create({
 // Request interceptor for adding auth token
 api.interceptors.request.use(
    (config) => {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (token) {
          config.headers.Authorization = `Bearer ${token}`;
       }
@@ -28,6 +28,15 @@ api.interceptors.request.use(
 api.interceptors.response.use(
    (response) => response,
    (error) => {
+      // Enhanced error logging
+      if (error.response) {
+         console.error(`API Error [${error.response.status}]:`, error.response.data);
+      } else if (error.request) {
+         console.error("API Error: No response received from server. Check if backend is running.");
+      } else {
+         console.error("API Error:", error.message);
+      }
+
       // Handle 401 Unauthorized globally
       if (error.response && error.response.status === 401) {
          // Clear storage and redirect to login if needed

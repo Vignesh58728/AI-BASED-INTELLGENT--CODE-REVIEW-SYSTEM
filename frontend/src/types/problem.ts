@@ -1,13 +1,16 @@
-export type Difficulty = 'easy' | 'medium' | 'hard';
+export type Difficulty = 'easy' | 'medium' | 'hard' | 'beginner' | 'intermediate' | 'advanced';
 
 export interface Problem {
-   id: string;
+   id: number | string;
    title: string;
    description: string;
-   difficulty: Difficulty;
-   tags: string[];
-   initialCode: string;
-   testCases: TestCase[];
+   module?: string;
+   difficulty: Difficulty | string;
+   points?: number;
+   tags?: string[];
+   template_code?: Record<string, string>;
+   initialCode?: string;
+   testCases?: TestCase[];
 }
 
 export interface TestCase {

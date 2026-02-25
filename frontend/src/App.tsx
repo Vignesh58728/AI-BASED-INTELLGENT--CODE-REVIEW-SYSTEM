@@ -5,10 +5,9 @@ import { LevelProvider } from "@/context/LevelContext"
 import { ProgressProvider } from "@/context/ProgressContext"
 
 import { MainLayout } from '@/layout/MainLayout';
-import { LandingPage } from '@/pages/auth/LandingPage';
-import { LoginPage } from '@/pages/auth/LoginPage';
+import { Login } from '@/pages/Login';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
-import { LevelSelectionPage } from '@/pages/levels/LevelSelectionPage';
+import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
 import { LogoSplashPage } from '@/pages/auth/LogoSplashPage';
 import { SchoolDashboard } from '@/pages/levels/SchoolDashboard';
 import { CollegeDashboard } from '@/pages/levels/CollegeDashboard';
@@ -17,25 +16,38 @@ import { BeginnerPractice } from '@/pages/school/BeginnerPractice';
 import { IntermediatePractice } from '@/pages/school/IntermediatePractice';
 import { AdvancedPractice } from '@/pages/school/AdvancedPractice';
 import { ExamsPage } from '@/pages/school/ExamsPage';
-import { ProblemSolverPage } from '@/pages/shared/ProblemSolverPage';
+import { ExamInterface } from '@/pages/school/ExamInterface';
+import { Practice } from '@/pages/Practice';
+
+// New Pages
+import { SkillAnalysis } from '@/pages/SkillAnalysis';
+import { ReviewHistory } from '@/pages/ReviewHistory';
+import { AdminPanel } from '@/pages/AdminPanel';
+import { Profile } from '@/pages/Profile';
 
 // College Module Pages
 import { DataStructuresPractice } from '@/pages/college/DataStructuresPractice';
 import { AlgorithmsPractice } from '@/pages/college/AlgorithmsPractice';
+import { CollegePracticePage } from '@/pages/college/CollegePracticePage';
 import { PlacementPreparation } from '@/pages/college/PlacementPreparation';
+import { CSCoreSubjects } from '@/pages/college/CSCoreSubjects';
+import { InterviewPrep } from '@/pages/college/InterviewPrep';
+import { MockInterviewPage } from '@/pages/college/MockInterviewPage';
+import { PlacementAnalytics } from '@/pages/college/PlacementAnalytics';
 
 // IT Module Pages
 import { FullStackPractice } from '@/pages/it/FullStackPractice';
 import { CloudComputingPractice } from '@/pages/it/CloudComputingPractice';
 import { SecurityPractice } from '@/pages/it/SecurityPractice';
 
-// New Pages
 import { ProblemsListPage } from '@/pages/shared/ProblemsListPage';
 import { ExplorePage } from '@/pages/shared/ExplorePage';
 import { DiscussPage } from '@/pages/shared/DiscussPage';
 import { InterviewPrepPage } from '@/pages/shared/InterviewPrepPage';
 import { InterviewAssessmentPage } from '@/pages/shared/InterviewAssessmentPage';
 import { AIPage } from '@/pages/shared/AIPage';
+import { AIPracticePage } from '@/pages/shared/AIPracticePage';
+
 
 import { ReactNode } from 'react';
 
@@ -53,19 +65,21 @@ function App() {
                <ProgressProvider>
                   <Router>
                      <Routes>
-                        <Route path="/" element={<LandingPage />} />
-                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/" element={<Navigate to="/login" replace />} />
+                        <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<RegisterPage />} />
                         <Route path="/logo-splash" element={<LogoSplashPage />} />
-                        <Route path="/forgot-password" element={<div className="flex justify-center items-center h-screen">Forgot Password Page</div>} />
+                        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
                         {/* Protected Routes */}
                         <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-                           <Route path="/dashboard" element={<LevelSelectionPage />} />
                            <Route path="/explore" element={<ExplorePage />} />
-                           <Route path="/ai" element={<AIPage />} />
                            <Route path="/problems" element={<ProblemsListPage />} />
                            <Route path="/discuss" element={<DiscussPage />} />
+                           <Route path="/skill-analysis" element={<SkillAnalysis />} />
+                           <Route path="/history" element={<ReviewHistory />} />
+                           <Route path="/admin" element={<AdminPanel />} />
+
                            <Route path="/interview/preparation" element={<InterviewPrepPage />} />
                            <Route path="/interview/assessment" element={<InterviewAssessmentPage />} />
 
@@ -74,21 +88,30 @@ function App() {
                            <Route path="/school/intermediate" element={<IntermediatePractice />} />
                            <Route path="/school/advanced" element={<AdvancedPractice />} />
                            <Route path="/school/exams" element={<ExamsPage />} />
-                           <Route path="/problem/:id" element={<ProblemSolverPage />} />
-                           <Route path="/exam/:id" element={<div className="p-8">Exam Interface Placeholder</div>} />
+                           <Route path="/practice/:id" element={<Practice />} />
+                           <Route path="/exam/:id" element={<ExamInterface />} />
+
                            <Route path="/college" element={<CollegeDashboard />} />
                            <Route path="/college/ds" element={<DataStructuresPractice />} />
                            <Route path="/college/algorithms" element={<AlgorithmsPractice />} />
+                           <Route path="/college/practice/:id" element={<CollegePracticePage />} />
+                           <Route path="/college/core" element={<CSCoreSubjects />} />
                            <Route path="/college/placement" element={<PlacementPreparation />} />
+                           <Route path="/college/interview" element={<InterviewPrep />} />
+                           <Route path="/college/mock" element={<MockInterviewPage />} />
+                           <Route path="/college/analytics" element={<PlacementAnalytics />} />
                            <Route path="/it" element={<ITDashboard />} />
                            <Route path="/it/fullstack" element={<FullStackPractice />} />
                            <Route path="/it/cloud" element={<CloudComputingPractice />} />
                            <Route path="/it/security" element={<SecurityPractice />} />
 
                            {/* Placeholder for other routes */}
-                           <Route path="/profile" element={<div className="p-8">Profile Page</div>} />
+                           <Route path="/profile" element={<Profile />} />
                            <Route path="/leaderboard" element={<div className="p-8">Leaderboard Page</div>} />
                         </Route>
+
+                        <Route path="/ai" element={<ProtectedRoute><AIPage /></ProtectedRoute>} />
+                        <Route path="/ai/practice" element={<ProtectedRoute><AIPracticePage /></ProtectedRoute>} />
                      </Routes>
                   </Router>
                </ProgressProvider>

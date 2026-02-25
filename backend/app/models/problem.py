@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, Enum
-from sqlalchemy.orm import relationship
-from app.models.base import Base
+from beanie import Document
+from pydantic import Field
+from typing import Optional, List, Dict
 import enum
 
 class DifficultyLevel(str, enum.Enum):
@@ -13,16 +13,16 @@ class ProblemModule(str, enum.Enum):
     COLLEGE = "college"
     IT = "it"
 
-class Problem(Base):
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(Text)
-    module = Column(Enum(ProblemModule))
-    difficulty = Column(Enum(DifficultyLevel))
-    points = Column(Integer, default=10)
+class Problem(Document):
+    title: str = Field(..., index=True)
+    description: str
+    module: ProblemModule
+    difficulty: DifficultyLevel
+    points: int = 10
+    tags: List[str] = []
     
     # Boilerplate code for various languages
-    template_code = Column(JSON, default=dict)
+    template_code: Dict[str, str] = {}
 
-    # Relationships
-    submissions = relationship("Submission", back_populates="problem")
+    class Settings:
+        name = "problems"

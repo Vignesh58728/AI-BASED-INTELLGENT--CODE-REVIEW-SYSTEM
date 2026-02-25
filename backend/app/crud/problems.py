@@ -1,23 +1,19 @@
 from typing import List, Optional
-from sqlalchemy.orm import Session
+from beanie import PydanticObjectId
 from app.models.problem import Problem, ProblemModule, DifficultyLevel
 from app.schemas.problem import ProblemCreate
 
-def get(db: Session, id: int) -> Optional[Problem]:
-    return db.query(Problem).filter(Problem.id == id).first()
+async def get(id: str) -> Optional[Problem]:
+    return await Problem.get(id)
 
-def get_multi_by_module(
-    db: Session, *, module: ProblemModule, skip: int = 0, limit: int = 100
+async def get_multi_by_module(
+    *, module: ProblemModule, skip: int = 0, limit: int = 100
 ) -> List[Problem]:
-    return (
-        db.query(Problem)
-        .filter(Problem.module == module)
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
+    return await Problem.find(
+        Problem.module == module
+    ).skip(skip).limit(limit).to_list()
 
-def create(db: Session, *, obj_in: ProblemCreate) -> Problem:
+async def create(*, obj_in: ProblemCreate) -> Problem:
     db_obj = Problem(
         title=obj_in.title,
         description=obj_in.description,
@@ -26,7 +22,5 @@ def create(db: Session, *, obj_in: ProblemCreate) -> Problem:
         points=obj_in.points,
         template_code=obj_in.template_code
     )
-    db.add(db_obj)
-    db.commit()
-    db.refresh(db_obj)
+    await db_obj.insert()
     return db_obj

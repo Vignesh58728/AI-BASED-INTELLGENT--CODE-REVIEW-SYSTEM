@@ -2,16 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import React, {
-   createContext,
-   useState,
-   useContext,
    useRef,
    useEffect,
+   useCallback,
 } from "react";
-
-const MouseEnterContext = createContext<
-   [boolean, React.Dispatch<React.SetStateAction<boolean>>] | undefined
->(undefined);
 
 export const CardContainer = ({
    children,
@@ -23,7 +17,6 @@ export const CardContainer = ({
    containerClassName?: string;
 }) => {
    const containerRef = useRef<HTMLDivElement>(null);
-   const [isMouseEnter, setIsMouseEnter] = useState(false);
 
    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
       if (!containerRef.current) return;
@@ -35,44 +28,40 @@ export const CardContainer = ({
    };
 
    const handleMouseEnter = () => {
-      setIsMouseEnter(true);
       if (!containerRef.current) return;
    };
 
    const handleMouseLeave = () => {
       if (!containerRef.current) return;
-      setIsMouseEnter(false);
       containerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;
    };
 
    return (
-      <MouseEnterContext.Provider value={[isMouseEnter, setIsMouseEnter]}>
+      <div
+         className={cn(
+            "flex items-center justify-center",
+            containerClassName
+         )}
+         style={{
+            perspective: "1000px",
+         } as React.CSSProperties}
+      >
          <div
+            ref={containerRef}
+            onMouseEnter={handleMouseEnter}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
             className={cn(
-               "flex items-center justify-center",
-               containerClassName
+               "flex items-center justify-center relative transition-all duration-200 ease-linear",
+               className
             )}
             style={{
-               perspective: "1000px",
+               transformStyle: "preserve-3d",
             }}
          >
-            <div
-               ref={containerRef}
-               onMouseEnter={handleMouseEnter}
-               onMouseMove={handleMouseMove}
-               onMouseLeave={handleMouseLeave}
-               className={cn(
-                  "flex items-center justify-center relative transition-all duration-200 ease-linear",
-                  className
-               )}
-               style={{
-                  transformStyle: "preserve-3d",
-               }}
-            >
-               {children}
-            </div>
+            {children}
          </div>
-      </MouseEnterContext.Provider>
+      </div>
    );
 };
 
@@ -118,38 +107,26 @@ export const CardItem = ({
    rotateZ?: number | string;
    [key: string]: any;
 }) => {
-   const ref = useRef<HTMLDivElement>(null);
-   const [isMouseEnter] = useMouseEnter();
+   const ref = useRef<any>(null);
+
+   const handleAnimations = useCallback(() => {
+      if (!ref.current) return;
+      ref.current.style.transform = `translateX(${translateX}px) translateY(${translateY}px) translateZ(${translateZ}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
+   }, [translateX, translateY, translateZ, rotateX, rotateY, rotateZ]);
 
    useEffect(() => {
       handleAnimations();
-   }, [isMouseEnter]);
+   }, [handleAnimations]);
 
-   const handleAnimations = () => {
-      if (!ref.current) return;
-      if (isMouseEnter) {
-         ref.current.style.transform = `translateX(${translateX}px) translateY(${translateY}px) translateZ(${translateZ}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
-      } else {
-         ref.current.style.transform = `translateX(0px) translateY(0px) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;
-      }
-   };
+   const CustomTag = Tag as any;
 
    return (
-      <Tag
+      <CustomTag
          ref={ref}
          className={cn("transition duration-200 ease-linear", className)}
          {...rest}
       >
          {children}
-      </Tag>
+      </CustomTag>
    );
-};
-
-// Create a hook to use the context
-export const useMouseEnter = () => {
-   const context = useContext(MouseEnterContext);
-   if (context === undefined) {
-      throw new Error("useMouseEnter must be used within a MouseEnterProvider");
-   }
-   return context;
 };

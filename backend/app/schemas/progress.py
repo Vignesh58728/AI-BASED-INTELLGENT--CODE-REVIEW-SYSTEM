@@ -8,14 +8,14 @@ class ProgressBase(BaseModel):
     failed_stage: Optional[str] = None
 
 class ProgressCreate(ProgressBase):
-    user_id: int
+    user_id: str
 
 class ProgressUpdate(ProgressBase):
     pass
 
 class Progress(ProgressBase):
-    id: int
-    user_id: int
+    id: str
+    user_id: str
 
     class Config:
         from_attributes = True

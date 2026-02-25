@@ -1,81 +1,150 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { Compass, BookOpen, Users, Trophy } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/Card";
+import { MagicCard } from "@/components/ui/magic-card";
+import { useTheme } from "next-themes";
+import pythonIcon from "@/assets/images/python.png";
+import bookIcon from "@/assets/images/book.png";
+import aiIcon from "@/assets/images/ai-assistant.png";
 
 export function ExplorePage() {
-   return (
-      <div className="container mx-auto py-8 px-4">
-         <h1 className="text-3xl font-bold mb-8">Explore</h1>
+   const { theme } = useTheme();
+   const [articles, setArticles] = useState<any[]>([]);
+   const [loading, setLoading] = useState(true);
 
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {[
-               { title: 'New to Coding?', icon: Compass, color: 'text-blue-500', desc: 'Start your journey here' },
-               { title: 'Top Interview Qs', icon: Trophy, color: 'text-yellow-500', desc: 'Most asked problems' },
-               { title: 'Learn DSA', icon: BookOpen, color: 'text-green-500', desc: 'Master basic concepts' },
-               { title: 'Community Gems', icon: Users, color: 'text-purple-500', desc: 'Best posts by users' },
-            ].map((item, i) => (
-               <Card key={i} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="pt-6">
-                     <item.icon className={`h-10 w-10 ${item.color} mb-4`} />
-                     <h3 className="font-bold mb-1">{item.title}</h3>
-                     <p className="text-sm text-muted-foreground">{item.desc}</p>
-                  </CardContent>
+   useEffect(() => {
+      const fetchArticles = async () => {
+         try {
+            const response = await fetch('https://dev.to/api/articles?tag=coding&per_page=6');
+            const data = await response.json();
+            setArticles(data);
+         } catch (error) {
+            console.error('Error fetching articles:', error);
+         } finally {
+            setLoading(false);
+         }
+      };
+      fetchArticles();
+   }, []);
+
+   // --- Daily Thirukkural Logic ---
+   const kurals = [
+      {
+         tamil: "தெய்வத்தான் ஆகா தெனினும் முயற்சிதன் மெய்வருத்தக் கூலி தரும்.",
+         meaning: "Even if divine help is unavailable, the effort put in by one's own body will yield its reward."
+      },
+      {
+         tamil: "கற்க கசடறக் கற்பவை கற்றபின் நிற்க அதற்குத் தக.",
+         meaning: "Learn what needs to be learned flawlessly; then act according to what you have learned."
+      },
+      {
+         tamil: "எண்ணித் துணிக கருமம் துணிந்தபின் எண்ணுவம் என்பது இழுக்கு.",
+         meaning: "Think deeply before starting any action; to think after starting is a failing."
+      }
+   ];
+
+   const dailyKural = kurals[new Date().getDate() % kurals.length];
+
+   const mainModules = [
+      {
+         title: 'New to Coding?',
+         image: pythonIcon,
+         desc: 'Start your journey here',
+         path: '/school',
+         detail: 'Python & Logic'
+      },
+      {
+         title: 'Learn DSA',
+         image: bookIcon,
+         desc: 'Master algorithms',
+         path: '/college',
+         detail: 'Structured Thinking'
+      },
+      {
+         title: 'AIVISO Assistant',
+         image: aiIcon,
+         desc: 'AI-powered reviews',
+         path: '/ai-coach',
+         detail: 'Smart Guidance'
+      }
+   ];
+
+   return (
+      <div className="min-h-screen bg-black text-white space-y-12 p-12">
+         <div className="space-y-2">
+            <h1 className="text-4xl font-black tracking-tighter uppercase text-white">
+               Explore <span className="text-primary">Now</span>
+            </h1>
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl">
+            {mainModules.map((item, i) => (
+               <Card key={i} className="w-full border-none p-0 shadow-none relative overflow-hidden bg-black group/card">
+                  <MagicCard
+                     gradientColor={theme === "dark" ? "#262626" : "#D9D9D955"}
+                     className="p-1 cursor-pointer transition-all duration-300 h-full border-none"
+                  >
+                     <CardContent className="p-8 flex items-center gap-8 relative z-10 h-full">
+                        <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center border border-zinc-200 group-hover/card:scale-110 transition-transform duration-500 shadow-xl shrink-0">
+                           <img src={item.image} alt={item.title} className="h-10 w-10 object-contain" />
+                        </div>
+                        <div>
+                           <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-1">{item.title}</h3>
+                           <p className="text-zinc-400 text-xs font-medium">{item.desc}</p>
+                           <div className="mt-4 text-primary/60 text-[10px] font-black uppercase tracking-[0.2em]">{item.detail}</div>
+                        </div>
+                     </CardContent>
+                  </MagicCard>
                </Card>
             ))}
          </div>
 
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-               <section>
-                  <h2 className="text-xl font-bold mb-4">Featured Cards</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                     <Card className="bg-blue-600 text-white min-h-[200px] flex flex-col justify-end p-6 border-none">
-                        <h3 className="text-2xl font-bold mb-2">Introduction to Algorithms</h3>
-                        <p className="text-blue-100 text-sm">Master the foundations of problem solving.</p>
-                     </Card>
-                     <Card className="bg-purple-600 text-white min-h-[200px] flex flex-col justify-end p-6 border-none">
-                        <h3 className="text-2xl font-bold mb-2">Google Interview Prep</h3>
-                        <p className="text-purple-100 text-sm">Targeted practice for top companies.</p>
-                     </Card>
-                  </div>
-               </section>
+         {/* --- Daily Thirukkural Section --- */}
+         <div className="py-12 text-center max-w-4xl mx-auto mb-16 relative overflow-hidden">
+            <h2 className="text-2xl md:text-3xl font-medium text-white mb-6 leading-relaxed px-4 italic font-serif">
+               "{dailyKural.tamil}"
+            </h2>
+            <p className="text-zinc-400 text-sm md:text-base font-medium max-w-2xl mx-auto px-6 leading-relaxed opacity-80">
+               {dailyKural.meaning}
+            </p>
+         </div>
 
-               <section>
-                  <h2 className="text-xl font-bold mb-4">Latest Articles</h2>
-                  <div className="space-y-4">
+         {/* --- Latest Articles Section --- */}
+         <div className="max-w-4xl space-y-8">
+            <h2 className="text-xl font-black uppercase tracking-tight">Latest Articles</h2>
+            <div className="space-y-4 bg-zinc-900/10 rounded-3xl p-4">
+               {loading ? (
+                  <div className="space-y-4 animate-pulse">
                      {[1, 2, 3].map(i => (
-                        <div key={i} className="flex gap-4 p-4 rounded-lg border hover:bg-muted transition-colors cursor-pointer">
-                           <div className="h-20 w-32 bg-muted rounded-md shrink-0" />
-                           <div>
-                              <h3 className="font-bold mb-1">How I optimized my Dijkstra solution by 10x</h3>
-                              <p className="text-sm text-muted-foreground line-clamp-2">In this article, I discuss the common pitfalls when implementing shortest path algorithms and how to use memory efficiently...</p>
-                              <div className="flex gap-2 mt-2">
-                                 <span className="text-[10px] bg-muted px-2 py-0.5 rounded italic">#dsa</span>
-                                 <span className="text-[10px] bg-muted px-2 py-0.5 rounded italic">#optimization</span>
-                              </div>
-                           </div>
-                        </div>
+                        <div key={i} className="h-24 bg-white/5 rounded-2xl" />
                      ))}
                   </div>
-               </section>
-            </div>
-
-            <div className="space-y-6">
-               <Card>
-                  <CardHeader>
-                     <CardTitle className="text-lg">Daily Challenge</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                     <div className="p-4 rounded-lg bg-muted mb-4">
-                        <h4 className="font-medium text-blue-500 mb-1">4. Median of Two Sorted Arrays</h4>
-                        <div className="flex gap-2 mb-4">
-                           <Badge variant="outline" className="text-[10px] uppercase">Hard</Badge>
+               ) : (
+                  articles.map((article: any) => (
+                     <a
+                        key={article.id}
+                        href={article.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex gap-6 p-6 rounded-2xl border border-white/5 hover:bg-white/5 transition-all cursor-pointer group/article block"
+                     >
+                        <div className="hidden sm:block h-20 w-32 rounded-lg bg-zinc-800 overflow-hidden shrink-0">
+                           {article.cover_image && (
+                              <img src={article.cover_image} alt={article.title} className="h-full w-full object-cover grayscale group-hover/article:grayscale-0 transition-all" />
+                           )}
                         </div>
-                        <Button className="w-full">Solve Now</Button>
-                     </div>
-                  </CardContent>
-               </Card>
+                        <div className="flex-1 min-w-0">
+                           <h3 className="text-lg font-bold text-white mb-1 group-hover/article:text-primary transition-colors truncate">
+                              {article.title}
+                           </h3>
+                           <div className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-zinc-500">
+                              <span>{article.user.name}</span>
+                              <span className="opacity-20">//</span>
+                              <span>{article.reading_time_minutes} min read</span>
+                           </div>
+                        </div>
+                     </a>
+                  ))
+               )}
             </div>
          </div>
       </div>

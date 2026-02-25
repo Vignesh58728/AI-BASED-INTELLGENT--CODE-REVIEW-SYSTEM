@@ -7,12 +7,28 @@ export const problemsApi = {
       const response = await api.get('/problems', { params: filters });
       return response.data;
    },
+   getCollegeProblems: async (): Promise<Problem[]> => {
+      const response = await api.get('/problems/college');
+      return response.data;
+   },
+   getSchoolProblems: async (): Promise<Problem[]> => {
+      const response = await api.get('/problems/school');
+      return response.data;
+   },
+   getITProblems: async (): Promise<Problem[]> => {
+      const response = await api.get('/problems/it');
+      return response.data;
+   },
    getProblemById: async (id: string): Promise<Problem> => {
       const response = await api.get(`/problems/${id}`);
       return response.data;
    },
    submitSolution: async (submissionData: any): Promise<Submission> => {
       const response = await api.post('/submissions', submissionData);
+      return response.data;
+   },
+   getSubmissions: async (userId: string): Promise<Submission[]> => {
+      const response = await api.get(`/submissions/user/${userId}`);
       return response.data;
    }
 };

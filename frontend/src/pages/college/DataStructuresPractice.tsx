@@ -1,16 +1,30 @@
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ProblemCard } from "@/components/practice/ProblemCard";
-
-const dsProblems = [
-   { id: "ds1", title: "Reverse a Linked List", difficulty: "Medium", completed: true },
-   { id: "ds2", title: "Check for Balanced Brackets", difficulty: "Easy", completed: false },
-   { id: "ds3", title: "Implement a Queue using Stacks", difficulty: "Medium", completed: false },
-   { id: "ds4", title: "Find the Middle element of a Linked List", difficulty: "Easy", completed: true },
-   { id: "ds5", title: "Binary Tree Level Order Traversal", difficulty: "Medium", completed: false },
-   { id: "ds6", title: "Lowest Common Ancestor in a BST", difficulty: "Medium", completed: false },
-];
+import { problemsApi } from "@/services/problemsApi";
+import { Problem } from "@/types/problem";
 
 export function DataStructuresPractice() {
+   const navigate = useNavigate();
+   const [problems, setProblems] = useState<Problem[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
+
+   useEffect(() => {
+      const fetchProblems = async () => {
+         try {
+            const data = await problemsApi.getCollegeProblems();
+            // Filter locally for DS category if backend doesn't support sub-categories yet
+            // For now, we seed a few DS problems.
+            setProblems(data.filter(p => p.title.includes("Linked List") || p.title.includes("Tree")));
+         } catch (e) {
+            console.error("Error fetching DS problems:", e);
+         } finally {
+            setIsLoading(false);
+         }
+      };
+      fetchProblems();
+   }, []);
+
    return (
       <div className="space-y-6 container mx-auto py-8">
          <div>
@@ -18,11 +32,19 @@ export function DataStructuresPractice() {
             <p className="text-muted-foreground">Master core data structures with these curated problems.</p>
          </div>
 
-         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {dsProblems.map((problem) => (
-               <ProblemCard key={problem.id} problem={problem as any} />
-            ))}
-         </div>
+         {isLoading ? (
+            <div className="text-center py-12">Loading problems...</div>
+         ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+               {problems.map((problem) => (
+                  <ProblemCard
+                     key={problem.id}
+                     problem={problem as any}
+                     onClick={() => navigate(`/college/practice/${problem.id}`)}
+                  />
+               ))}
+            </div>
+         )}
       </div>
    );
 }

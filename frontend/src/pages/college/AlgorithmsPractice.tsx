@@ -1,16 +1,29 @@
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ProblemCard } from "@/components/practice/ProblemCard";
-
-const algoProblems = [
-   { id: "algo1", title: "Merge Sort Implementation", difficulty: "Medium", completed: false },
-   { id: "algo2", title: "Knapsack Problem (0/1)", difficulty: "Hard", completed: false },
-   { id: "algo3", title: "Dijkstra's Shortest Path", difficulty: "Hard", completed: false },
-   { id: "algo4", title: "Longest Common Subsequence", difficulty: "Medium", completed: false },
-   { id: "algo5", title: "Binary Search", difficulty: "Easy", completed: true },
-   { id: "algo6", title: "Quicksort Implementation", difficulty: "Medium", completed: false },
-];
+import { problemsApi } from "@/services/problemsApi";
+import { Problem } from "@/types/problem";
 
 export function AlgorithmsPractice() {
+   const navigate = useNavigate();
+   const [problems, setProblems] = useState<Problem[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
+
+   useEffect(() => {
+      const fetchProblems = async () => {
+         try {
+            const data = await problemsApi.getCollegeProblems();
+            // Filter locally for Algo category
+            setProblems(data.filter(p => p.title.includes("Sort") || p.title.includes("Knapsack")));
+         } catch (e) {
+            console.error("Error fetching Algo problems:", e);
+         } finally {
+            setIsLoading(false);
+         }
+      };
+      fetchProblems();
+   }, []);
+
    return (
       <div className="space-y-6 container mx-auto py-8">
          <div>
@@ -18,11 +31,19 @@ export function AlgorithmsPractice() {
             <p className="text-muted-foreground">Learn and implement essential competitive algorithms.</p>
          </div>
 
-         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {algoProblems.map((problem) => (
-               <ProblemCard key={problem.id} problem={problem as any} />
-            ))}
-         </div>
+         {isLoading ? (
+            <div className="text-center py-12">Loading problems...</div>
+         ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+               {problems.map((problem) => (
+                  <ProblemCard
+                     key={problem.id}
+                     problem={problem as any}
+                     onClick={() => navigate(`/college/practice/${problem.id}`)}
+                  />
+               ))}
+            </div>
+         )}
       </div>
    );
 }

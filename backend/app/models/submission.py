@@ -1,21 +1,34 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Float
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-from app.models.base import Base
+from beanie import Document, Link
+from pydantic import Field
+from datetime import datetime
+from typing import Optional
+from app.models.user import User
+from app.models.problem import Problem
 
-class Submission(Base):
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("user.id"))
-    problem_id = Column(Integer, ForeignKey("problem.id"))
+class Submission(Document):
+    user: Link[User]
+    problem: Link[Problem]
     
-    code = Column(Text)
-    language = Column(String)
+    code: str
+    language: str
     
-    score = Column(Float, default=0.0)
-    feedback = Column(Text) # AI Feedback
+    score: float = 0.0
+    feedback: Optional[str] = None # AI Feedback
     
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    # Execution Results
+    status: str = "pending" # pending, success, error, timeout
+    output: Optional[str] = None
+    error_msg: Optional[str] = None
     
-    # Relationships
-    owner = relationship("User", back_populates="submissions")
-    problem = relationship("Problem", back_populates="submissions")
+    # CCM (Code Check Module) Results
+    ccm_status: str = "pending" # pending, completed, rejected
+    ccm_feedback: Optional[str] = None
+    ccm_score: float = 0.0
+    
+    # CRM (Code Review Module) & Tracking
+    review_chain_id: Optional[str] = None
+    
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "submissions"

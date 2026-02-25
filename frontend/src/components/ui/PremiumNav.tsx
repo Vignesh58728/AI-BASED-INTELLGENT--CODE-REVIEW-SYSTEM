@@ -25,9 +25,8 @@ const PremiumNav: React.FC<PremiumNavProps> = ({ items }) => {
                      <Link
                         to={item.href}
                         className={cn(
-                           "block px-4 py-2 text-sm font-semibold transition-all duration-400 ease-in-out rounded-lg",
+                           "block px-4 py-2 text-sm font-semibold transition-all duration-200 ease-in-out rounded-lg",
                            "bg-white/10 text-white hover:text-white",
-                           "hover:tracking-[4px]",
                            isActive ? "bg-white/20 shadow-lg ring-1 ring-white/20" : "hover:bg-white/20"
                         )}
                      >

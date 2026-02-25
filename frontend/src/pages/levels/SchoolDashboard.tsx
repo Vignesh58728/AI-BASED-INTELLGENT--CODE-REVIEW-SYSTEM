@@ -1,124 +1,95 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-// import { Button } from "@/components/ui/Button";
-import { BookOpen, Trophy, Timer } from "lucide-react";
+import { MagicCard } from "@/components/ui/magic-card";
+import {
+   Card,
+   CardHeader,
+   CardTitle,
+   CardDescription
+} from "@/components/ui/Card";
+import { useTheme } from "next-themes";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { progressApi } from "@/services/skillService";
+
+import pythonIcon from "@/assets/images/python.png";
+import intermediateIcon from "@/assets/images/intermediate-level.png";
+import advancedIcon from "@/assets/images/it.png";
+import careerIcon from "@/assets/images/career-path.png";
 
 export function SchoolDashboard() {
    const navigate = useNavigate();
+   const { theme } = useTheme();
+   const [progress, setProgress] = useState<any>(null);
+
+   useEffect(() => {
+      const fetchProgress = async () => {
+         try {
+            const data = await progressApi.getUserProgress();
+            setProgress(data);
+         } catch (error) {
+            console.error("Error fetching school progress:", error);
+         }
+      };
+      fetchProgress();
+   }, []);
+
+   const modules = [
+      {
+         title: "Beginner Practice",
+         desc: "35 Foundational Programs",
+         icon: pythonIcon,
+         path: "/school/beginner",
+         stats: progress?.scores?.school?.beginner !== undefined ? `${progress.scores.school.beginner}% Done` : "Level 1"
+      },
+      {
+         title: "Intermediate",
+         desc: "Level Up your Skills",
+         icon: intermediateIcon,
+         path: "/school/intermediate",
+         stats: progress?.scores?.school?.intermediate !== undefined ? `${progress.scores.school.intermediate}% Done` : "Level 2"
+      },
+      {
+         title: "Advanced",
+         desc: "Master Complex Logic",
+         icon: advancedIcon,
+         path: "/school/advanced",
+         stats: progress?.scores?.school?.advanced !== undefined ? `${progress.scores.school.advanced}% Done` : "Level 3"
+      },
+      {
+         title: "Mock Exams",
+         desc: "3hr Full Simulation",
+         icon: careerIcon,
+         path: "/school/exams",
+         stats: "Assessment"
+      }
+   ];
 
    return (
-      <div className="space-y-8">
+      <div className="min-h-screen bg-black text-white space-y-8 p-8">
          <div>
-            <h1 className="text-3xl font-bold tracking-tight">School Dashboard</h1>
-            <p className="text-muted-foreground">Start your coding journey here.</p>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">School Dashboard</h1>
          </div>
 
-         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="hover:bg-muted/50 transition cursor-pointer" onClick={() => navigate('/school/beginner')}>
-               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Beginner Practice</CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
-               </CardHeader>
-               <CardContent>
-                  <div className="text-2xl font-bold">Start</div>
-                  <p className="text-xs text-muted-foreground">Learn syntax & loops</p>
-               </CardContent>
-            </Card>
-            <Card className="hover:bg-muted/50 transition cursor-pointer" onClick={() => navigate('/school/intermediate')}>
-               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Intermediate</CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
-               </CardHeader>
-               <CardContent>
-                  <div className="text-2xl font-bold">Level Up</div>
-                  <p className="text-xs text-muted-foreground">Functions & Arrays</p>
-               </CardContent>
-            </Card>
-            <Card className="hover:bg-muted/50 transition cursor-pointer" onClick={() => navigate('/school/advanced')}>
-               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Advanced</CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
-               </CardHeader>
-               <CardContent>
-                  <div className="text-2xl font-bold">Master</div>
-                  <p className="text-xs text-muted-foreground">OOPs & Algorithms</p>
-               </CardContent>
-            </Card>
-            <Card className="hover:bg-muted/50 transition cursor-pointer" onClick={() => navigate('/school/exams')}>
-               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Mock Exams</CardTitle>
-                  <Timer className="h-4 w-4 text-muted-foreground" />
-               </CardHeader>
-               <CardContent>
-                  <div className="text-2xl font-bold">Test</div>
-                  <p className="text-xs text-muted-foreground">3hr Full Mock</p>
-               </CardContent>
-            </Card>
-         </div>
-
-         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-               <CardHeader>
-                  <CardTitle>Recent Activity</CardTitle>
-               </CardHeader>
-               <CardContent>
-                  <div className="space-y-4">
-                     <div className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
-                        <div className="space-y-1">
-                           <p className="text-sm font-medium leading-none">Completed "Hello World"</p>
-                           <p className="text-xs text-muted-foreground">Beginner • 2 hours ago</p>
+         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 group/cards">
+            {modules.map((item, i) => (
+               <Card key={i} className="w-full border-none p-0 shadow-none relative overflow-hidden transition-all duration-300 group-hover/cards:blur-[2px] group-hover/cards:scale-[0.98] hover:!blur-none hover:!scale-[1.02] hover:z-10 bg-black">
+                  <MagicCard
+                     gradientColor={theme === "dark" ? "#262626" : "#D9D9D955"}
+                     className="p-1 cursor-pointer hover:bg-accent/50 group h-full border-none"
+                     onClick={() => navigate(item.path)}
+                  >
+                     <CardHeader className="pb-2">
+                        <div className="flex flex-row items-center justify-between pb-2">
+                           <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
+                           <img src={item.icon} alt={item.title} className="h-4 w-4 group-hover:scale-110 transition-transform" />
                         </div>
-                        <span className="text-xs font-medium text-green-500">+10 XP</span>
-                     </div>
-                     <div className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
-                        <div className="space-y-1">
-                           <p className="text-sm font-medium leading-none">Started "Sum of Two Numbers"</p>
-                           <p className="text-xs text-muted-foreground">Beginner • 5 hours ago</p>
+                        <div>
+                           <CardDescription className="text-xs text-muted-foreground mb-3">{item.desc}</CardDescription>
+                           <div className="text-sm font-semibold">{item.stats}</div>
                         </div>
-                        <span className="text-xs font-medium text-blue-500">In Progress</span>
-                     </div>
-                  </div>
-               </CardContent>
-            </Card>
-            <Card className="col-span-3">
-               <CardHeader>
-                  <CardTitle>Class Leaderboard</CardTitle>
-               </CardHeader>
-               <CardContent>
-                  <div className="space-y-4">
-                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                           <Trophy className="h-4 w-4 text-yellow-500" />
-                           <div className="space-y-1">
-                              <p className="text-sm font-medium leading-none">Olivia Martin</p>
-                              <p className="text-xs text-muted-foreground">Level 5</p>
-                           </div>
-                        </div>
-                        <span className="text-sm font-bold">1,999 XP</span>
-                     </div>
-                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                           <span className="h-4 w-4 flex items-center justify-center text-sm font-bold text-muted-foreground">2</span>
-                           <div className="space-y-1">
-                              <p className="text-sm font-medium leading-none">Jackson Lee</p>
-                              <p className="text-xs text-muted-foreground">Level 4</p>
-                           </div>
-                        </div>
-                        <span className="text-sm font-bold">1,850 XP</span>
-                     </div>
-                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                           <span className="h-4 w-4 flex items-center justify-center text-sm font-bold text-muted-foreground">3</span>
-                           <div className="space-y-1">
-                              <p className="text-sm font-medium leading-none">Isabella Nguyen</p>
-                              <p className="text-xs text-muted-foreground">Level 3</p>
-                           </div>
-                        </div>
-                        <span className="text-sm font-bold">1,600 XP</span>
-                     </div>
-                  </div>
-               </CardContent>
-            </Card>
+                     </CardHeader>
+                  </MagicCard>
+               </Card>
+            ))}
          </div>
       </div>
    );

@@ -1,6 +1,5 @@
 ﻿import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { CodeEditor } from "@/components/CodeEditor";
 import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -12,6 +11,7 @@ import { AIChat } from "@/components/ai/AIChat";
 import { FillTheBlank } from "@/components/FillTheBlank";
 import { ModelSelector } from "@/components/ai/ModelSelector";
 import { offlineExecutor } from "@/lib/offlineExecutor";
+import Editor from "@monaco-editor/react";
 
 export function Practice() {
    const { id } = useParams<{ id: string }>();
@@ -26,8 +26,6 @@ export function Practice() {
    const [isLoading, setIsLoading] = useState(true);
    const [selectedModel, setSelectedModel] = useState("GPT-OSS-120b");
    const [language, setLanguage] = useState("python");
-   const [nlPrompt, setNlPrompt] = useState("");
-   const [showNlInput, setShowNlInput] = useState(false);
 
    useEffect(() => {
       const fetchProblemData = async () => {
@@ -126,7 +124,7 @@ export function Practice() {
    const handleExplain = async () => {
       setIsAnalyzing(true);
       try {
-         const result = await submissionService.explainCode(code, "python", selectedModel);
+         const result = await submissionService.explainCode(code, "python", undefined, selectedModel);
          setAiFeedback(result.explanation);
          setIsChatOpen(true);
       } catch (e) {
@@ -160,54 +158,6 @@ export function Practice() {
       }
    };
 
-   const handleFix = async () => {
-      setIsAnalyzing(true);
-      setAiFeedback("🔧 Auto-fixing bugs and smells...");
-      try {
-         const result = await submissionService.fixCode(code, language);
-         if (result.fixed_code) {
-            setCode(result.fixed_code);
-            setAiFeedback(`### ✅ Code Fixed\n\n${result.explanation}`);
-         }
-      } catch (e) {
-         setAiFeedback("Error auto-fixing code.");
-      } finally {
-         setIsAnalyzing(false);
-      }
-   };
-
-   const handlePlagiarism = async () => {
-      setIsAnalyzing(true);
-      setAiFeedback("🛡️ Checking for plagiarism...");
-      try {
-         const result = await submissionService.checkPlagiarism(code, language);
-         const status = result.is_plagiarized ? "⚠️ Likely Copy-Pasted" : "✅ Original Code";
-         setAiFeedback(`### Plagiarism Check: ${status}\n\n**Confidence**: ${result.confidence}%\n**Source**: ${result.likely_source || "None detected"}`);
-      } catch (e) {
-         setAiFeedback("Error checking plagiarism.");
-      } finally {
-         setIsAnalyzing(false);
-      }
-   };
-
-   const handleGenerateCode = async () => {
-      if (!nlPrompt.trim()) return;
-      setIsAnalyzing(true);
-      setAiFeedback("✨ Generating code from prompt...");
-      try {
-         const result = await submissionService.generateCode(nlPrompt, language);
-         if (result.code) {
-            setCode(result.code);
-            setAiFeedback(`### ✨ Generated Code\n\n${result.explanation}`);
-            setShowNlInput(false);
-            setNlPrompt("");
-         }
-      } catch (e) {
-         setAiFeedback("Error generating code.");
-      } finally {
-         setIsAnalyzing(false);
-      }
-   };
 
    if (isLoading) {
       return (
@@ -288,31 +238,26 @@ export function Practice() {
                <div className={`${isChatOpen ? "lg:col-span-3 xl:col-span-2" : "lg:col-span-2"} flex flex-col gap-4`}>
                   {/* Code Editor */}
                   <div className="min-h-[400px] h-[400px] relative rounded-xl overflow-hidden border border-zinc-200 shadow-xl bg-white">
-                     <CodeEditor value={code} onChange={(val: any) => setCode(val || "")} />
-                     {showNlInput && (
-                        <div className="absolute top-4 left-4 right-4 bg-white border border-primary/50 rounded-xl p-4 shadow-2xl z-20 animate-in fade-in slide-in-from-top-2">
-                           <div className="flex items-center gap-2 mb-3 text-primary text-[10px] font-bold uppercase tracking-widest">
-                              <Sparkles size={14} fill="currentColor" /> Natural Language to Code
-                           </div>
-                           <div className="flex gap-2">
-                              <input
-                                 type="text"
-                                 placeholder="e.g., Sort a list in descending order"
-                                 className="flex-1 bg-zinc-50 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-black outline-none focus:border-primary/50 transition-colors"
-                                 value={nlPrompt}
-                                 onChange={(e) => setNlPrompt(e.target.value)}
-                                 onKeyDown={(e) => e.key === 'Enter' && handleGenerateCode()}
-                                 autoFocus
-                              />
-                              <Button size="sm" onClick={handleGenerateCode} disabled={isAnalyzing || !nlPrompt.trim()} className="bg-primary hover:bg-primary/80">
-                                 Generate
-                              </Button>
-                              <Button variant="ghost" size="sm" onClick={() => setShowNlInput(false)} className="text-zinc-500">
-                                 Cancel
-                              </Button>
-                           </div>
-                        </div>
-                     )}
+                     <Editor
+                        height="100%"
+                        language={language}
+                        value={code}
+                        theme="light"
+                        onChange={(value) => setCode(value || "")}
+                        options={{
+                           minimap: { enabled: false },
+                           fontSize: 14,
+                           scrollBeyondLastLine: false,
+                           lineNumbers: "on",
+                           glyphMargin: false,
+                           folding: true,
+                           lineDecorationsWidth: 0,
+                           lineNumbersMinChars: 3,
+                           fontFamily: "JetBrains Mono, Fira Code, monospace",
+                           automaticLayout: true,
+                           padding: { top: 16, bottom: 16 },
+                        }}
+                     />
                      {suggestions.length > 0 && (
                         <div className="absolute bottom-4 right-4 bg-white/95 border border-primary/20 rounded-xl p-3 shadow-lg z-10 max-w-xs animate-in fade-in slide-in-from-bottom-2">
                            <div className="flex items-center justify-between gap-2 mb-2 text-primary text-[10px] font-bold uppercase tracking-tighter">
@@ -375,15 +320,6 @@ export function Practice() {
                   <img src="/chaos.png" alt="Edge Cases" className="mr-2 h-4 w-4" /> Edge Cases
                </Button>
                <div className="border-l border-zinc-200 h-6 mx-1" />
-               <Button variant="ghost" size="sm" onClick={handleFix} disabled={isAnalyzing} className="h-9 text-xs text-blue-600 hover:text-blue-700">
-                  <Wrench className="mr-2 h-4 w-4" /> Auto-Fix
-               </Button>
-               <Button variant="ghost" size="sm" onClick={handlePlagiarism} disabled={isAnalyzing} className="h-9 text-xs text-orange-600 hover:text-orange-700">
-                  <ShieldAlert className="mr-2 h-4 w-4" /> Check Plagiarism
-               </Button>
-               <Button variant="ghost" size="sm" onClick={() => setShowNlInput(true)} disabled={isAnalyzing} className="h-9 text-xs text-purple-600 hover:text-purple-700">
-                  <Sparkles className="mr-2 h-4 w-4" /> NL to Code
-               </Button>
             </div>
             <div className="flex gap-3 items-center">
                <select

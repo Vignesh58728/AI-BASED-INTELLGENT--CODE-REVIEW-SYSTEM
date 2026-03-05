@@ -3,6 +3,7 @@ import json
 from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
+from openai import AsyncOpenAI
 from groq import AsyncGroq
 
 from app.core.config import settings
@@ -15,50 +16,65 @@ from app.schemas.ai import (
 from app.schemas.ai_review import ExplainRequest, ExplainResponse, SuggestionResponse
 
 
-client = AsyncGroq(api_key=settings.GROQ_API_KEY) if settings.GROQ_API_KEY else None
-
-DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
+DEFAULT_MODEL = "gpt-4o"
 
 MODEL_PROVIDER_MAP: Dict[str, Tuple[str, str]] = {
-    "default": ("google", "gemini-2.0-flash"),
-    "llama 3.3": ("groq", DEFAULT_GROQ_MODEL),
-    "deepseek-v3": ("deepseek", "deepseek-chat"),
-    "gpt-oss-120b": ("cerebras", "gpt-oss-120b"),
-    "gemini 2.0 flash": ("google", "gemini-2.0-flash"),
+    "default": ("groq", "llama-3.3-70b-versatile"),
+    "llama 3.3 70b": ("groq", "llama-3.3-70b-versatile"),
+    "llama 3.1 70b": ("groq", "llama-3.1-70b-versatile"),
+    "llama 3.1 8b": ("groq", "llama-3.1-8b-instant"),
     "gpt-4o": ("openai", "gpt-4o"),
+    "gpt-4o-mini": ("openai", "gpt-4o-mini"),
+    "gpt-4-turbo": ("openai", "gpt-4-turbo"),
+    "gpt-3.5-turbo": ("openai", "gpt-3.5-turbo"),
+    "gemma 3": ("openrouter", "google/gemma-3-2b-it:free"),
+    "gpt-oss": ("gpt_oss", "gpt-oss"),
+    "openai/gpt-oss-120b": ("gpt_oss", "gpt-oss"),
+    "gemini 2.5 flash": ("google", "gemini-1.5-flash"), # Correcting invalid name to stable flash model
 }
 
 PROVIDER_SYSTEM_PROMPTS: Dict[str, str] = {
     "groq": (
-        "You are an expert code tutor for students. Give clear step-by-step reasoning, "
-        "explain tradeoffs, and avoid handing out full solutions unless the user asks."
-    ),
-    "deepseek": (
-        "You are a competitive-programming and systems mentor. Focus on algorithmic rigor, "
-        "edge cases, and efficient implementation choices."
-    ),
-    "gemini": (
-        "You are a curriculum-aware coding tutor. Explain in simple language first, then add "
-        "advanced depth as needed."
-    ),
-    "cerebras": (
-        "You are a fast and intelligent coding mentor. Provide extremely low-latency, "
-        "precise, and high-quality programming guidance."
-    ),
-    "google": (
-        "You are an advanced AI tutor powered by Gemini 2.0 Flash. Provide deep insights, "
-        "clear code explanations, and helpful hints while maintaining ultra-fast responses."
+        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
+        "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
     "openai": (
-        "You are a sophisticated AI code instructor. Provide detailed, structured, "
-        "and highly accurate line-by-line explanations of complex programming logic."
+        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
+        "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
+    ),
+    "anthropic": (
+        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
+        "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
+    ),
+    "deepseek": (
+        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
+        "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
+    ),
+    "openrouter": (
+        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
+        "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
+    ),
+    "gpt_oss": (
+        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
+        "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
+    ),
+    "google": (
+        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
+        "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
 }
 
 FALLBACK_ORDER: List[Tuple[str, str]] = [
-    ("google", "gemini-2.0-flash"),
-    ("groq", DEFAULT_GROQ_MODEL),
-    ("cerebras", "gpt-oss-120b"),
+    ("groq", "llama-3.3-70b-versatile"),
+    ("openai", "gpt-4o"),
+    ("deepseek", "deepseek-chat"),
 ]
 
 
@@ -68,10 +84,10 @@ def _provider_key(provider: str) -> Optional[str]:
         "openai": settings.OPENAI_API_KEY,
         "anthropic": settings.ANTHROPIC_API_KEY,
         "deepseek": settings.DEEPSEEK_API_KEY,
-        "gemini": settings.GEMINI_API_KEY,
         "perplexity": settings.PERPLEXITY_API_KEY,
-        "cerebras": settings.CEREBRAS_API_KEY,
-        "google": settings.GOOGLE_API_KEY,
+        "openrouter": settings.OPENROUTER_API_KEY,
+        "gpt_oss": settings.GPT_OSS_API_KEY,
+        "google": settings.GEMINI_API_KEY,
     }
     return key_map.get(provider)
 
@@ -135,12 +151,6 @@ async def _chat_openai_compatible(
     return content, sources
 
 
-async def _chat_groq(messages: List[Dict[str, str]], model: str) -> Tuple[str, List[AIChatSource]]:
-    if client is None:
-        raise RuntimeError("GROQ_API_KEY is missing.")
-    completion = await client.chat.completions.create(messages=messages, model=model)
-    answer = completion.choices[0].message.content
-    return answer, [AIChatSource(title="AI Generated", url="#")]
 
 
 async def _chat_anthropic(messages: List[Dict[str, str]], model: str, api_key: str) -> Tuple[str, List[AIChatSource]]:
@@ -168,32 +178,6 @@ async def _chat_anthropic(messages: List[Dict[str, str]], model: str, api_key: s
     return answer or "No response received.", [AIChatSource(title="AI Generated", url="#")]
 
 
-async def _chat_gemini(messages: List[Dict[str, str]], model: str, api_key: str) -> Tuple[str, List[AIChatSource]]:
-    system = next((m["content"] for m in messages if m["role"] == "system"), "")
-    conversation = [m for m in messages if m["role"] in {"user", "assistant"}]
-    contents: List[Dict[str, Any]] = []
-    for msg in conversation:
-        role = "user" if msg["role"] == "user" else "model"
-        contents.append({"role": role, "parts": [{"text": msg["content"]}]})
-
-    payload = {
-        "systemInstruction": {"parts": [{"text": system}]},
-        "contents": contents,
-        "generationConfig": {"temperature": 0.4},
-    }
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    async with httpx.AsyncClient(timeout=35) as http:
-        response = await http.post(url, json=payload)
-        response.raise_for_status()
-        data = response.json()
-
-    candidates = data.get("candidates", [])
-    if not candidates:
-        return "No response received.", [AIChatSource(title="AI Generated", url="#")]
-
-    parts = candidates[0].get("content", {}).get("parts", [])
-    answer = "\n".join([part.get("text", "") for part in parts if part.get("text")]).strip()
-    return answer or "No response received.", [AIChatSource(title="AI Generated", url="#")]
 
 
 async def _chat_perplexity(messages: List[Dict[str, str]], model: str, api_key: str) -> Tuple[str, List[AIChatSource]]:
@@ -214,35 +198,73 @@ async def _chat_perplexity(messages: List[Dict[str, str]], model: str, api_key: 
     return answer, sources
 
 
-async def _chat_google_genai(messages: List[Dict[str, str]], model: str, api_key: str) -> Tuple[str, List[AIChatSource]]:
-    from google import genai
-    from google.genai import types
-    
-    client = genai.Client(api_key=api_key)
-    
-    # Extract system prompt and conversation history
-    system_prompt = next((m["content"] for m in messages if m["role"] == "system"), "")
-    chat_history = [m for m in messages if m["role"] in {"user", "assistant"}]
-    
-    # Prepare Gemini-compatible history
-    contents: List[types.Content] = []
-    for msg in chat_history:
-        role = "user" if msg["role"] == "user" else "model"
-        contents.append(types.Content(role=role, parts=[types.Part(text=msg["content"])]))
-    
-    config = types.GenerateContentConfig(
-        system_instruction=system_prompt,
-        temperature=0.7,
-    )
-    
-    response = await client.aio.models.generate_content(
-        model=model,
-        contents=contents,
-        config=config
-    )
-    
-    answer = response.text or "No response received."
+async def _chat_gemini(messages: List[Dict[str, str]], model: str, api_key: str) -> Tuple[str, List[AIChatSource]]:
+    """Native Gemini REST API implementation (generateContent)."""
+    # Convert OpenAI-style messages to Gemini-style contents
+    contents = []
+    system_instruction = ""
+    for msg in messages:
+        if msg["role"] == "system":
+            system_instruction = msg["content"]
+        else:
+            role = "user" if msg["role"] == "user" else "model"
+            contents.append({"role": role, "parts": [{"text": msg["content"]}]})
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    payload = {"contents": contents}
+    if system_instruction:
+        payload["system_instruction"] = {"parts": [{"text": system_instruction}]}
+
+    async with httpx.AsyncClient(timeout=45) as http:
+        response = await http.post(url, json=payload)
+        response.raise_for_status()
+        data = response.json()
+
+    # Extract answer
+    try:
+        answer = data["candidates"][0]["content"]["parts"][0]["text"]
+    except (KeyError, IndexError):
+        answer = "Gemini returned an empty or malformed response."
+
     return answer, [AIChatSource(title="AI Generated", url="#")]
+
+async def _chat_google_genai(messages: List[Dict[str, str]], model: str, api_key: str) -> Tuple[str, List[AIChatSource]]:
+    try:
+        from google import genai
+        from google.genai import types
+    except ImportError:
+        # Fallback to Gemini REST API if google-genai is not installed
+        return await _chat_gemini(messages, model, api_key)
+    
+    try:
+        client = genai.Client(api_key=api_key)
+        
+        # Extract system prompt and conversation history
+        system_prompt = next((m["content"] for m in messages if m["role"] == "system"), "")
+        chat_history = [m for m in messages if m["role"] in {"user", "assistant"}]
+        
+        # Prepare Gemini-compatible history
+        contents: List[types.Content] = []
+        for msg in chat_history:
+            role = "user" if msg["role"] == "user" else "model"
+            contents.append(types.Content(role=role, parts=[types.Part(text=msg["content"])]))
+        
+        config = types.GenerateContentConfig(
+            system_instruction=system_prompt,
+            temperature=0.7,
+        )
+        
+        response = await client.aio.models.generate_content(
+            model=model,
+            contents=contents,
+            config=config
+        )
+        
+        answer = response.text or "No response received."
+        return answer, [AIChatSource(title="AI Generated", url="#")]
+    except Exception as e:
+        print(f"Google GenAI error: {e}, falling back to REST API")
+        return await _chat_gemini(messages, model, api_key)
 
 
 def _suggested_questions(provider: str) -> List[str]:
@@ -259,37 +281,66 @@ def _suggested_questions(provider: str) -> List[str]:
     ]
 
 
-async def _get_adhoc_google_response(messages: List[Dict[str, str]], json_mode: bool = False) -> str:
-    """Internal helper for specialized Gemini 2.0 requirements."""
-    if not settings.GOOGLE_API_KEY:
-        raise RuntimeError("GOOGLE_API_KEY is missing for default Gemini operations.")
-    
-    from google import genai
-    from google.genai import types
-    
-    genai_client = genai.Client(api_key=settings.GOOGLE_API_KEY)
-    
-    system_prompt = next((m["content"] for m in messages if m["role"] == "system"), "")
-    chat_history = [m for m in messages if m["role"] in {"user", "assistant"}]
-    
-    contents: List[types.Content] = []
-    for msg in chat_history:
-        role = "user" if msg["role"] == "user" else "model"
-        contents.append(types.Content(role=role, parts=[types.Part(text=msg["content"])]))
-    
-    config = types.GenerateContentConfig(
-        system_instruction=system_prompt,
-        temperature=0.4,
-    )
-    if json_mode:
-        config.response_mime_type = "application/json"
-    
-    response = await genai_client.aio.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=contents,
-        config=config
-    )
-    return response.text or ""
+
+
+
+
+async def _execute_chat_provider(provider: str, model: str, messages: List[Dict[str, str]], request: AIChatRequest) -> Tuple[str, List[AIChatSource]]:
+    if provider == "groq":
+        if not settings.GROQ_API_KEY:
+            raise RuntimeError("GROQ_API_KEY is missing.")
+        client = AsyncGroq(api_key=settings.GROQ_API_KEY)
+        completion = await client.chat.completions.create(messages=messages, model=model)
+        answer = completion.choices[0].message.content
+        return answer, [AIChatSource(title="AI Generated", url="#")]
+    elif provider == "openai":
+        return await _chat_openai_compatible(
+            base_url="https://api.openai.com/v1",
+            api_key=settings.OPENAI_API_KEY or "",
+            model=model,
+            messages=messages,
+        )
+    elif provider == "deepseek":
+        return await _chat_openai_compatible(
+            base_url="https://api.deepseek.com",
+            api_key=settings.DEEPSEEK_API_KEY or "",
+            model=model,
+            messages=messages,
+        )
+    elif provider == "anthropic":
+        return await _chat_anthropic(messages, model, settings.ANTHROPIC_API_KEY or "")
+    elif provider == "perplexity":
+        return await _chat_perplexity(messages, model, settings.PERPLEXITY_API_KEY or "")
+    elif provider == "openrouter":
+        return await _chat_openai_compatible(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=settings.OPENROUTER_API_KEY or "",
+            model=model,
+            messages=messages,
+        )
+    elif provider == "gpt_oss":
+        return await _chat_openai_compatible(
+            base_url="https://api.openai.com/v1", # Default to OpenAI compatible base
+            api_key=settings.GPT_OSS_API_KEY or "",
+            model=model,
+            messages=messages,
+        )
+    elif provider == "google":
+        return await _chat_google_genai(messages, model, settings.GEMINI_API_KEY or "")
+    else:
+        # Default fallback to Groq
+        if settings.GROQ_API_KEY:
+            client = AsyncGroq(api_key=settings.GROQ_API_KEY)
+            completion = await client.chat.completions.create(messages=messages, model="llama-3.3-70b-versatile")
+            answer = completion.choices[0].message.content
+            return answer, [AIChatSource(title="AI Generated", url="#")]
+        else:
+            return await _chat_openai_compatible(
+                base_url="https://api.openai.com/v1",
+                api_key=settings.OPENAI_API_KEY or "",
+                model="llama-3.3-70b-versatile" if settings.GROQ_API_KEY else DEFAULT_MODEL,
+                messages=messages,
+            )
 
 
 async def get_chat_response(request: AIChatRequest) -> AIChatResponse:
@@ -302,55 +353,39 @@ async def get_chat_response(request: AIChatRequest) -> AIChatResponse:
             status="failed",
         )
 
-    messages = _build_messages(request, provider)
+    # Prepare a list of providers to try: [Initial choice] + [Fallbacks if not already tried]
+    providers_to_try = [(provider, model)]
+    for f_provider, f_model in FALLBACK_ORDER:
+        if (f_provider, f_model) not in providers_to_try:
+            if _provider_key(f_provider):
+                providers_to_try.append((f_provider, f_model))
 
-    try:
-        if provider == "groq":
-            answer, sources = await _chat_groq(messages, model)
-        elif provider == "openai":
-            answer, sources = await _chat_openai_compatible(
-                base_url="https://api.openai.com/v1",
-                api_key=settings.OPENAI_API_KEY or "",
-                model=model,
-                messages=messages,
+    last_error = ""
+    for current_provider, current_model in providers_to_try:
+        messages = _build_messages(request, current_provider)
+        try:
+            answer, sources = await _execute_chat_provider(current_provider, current_model, messages, request)
+            
+            # Silently return the answer even if we fell back
+            return AIChatResponse(
+                answer=answer,
+                sources=sources,
+                suggested_questions=_suggested_questions(current_provider),
+                status="completed",
             )
-        elif provider == "deepseek":
-            answer, sources = await _chat_openai_compatible(
-                base_url="https://api.deepseek.com",
-                api_key=settings.DEEPSEEK_API_KEY or "",
-                model=model,
-                messages=messages,
-            )
-        elif provider == "anthropic":
-            answer, sources = await _chat_anthropic(messages, model, settings.ANTHROPIC_API_KEY or "")
-        elif provider == "gemini":
-            answer, sources = await _chat_gemini(messages, model, settings.GEMINI_API_KEY or "")
-        elif provider == "perplexity":
-            answer, sources = await _chat_perplexity(messages, model, settings.PERPLEXITY_API_KEY or "")
-        elif provider == "cerebras":
-            answer, sources = await _chat_openai_compatible(
-                base_url="https://api.cerebras.ai/v1",
-                api_key=settings.CEREBRAS_API_KEY or "",
-                model=model,
-                messages=messages,
-            )
-        elif provider == "google":
-            answer, sources = await _chat_google_genai(messages, model, settings.GOOGLE_API_KEY or "")
-        else:
-            answer, sources = await _chat_groq(messages, DEFAULT_GROQ_MODEL)
-    except Exception as exc:
-        return AIChatResponse(
-            answer=f"Failed to get AI response from provider '{provider}': {exc}",
-            sources=[AIChatSource(title="Provider Error", url="#")],
-            suggested_questions=["Try another model", "Check the API key", "Disable web search and retry"],
-            status="failed",
-        )
+        except Exception as exc:
+            error_msg = str(exc)
+            last_error = f"{current_provider}: {error_msg}"
+            # Log the error (optional, but good for debugging)
+            print(f"Fallback triggered: Provider {current_provider} failed with: {error_msg}")
+            # Continue to next provider in loop
+            continue
 
     return AIChatResponse(
-        answer=answer,
-        sources=sources,
-        suggested_questions=_suggested_questions(provider),
-        status="completed",
+        answer=f"All available AI providers failed. Last error ({last_error}). Please try again later.",
+        sources=[AIChatSource(title="System Error", url="#")],
+        suggested_questions=["Try again in a minute", "Check server logs", "Check API keys"],
+        status="failed",
     )
 
 
@@ -360,9 +395,11 @@ async def explain_code(request: ExplainRequest) -> ExplainResponse:
     model_to_use = request.model or "default"
     
     # Reuse AIChatRequest logic to leverage the existing provider resolution
+    line_context = f"Specifically focus on line {request.line}. " if request.line else ""
+    
     chat_request = AIChatRequest(
         query=(
-            f"Explain this {request.language} code logic step-by-step and line-by-line. "
+            f"{line_context}Explain this {request.language} code logic step-by-step and line-by-line. "
             "Help me understand the algorithm and flow. "
             "IMPORTANT: Do NOT give me the corrected code or the full solution. "
             "Just explain the logic. Use markdown formatting with code highlights."
@@ -370,7 +407,7 @@ async def explain_code(request: ExplainRequest) -> ExplainResponse:
         model=model_to_use,
         file_context=f"Language: {request.language}\nCode to Explain:\n{request.code}",
         history=[],
-        language_hint="english"
+        language_hint=request.language_hint or "english"
     )
     
     try:
@@ -383,8 +420,34 @@ async def explain_code(request: ExplainRequest) -> ExplainResponse:
         return ExplainResponse(explanation=f"Explanation failed: {str(e)}", status="failed")
 
 
+
+async def _get_completion_text(messages: list, temperature: float = 0.3, model_name: str = "default") -> str:
+    """Helper for internal completions using the standard chat provider logic."""
+    from app.schemas.ai import AIChatRequest
+    
+    # Extract the last user message and history
+    query = ""
+    history = []
+    for msg in messages:
+        if msg["role"] == "user":
+            query = msg["content"]
+        elif msg["role"] == "assistant":
+            history.append(msg)
+            
+    request = AIChatRequest(
+        query=query,
+        model=model_name,
+        history=history,
+        language_hint="english"
+    )
+    
+    response = await get_chat_response(request)
+    if response.status == "failed":
+        raise ValueError(f"AI Completion failed: {response.answer}")
+    return response.answer.strip()
+
 async def get_suggestions(request: ExplainRequest) -> SuggestionResponse:
-    """Provides real AI code completions using Gemini 2.0 Flash."""
+    """Provides real AI code completions using the configured model."""
     messages = [
         {
             "role": "system",
@@ -396,32 +459,36 @@ async def get_suggestions(request: ExplainRequest) -> SuggestionResponse:
         },
         {"role": "user", "content": f"Snippet:\n{request.code}"},
     ]
-    raw_content = await _get_adhoc_google_response(messages)
-    raw_content = raw_content.strip()
-    suggestions: List[str] = []
 
-    if raw_content.startswith("[") and raw_content.endswith("]"):
-        try:
-            parsed_list = ast.literal_eval(raw_content)
-            if isinstance(parsed_list, list):
-                suggestions = [str(item).strip() for item in parsed_list][:3]
-        except Exception:
-            pass
+    try:
+        raw_content = await _get_completion_text(messages, temperature=0.3, model_name=request.model or "default")
+        suggestions: List[str] = []
 
-    if not suggestions:
-        for line in raw_content.split("\n"):
-            line = line.strip()
-            if not line:
-                continue
-            clean = line.strip("`\"'").lstrip("-*â€¢").strip()
-            if clean and clean not in suggestions:
-                suggestions.append(clean)
+        if raw_content.startswith("[") and raw_content.endswith("]"):
+            try:
+                parsed_list = ast.literal_eval(raw_content)
+                if isinstance(parsed_list, list):
+                    suggestions = [str(item).strip() for item in parsed_list][:3]
+            except Exception:
+                pass
 
-    return SuggestionResponse(suggestions=suggestions[:3], status="completed")
+        if not suggestions:
+            for line in raw_content.split("\n"):
+                line = line.strip()
+                if not line:
+                    continue
+                clean = line.strip("`\"'").lstrip("-*•").strip()
+                if clean and clean not in suggestions:
+                    suggestions.append(clean)
+
+        return SuggestionResponse(suggestions=suggestions[:3], status="completed")
+    except Exception as e:
+        print(f"Suggestions error: {e}")
+        return SuggestionResponse(suggestions=[], status="failed")
 
 
-async def analyze_code_with_llm(code: str, language: str) -> dict:
-    """Uses Gemini to perform a detailed code review, focusing on bugs and code smells."""
+async def analyze_code_with_llm(code: str, language: str, model: str = "default") -> dict:
+    """Uses LLM to perform a detailed code review, focusing on bugs and code smells."""
     messages = [
         {
             "role": "system",
@@ -432,13 +499,23 @@ async def analyze_code_with_llm(code: str, language: str) -> dict:
                 "and 'detailed_reviews' (list of objects with 'line', 'comment', 'severity')."
             ),
         },
-        {"role": "user", "content": f"Language: {language}\nCode:\n{code}"},
+        {"role": "user", "content": f"Language: {language}\nCode:\n{code}\n\nReturn valid JSON only."},
     ]
-    response_text = await _get_adhoc_google_response(messages, json_mode=True)
-    return json.loads(response_text)
+    
+    try:
+        response_text = await _get_completion_text(messages, temperature=0.3, model_name=model)
+        # Extract JSON from markdown code blocks if present
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        return json.loads(response_text)
+    except Exception as e:
+        print(f"Code analysis error: {e}")
+        return {"score": 0, "feedback": f"Analysis failed: {str(e)}", "detailed_reviews": []}
 
 
-async def fix_code_with_llm(code: str, language: str) -> dict:
+async def fix_code_with_llm(code: str, language: str, model: str = "default") -> dict:
     """Provides an automated fix for bugs and smells in the code."""
     messages = [
         {
@@ -449,13 +526,22 @@ async def fix_code_with_llm(code: str, language: str) -> dict:
                 "of the changes made. Keep the logic consistent with user intent."
             ),
         },
-        {"role": "user", "content": f"Language: {language}\nCode:\n{code}"},
+        {"role": "user", "content": f"Language: {language}\nCode:\n{code}\n\nReturn valid JSON only."},
     ]
-    response_text = await _get_adhoc_google_response(messages, json_mode=True)
-    return json.loads(response_text)
+    
+    try:
+        response_text = await _get_completion_text(messages, temperature=0.3, model_name=model)
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        return json.loads(response_text)
+    except Exception as e:
+        print(f"Code fix error: {e}")
+        return {"fixed_code": code, "explanation": f"Fix failed: {str(e)}"}
 
 
-async def check_plagiarism_with_llm(code: str, language: str) -> dict:
+async def check_plagiarism_with_llm(code: str, language: str, model: str = "default") -> dict:
     """Heuristically checks if the code snippet appears to be copied from common repositories."""
     messages = [
         {
@@ -467,13 +553,22 @@ async def check_plagiarism_with_llm(code: str, language: str) -> dict:
                 "and 'likely_source' (description or URL if identifiable)."
             ),
         },
-        {"role": "user", "content": f"Language: {language}\nCode:\n{code}"},
+        {"role": "user", "content": f"Language: {language}\nCode:\n{code}\n\nReturn valid JSON only."},
     ]
-    response_text = await _get_adhoc_google_response(messages, json_mode=True)
-    return json.loads(response_text)
+    
+    try:
+        response_text = await _get_completion_text(messages, temperature=0.3, model_name=model)
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        return json.loads(response_text)
+    except Exception as e:
+        print(f"Plagiarism check error: {e}")
+        return {"is_plagiarized": False, "confidence": 0, "likely_source": f"Check failed: {str(e)}"}
 
 
-async def generate_code_from_nl(prompt: str, language: str) -> dict:
+async def generate_code_from_nl(prompt: str, language: str, model: str = "default") -> dict:
     """Generates code snippet from a natural language description."""
     messages = [
         {
@@ -484,14 +579,23 @@ async def generate_code_from_nl(prompt: str, language: str) -> dict:
                 "Do NOT include markdown markers in the 'code' string."
             ),
         },
-        {"role": "user", "content": f"Target Language: {language}\nPrompt: {prompt}"},
+        {"role": "user", "content": f"Target Language: {language}\nPrompt: {prompt}\n\nReturn valid JSON only."},
     ]
-    response_text = await _get_adhoc_google_response(messages, json_mode=True)
-    return json.loads(response_text)
+    
+    try:
+        response_text = await _get_completion_text(messages, temperature=0.5, model_name=model)
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        return json.loads(response_text)
+    except Exception as e:
+        print(f"Code generation error: {e}")
+        return {"code": "", "explanation": f"Generation failed: {str(e)}"}
 
 
-async def analyze_complexity_with_llm(code: str, language: str) -> dict:
-    """Uses Gemini to predict time and space complexity."""
+async def analyze_complexity_with_llm(code: str, language: str, model: str = "default") -> dict:
+    """Uses LLM to predict time and space complexity."""
     messages = [
         {
             "role": "system",
@@ -500,14 +604,23 @@ async def analyze_complexity_with_llm(code: str, language: str) -> dict:
                 "'time_complexity', 'space_complexity', and 'explanation'."
             ),
         },
-        {"role": "user", "content": f"Language: {language}\nCode:\n{code}"},
+        {"role": "user", "content": f"Language: {language}\nCode:\n{code}\n\nReturn valid JSON only."},
     ]
-    response_text = await _get_adhoc_google_response(messages, json_mode=True)
-    return json.loads(response_text)
+    
+    try:
+        response_text = await _get_completion_text(messages, temperature=0.3, model_name=model)
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        return json.loads(response_text)
+    except Exception as e:
+        print(f"Complexity analysis error: {e}")
+        return {"time_complexity": "Unknown", "space_complexity": "Unknown", "explanation": f"Analysis failed: {str(e)}"}
 
 
-async def predict_edge_cases_with_llm(code: str, language: str) -> dict:
-    """Uses Gemini to predict potential edge cases."""
+async def predict_edge_cases_with_llm(code: str, language: str, model: str = "default") -> dict:
+    """Uses LLM to predict potential edge cases."""
     messages = [
         {
             "role": "system",
@@ -516,10 +629,19 @@ async def predict_edge_cases_with_llm(code: str, language: str) -> dict:
                 "JSON with a list of 'cases' (each with 'input' and 'reason')."
             ),
         },
-        {"role": "user", "content": f"Language: {language}\nCode:\n{code}"},
+        {"role": "user", "content": f"Language: {language}\nCode:\n{code}\n\nReturn valid JSON only."},
     ]
-    response_text = await _get_adhoc_google_response(messages, json_mode=True)
-    return json.loads(response_text)
+    
+    try:
+        response_text = await _get_completion_text(messages, temperature=0.3, model_name=model)
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        return json.loads(response_text)
+    except Exception as e:
+        print(f"Edge case prediction error: {e}")
+        return {"cases": []}
 
 
 async def generate_question(request: "app.schemas.ai.AIGeneratedQuestionRequest") -> AIGeneratedQuestionResponse:
@@ -536,10 +658,36 @@ async def generate_question(request: "app.schemas.ai.AIGeneratedQuestionRequest"
         {
             "role": "user",
             "content": (
-                f"Topic: {request.topic}, Difficulty: {request.difficulty}, Language: {request.language}"
+                f"Topic: {request.topic}, Difficulty: {request.difficulty}, Language: {request.language}\n\nReturn valid JSON only."
             ),
         },
     ]
-    response_text = await _get_adhoc_google_response(messages, json_mode=True)
-    data = json.loads(response_text)
-    return AIGeneratedQuestionResponse(**data)
+
+    if not settings.GROQ_API_KEY and not settings.OPENAI_API_KEY:
+        return AIGeneratedQuestionResponse(
+            title="API Not Configured",
+            description="Please configure GROQ_API_KEY in backend .env",
+            template_code="# API key required",
+            difficulty=request.difficulty,
+            topic=request.topic
+        )
+
+    try:
+        response_text = await _get_completion_text(messages, temperature=0.7)
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        data = json.loads(response_text)
+        return AIGeneratedQuestionResponse(**data)
+    except Exception as e:
+        print(f"Question generation error: {e}")
+        return AIGeneratedQuestionResponse(
+            title="Generation Failed",
+            description=f"Error: {str(e)}",
+            template_code="# Error occurred",
+            difficulty=request.difficulty,
+            topic=request.topic
+        )
+
+

@@ -15,4 +15,9 @@ httpx
 python-dotenv
 boto3
 groq
-google-genai
+httpx
+openai
+langchain
+langchain-openai
+scikit-learn
+joblib

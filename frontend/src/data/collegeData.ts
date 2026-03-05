@@ -4,19 +4,9 @@ export interface CollegeProblem {
    title: string;
    difficulty: "Easy" | "Medium" | "Hard";
    completed: boolean;
-   category: "DS" | "Algo" | "Interview" | "Placement" | "Core";
+   category: "DS" | "Algo" | "Core";
 }
 
-export interface PlacementProgram {
-   id: string;
-   company: string;
-   role: string;
-   type: string;
-   duration: string;
-   questions: number;
-   difficulty: "Easy" | "Medium" | "Hard";
-   available: boolean;
-}
 
 export const DS_PROBLEMS: CollegeProblem[] = [
    // 1-20 (Already existing/modified)
@@ -226,31 +216,6 @@ export const ALGO_PROBLEMS: CollegeProblem[] = [
    { id: "algo100", title: "Reservoir Sampling Algorithm", difficulty: "Medium", completed: false, category: "Algo" },
 ];
 
-export const PLACEMENT_PROGRAMS: PlacementProgram[] = [
-   { id: "p1", company: "Google", role: "SDE-1", type: "Mock Interview", duration: "45 mins", questions: 2, difficulty: "Hard", available: true },
-   { id: "p2", company: "Amazon", role: "SDE-1", type: "Technical SDE-1", duration: "60 mins", questions: 3, difficulty: "Medium", available: true },
-   { id: "p3", company: "Microsoft", role: "SDE-1", type: "Coding Round", duration: "90 mins", questions: 4, difficulty: "Hard", available: true },
-   { id: "p4", company: "Meta", role: "Frontend Engineer", type: "Product UI Review", duration: "45 mins", questions: 2, difficulty: "Hard", available: true },
-   { id: "p5", company: "Netflix", role: "Backend Engineer", type: "System Design", duration: "60 mins", questions: 1, difficulty: "Hard", available: true },
-   { id: "p6", company: "Apple", role: "Hardware Engineer", type: "Hardware Logic", duration: "45 mins", questions: 3, difficulty: "Hard", available: true },
-   { id: "p7", company: "TCS", role: "Trainee", type: "NQT Mock", duration: "120 mins", questions: 5, difficulty: "Easy", available: true },
-   { id: "p8", company: "Infosys", role: "Systems Engineer", type: "Service Based Mock", duration: "90 mins", questions: 4, difficulty: "Medium", available: true },
-   { id: "p9", company: "Wipro", role: "Project Engineer", type: "Coding Aptitude", duration: "60 mins", questions: 3, difficulty: "Medium", available: true },
-   { id: "p10", company: "Accenture", role: "Associate", type: "Full Stack Round", duration: "90 mins", questions: 4, difficulty: "Medium", available: true },
-];
-
-export const INTERVIEW_QUESTIONS: CollegeProblem[] = [
-   { id: "int1", title: "Tell me about yourself", difficulty: "Easy", completed: false, category: "Interview" },
-   { id: "int2", title: "Why should we hire you?", difficulty: "Easy", completed: false, category: "Interview" },
-   { id: "int3", title: "What are your strengths and weaknesses?", difficulty: "Easy", completed: false, category: "Interview" },
-   { id: "int4", title: "Explain OOPs concepts", difficulty: "Medium", completed: false, category: "Interview" },
-   { id: "int5", title: "What is the difference between SQL and NoSQL?", difficulty: "Medium", completed: false, category: "Interview" },
-   { id: "int6", title: "Explain SDLC models", difficulty: "Medium", completed: false, category: "Interview" },
-   { id: "int7", title: "How do you handle conflict in a team?", difficulty: "Medium", completed: false, category: "Interview" },
-   { id: "int8", title: "Where do you see yourself in 5 years?", difficulty: "Easy", completed: false, category: "Interview" },
-   { id: "int9", title: "Explain normalization in DBMS", difficulty: "Medium", completed: false, category: "Interview" },
-   { id: "int10", title: "What is a dead-lock in OS?", difficulty: "Hard", completed: false, category: "Interview" },
-];
 
 export const CORE_SUBJECTS: CollegeProblem[] = [
    { id: "core1", title: "Process Scheduling Algorithms (OS)", difficulty: "Medium", completed: false, category: "Core" },

@@ -24,7 +24,7 @@ export function DiscussPage() {
 
                {/* Tags filter */}
                <div className="flex flex-wrap gap-2 mb-6">
-                  {['Interview Experience', 'Study Guide', 'General Discussion', 'Career Advice', 'Feedback'].map(tag => (
+                  {['Study Guide', 'General Discussion', 'Career Advice', 'Feedback'].map(tag => (
                      <Badge key={tag} variant="secondary" className="cursor-pointer hover:bg-muted-foreground/20">
                         {tag}
                      </Badge>
@@ -41,7 +41,7 @@ export function DiscussPage() {
                         </div>
                         <div className="flex-1">
                            <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">
-                              Amazon SDE-1 Interview Experience | Dec 2023 | Chennai
+                              {i === 1 ? "Mastering Dynamic Programming | Comprehensive Guide" : `Question about Track ${i} | Help needed`}
                            </h3>
                            <p className="text-muted-foreground text-sm line-clamp-1 mb-2">
                               I recently interviewed with Amazon for an SDE-1 role. The process consisted of an OA followed by 3 virtual onsite rounds...

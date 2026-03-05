@@ -1,9 +1,12 @@
 export interface User {
    id: string;
    email: string;
-   name: string;
-   avatarUrl?: string;
-   role: 'student' | 'admin';
+   username: string;
+   full_name?: string;
+   bio?: string;
+   lang?: string;
+   photo?: string;
+   role: string;
    createdAt: string;
 }
 

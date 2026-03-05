@@ -32,40 +32,41 @@ router = APIRouter()
 
 @router.post("/execute")
 async def execute_code(request: AIReviewRequest):
+    print(f"DEBUG: EXECUTE ROUTE CALLED with language={request.language}")
     """
     Execute the provided code and return output.
     Logs to MongoDB if user_id and problem_id are provided.
     """
-    result = await executor.execute_python_code(request.code)
-    
-    # Optionally save to MongoDB if context is provided
-    if hasattr(request, 'user_id') and hasattr(request, 'problem_id') and request.user_id and request.problem_id:
-        from app.crud import submission_crud
-        from app.schemas.submission_schema import SubmissionCreate
+    try:
+        result = await executor.execute_code(request.code, request.language or "python")
         
-        try:
-            sub_in = SubmissionCreate(
-                user_id=request.user_id,
-                problem_id=request.problem_id,
-                code=request.code,
-                language=request.language or "python",
-                score=0.0,
-                feedback=None
-            )
-            # Create the submission
-            db_obj = await submission_crud.create(obj_in=sub_in)
+        # Save to MongoDB if context is provided
+        if hasattr(request, 'user_id') and hasattr(request, 'problem_id') and request.user_id and request.problem_id:
+            from app.crud import submission_crud
+            from app.schemas.submission_schema import SubmissionCreate
             
-            # Update with execution results
-            db_obj.status = result.get("status", "error")
-            db_obj.output = result.get("output")
-            db_obj.error_msg = result.get("error")
-            await db_obj.save()
-            
-            result["submission_id"] = str(db_obj.id)
-        except Exception as e:
-            print(f"Failed to log execution to DB: {e}")
+            try:
+                sub_in = SubmissionCreate(
+                    user_id=request.user_id,
+                    problem_id=request.problem_id,
+                    code=request.code,
+                    language=request.language or "python",
+                    score=0.0,
+                    feedback=None
+                )
+                db_obj = await submission_crud.create(obj_in=sub_in)
+                db_obj.status = result.get("status", "error")
+                db_obj.output = result.get("output")
+                db_obj.error_msg = result.get("error")
+                await db_obj.save()
+                result["submission_id"] = str(db_obj.id)
+            except Exception as e:
+                print(f"Failed to log execution to DB: {e}")
 
-    return result
+        return result
+    except Exception as e:
+        print(f"CRITICAL ERROR IN ROUTE HANDLER: {e}")
+        return {"output": "", "error": f"Internal Route Error: {str(e)}", "status": "error"}
 
 @router.post("/generate-question", response_model=AIGeneratedQuestionResponse)
 async def generate_ai_question(
@@ -171,7 +172,7 @@ async def fix_code(request: FixRequest) -> Any:
     """
     Automatically fix bugs and improve code quality.
     """
-    result = await llm_service.fix_code_with_llm(request.code, request.language)
+    result = await llm_service.fix_code_with_llm(request.code, request.language, model=request.model or "default")
     return FixResponse(**result)
 
 @router.post("/plagiarism", response_model=PlagiarismResponse)
@@ -187,5 +188,5 @@ async def generate_code(request: CodeGenRequest) -> Any:
     """
     Generate code from natural language prompt.
     """
-    result = await llm_service.generate_code_from_nl(request.prompt, request.language)
+    result = await llm_service.generate_code_from_nl(request.prompt, request.language, model=request.model or "default")
     return CodeGenResponse(**result)

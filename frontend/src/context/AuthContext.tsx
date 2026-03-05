@@ -5,10 +5,13 @@ interface AuthContextType {
    setUser: (userData: any) => void;
    login: (userData: any) => void;
    logout: () => void;
+   updateProfile: (userData: any) => Promise<void>;
    isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+import { authApi } from '@/services/authService';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
    const [user, setUserState] = useState<any | null>(() => {
@@ -47,8 +50,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       sessionStorage.removeItem('token');
    };
 
+   const updateProfile = async (userData: any) => {
+      try {
+         const updatedUser = await authApi.updateProfile(userData);
+         // Keep the token if it exists in the current user state
+         const newUserState = { ...user, ...updatedUser };
+         setUser(newUserState);
+      } catch (error) {
+         console.error("Failed to update profile", error);
+         throw error;
+      }
+   };
+
    return (
-      <AuthContext.Provider value={{ user, setUser, login, logout, isAuthenticated: !!user }}>
+      <AuthContext.Provider value={{ user, setUser, login, logout, updateProfile, isAuthenticated: !!user }}>
          {children}
       </AuthContext.Provider>
    );

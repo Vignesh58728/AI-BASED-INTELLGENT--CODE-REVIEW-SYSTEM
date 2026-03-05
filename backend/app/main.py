@@ -1,9 +1,15 @@
+import sys
+import asyncio
+
+# Configure event loop for Windows to support subprocesses
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.session import init_db
 from app.core.config import settings
-from app.api import auth, problems, submissions, skill, reviewer
-
+from app.api import auth, problems, submissions, skill, code_review, reviewer, image_gen
 
 app = FastAPI(
     title="CodeMentor AI API",
@@ -13,7 +19,7 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup_event():
-    print("Starting up CodeMentor AI API...")
+    print("Starting up CodeMentor AI API and connecting to MongoDB...")
     try:
         print(f"Connecting to MongoDB at {settings.DATABASE_URL.split('@')[-1]}...") # Log host only for safety
         await init_db()
@@ -27,7 +33,7 @@ async def startup_event():
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -38,6 +44,8 @@ app.include_router(problems.router, prefix="/api/problems", tags=["Problems"])
 app.include_router(submissions.router, prefix="/api/submissions", tags=["Submissions"])
 app.include_router(skill.router, prefix="/api/skill", tags=["Skill Progress"])
 app.include_router(reviewer.router, prefix="/api/reviewer", tags=["AI Reviewer"])
+app.include_router(code_review.router, prefix="/api/code-review", tags=["Code Review"])
+app.include_router(image_gen.router, prefix="/api/image-gen", tags=["Image Generation"])
 
 @app.get("/")
 async def root():
@@ -53,4 +61,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=5000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=5001, reload=True)

@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { CodeEditor } from "@/components/CodeEditor";
 import { Button } from "@/components/ui/Button";
 import { Send, Zap, Sparkles, ChevronLeft, Bot } from "lucide-react";
 import { submissionService } from "@/services/submissionService";
@@ -243,7 +242,12 @@ export function CollegePracticePage() {
             {/* Right Column: Code Editor */}
             <div className="flex-1 flex flex-col relative overflow-hidden bg-white">
                <div className="flex-1">
-                  <CodeEditor value={code} onChange={(val) => setCode(val || "")} />
+                  <textarea
+                     className="w-full h-full p-4 font-mono text-sm outline-none resize-none bg-zinc-50/50"
+                     value={code}
+                     onChange={(e) => setCode(e.target.value)}
+                     placeholder="Write your solution here..."
+                  />
                </div>
 
                {/* AI Pair Programmer Suggestions */}

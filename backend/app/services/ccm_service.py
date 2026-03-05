@@ -39,13 +39,32 @@ class CCMService:
             messages = [
                 {
                     "role": "system", 
-                    "content": "You are the Code Check Module (CCM). Your goal is to detect flaws that simple I/O tests miss."
+                    "content": "You are the Code Check Module (CCM). Your goal is to detect flaws that simple I/O tests miss. Return valid JSON only."
                 },
                 {"role": "user", "content": eval_prompt}
             ]
             
-            # Use the specialized internal helper for JSON responses
-            response_text = await llm_service._get_adhoc_google_response(messages, json_mode=True)
+            # Use OpenAI for JSON responses
+            from openai import AsyncOpenAI
+            from app.core.config import settings
+            
+            if not settings.OPENAI_API_KEY:
+                raise RuntimeError("OPENAI_API_KEY is not configured")
+            
+            client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            completion = await client.chat.completions.create(
+                messages=messages,
+                model="gpt-4o",
+                temperature=0.3
+            )
+            response_text = completion.choices[0].message.content.strip()
+            
+            # Extract JSON from markdown if present
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+            
             eval_result = json.loads(response_text)
             
             # Record results in the submission object

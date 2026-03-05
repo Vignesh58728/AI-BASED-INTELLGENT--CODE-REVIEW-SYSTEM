@@ -1,11 +1,9 @@
-import { MagicCard } from "@/components/ui/magic-card";
 import {
    Card,
    CardHeader,
    CardTitle,
    CardDescription
 } from "@/components/ui/Card";
-import { useTheme } from "next-themes";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { progressApi } from "@/services/skillService";
@@ -17,7 +15,6 @@ import careerIcon from "@/assets/images/career-path.png";
 
 export function SchoolDashboard() {
    const navigate = useNavigate();
-   const { theme } = useTheme();
    const [progress, setProgress] = useState<any>(null);
 
    useEffect(() => {
@@ -71,23 +68,21 @@ export function SchoolDashboard() {
 
          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 group/cards">
             {modules.map((item, i) => (
-               <Card key={i} className="w-full border-none p-0 shadow-none relative overflow-hidden transition-all duration-300 group-hover/cards:blur-[2px] group-hover/cards:scale-[0.98] hover:!blur-none hover:!scale-[1.02] hover:z-10 bg-black">
-                  <MagicCard
-                     gradientColor={theme === "dark" ? "#262626" : "#D9D9D955"}
-                     className="p-1 cursor-pointer hover:bg-accent/50 group h-full border-none"
-                     onClick={() => navigate(item.path)}
-                  >
-                     <CardHeader className="pb-2">
-                        <div className="flex flex-row items-center justify-between pb-2">
-                           <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
-                           <img src={item.icon} alt={item.title} className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                        </div>
-                        <div>
-                           <CardDescription className="text-xs text-muted-foreground mb-3">{item.desc}</CardDescription>
-                           <div className="text-sm font-semibold">{item.stats}</div>
-                        </div>
-                     </CardHeader>
-                  </MagicCard>
+               <Card
+                  key={i}
+                  className="w-full border-zinc-800 p-1 shadow-none relative overflow-hidden transition-all duration-300 group-hover/cards:blur-[2px] group-hover/cards:scale-[0.98] hover:!blur-none hover:!scale-[1.02] hover:z-10 bg-zinc-900/50 cursor-pointer hover:bg-zinc-800/50"
+                  onClick={() => navigate(item.path)}
+               >
+                  <CardHeader className="pb-2">
+                     <div className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
+                        <img src={item.icon} alt={item.title} className="h-4 w-4 group-hover/cards:scale-110 transition-transform" />
+                     </div>
+                     <div>
+                        <CardDescription className="text-xs text-muted-foreground mb-3">{item.desc}</CardDescription>
+                        <div className="text-sm font-semibold">{item.stats}</div>
+                     </div>
+                  </CardHeader>
                </Card>
             ))}
          </div>

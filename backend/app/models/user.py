@@ -14,6 +14,9 @@ class User(Document):
     hashed_password: str
     is_active: bool = True
     role: UserRole = UserRole.STUDENT
+    bio: Optional[str] = None
+    lang: Optional[str] = "Python"
+    photo: Optional[str] = None
 
     # Relationships (Beanie uses Link for references)
     # We might want to keep these as references or embed depending on query patterns

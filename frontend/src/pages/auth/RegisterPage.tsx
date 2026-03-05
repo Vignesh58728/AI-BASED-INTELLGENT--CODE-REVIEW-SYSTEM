@@ -26,7 +26,7 @@ export function RegisterPage() {
 
    useEffect(() => {
       if (isAuthenticated) {
-         navigate('/explore');
+         navigate('/ai');
       }
    }, [isAuthenticated, navigate]);
 

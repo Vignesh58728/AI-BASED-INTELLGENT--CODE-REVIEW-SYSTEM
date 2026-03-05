@@ -9,6 +9,9 @@ class UserBase(BaseModel):
     full_name: Optional[str] = None
     username: Optional[str] = None
     role: UserRole = UserRole.STUDENT
+    bio: Optional[str] = None
+    lang: Optional[str] = "Python"
+    photo: Optional[str] = None
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
@@ -19,6 +22,10 @@ class UserCreate(UserBase):
 # Properties to receive via API on update
 class UserUpdate(UserBase):
     password: Optional[str] = None
+    full_name: Optional[str] = None
+    bio: Optional[str] = None
+    lang: Optional[str] = None
+    photo: Optional[str] = None
 
 class UserInDBBase(UserBase):
     id: Optional[int] = None

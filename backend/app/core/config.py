@@ -13,16 +13,17 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
     ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
     DEEPSEEK_API_KEY: Optional[str] = os.getenv("DEEPSEEK_API_KEY")
-    GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY")
     PERPLEXITY_API_KEY: Optional[str] = os.getenv("PERPLEXITY_API_KEY")
-    CEREBRAS_API_KEY: Optional[str] = os.getenv("CEREBRAS_API_KEY")
-    GOOGLE_API_KEY: Optional[str] = os.getenv("GOOGLE_API_KEY")
+    OPENROUTER_API_KEY: Optional[str] = os.getenv("OPENROUTER_API_KEY")
+    GPT_OSS_API_KEY: Optional[str] = os.getenv("GPT_OSS_API_KEY")
+    GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY")
+    JUDGE0_API_KEY: Optional[str] = os.getenv("JUDGE0_API_KEY")
     ALGORITHM: str = "HS256"
 
     # Google OAuth
     GOOGLE_CLIENT_ID: Optional[str] = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET: Optional[str] = os.getenv("GOOGLE_CLIENT_SECRET")
-    GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:5000/api/auth/google/callback")
+    GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:5001/api/auth/google/callback")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
     # Database
@@ -42,26 +43,24 @@ class Settings(BaseSettings):
         """
         Dynamically load secrets from AWS Secrets Manager if AWS_SECRET_NAME is set.
         """
-        if not self.AWS_SECRET_NAME:
-            return
-            
-        import boto3
-        import json
-        from botocore.exceptions import ClientError
-
-        client = boto3.client("secretsmanager", region_name=self.AWS_REGION)
         try:
+            import boto3
+            import json
+            from botocore.exceptions import ClientError
+
+            client = boto3.client("secretsmanager", region_name=self.AWS_REGION)
             get_secret_value_response = client.get_secret_value(SecretId=self.AWS_SECRET_NAME)
             if "SecretString" in get_secret_value_response:
                 secrets = json.loads(get_secret_value_response["SecretString"])
                 for key, value in secrets.items():
                     if hasattr(self, key):
                         setattr(self, key, value)
-        except ClientError as e:
-            print(f"Error loading AWS secrets: {e}")
+        except (ImportError, Exception) as e:
+            print(f"Error loading AWS secrets (boto3 may be crashing): {e}")
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
         case_sensitive = True
 
 settings = Settings()

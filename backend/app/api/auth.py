@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.core import security
 from app.core.config import settings
 from app.core.dependencies import get_db, get_current_user
-from app.schemas.user import User, UserCreate, Token
+from app.schemas.user import User, UserCreate, UserUpdate, Token
 from app.services import auth_service
 from app.crud import users as crud_users
 import httpx
@@ -22,6 +22,18 @@ async def get_user_profile(
     Get current user profile.
     """
     return current_user
+
+@router.patch("/profile", response_model=User)
+async def update_user_profile(
+    *,
+    user_in: UserUpdate,
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Update current user profile.
+    """
+    user = await crud_users.update(db_obj=current_user, obj_in=user_in)
+    return user
 
 @router.post("/login", response_model=Token)
 async def login_access_token(

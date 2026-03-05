@@ -1,21 +1,18 @@
-import { MagicCard } from "@/components/ui/magic-card";
 import {
    Card,
    CardHeader,
    CardTitle,
    CardDescription
 } from "@/components/ui/Card";
-import { useTheme } from "next-themes";
 import { Briefcase, Code, Terminal, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { problemsApi } from "@/services/problemsApi";
 import { useAuth } from "@/context/AuthContext";
-import { DS_PROBLEMS, ALGO_PROBLEMS, CORE_SUBJECTS, INTERVIEW_QUESTIONS } from "@/data/collegeData";
+import { DS_PROBLEMS, ALGO_PROBLEMS, CORE_SUBJECTS } from "@/data/collegeData";
 
 export function CollegeDashboard() {
    const navigate = useNavigate();
-   const { theme } = useTheme();
    const { user } = useAuth();
    const [submissions, setSubmissions] = useState<any[]>([]);
    const [isLoading, setIsLoading] = useState(true);
@@ -46,17 +43,14 @@ export function CollegeDashboard() {
       const dsCompleted = getCompletedCount(DS_PROBLEMS.map((p: any) => p.id));
       const algoCompleted = getCompletedCount(ALGO_PROBLEMS.map((p: any) => p.id));
       const coreCompleted = getCompletedCount(CORE_SUBJECTS.map((p: any) => p.id));
-      const interviewCompleted = getCompletedCount(INTERVIEW_QUESTIONS.map((p: any) => p.id));
-
-      const totalProblems = DS_PROBLEMS.length + ALGO_PROBLEMS.length + CORE_SUBJECTS.length + INTERVIEW_QUESTIONS.length;
-      const totalCompleted = dsCompleted + algoCompleted + coreCompleted + interviewCompleted;
+      const totalProblems = DS_PROBLEMS.length + ALGO_PROBLEMS.length + CORE_SUBJECTS.length;
+      const totalCompleted = dsCompleted + algoCompleted + coreCompleted;
       const overallProgress = totalProblems > 0 ? Math.round((totalCompleted / totalProblems) * 100) : 0;
 
       return {
          dsStats: `${dsCompleted}/${DS_PROBLEMS.length} Problems`,
          algoStats: `${algoCompleted}/${ALGO_PROBLEMS.length} Problems`,
          coreStats: `${coreCompleted}/${CORE_SUBJECTS.length} Topics`,
-         placementStats: interviewCompleted > 0 ? `${interviewCompleted}/${INTERVIEW_QUESTIONS.length} Done` : "Ready to Start",
          overallProgress
       };
    }, [submissions]);
@@ -89,15 +83,6 @@ export function CollegeDashboard() {
          path: "/college/core",
          stats: trackStats.coreStats
       },
-      {
-         title: "Placement Preparation",
-         description: "Mock interviews and top company questions.",
-         icon: Briefcase,
-         color: "text-orange-500",
-         beamColor: "#f97316",
-         path: "/college/placement",
-         stats: trackStats.placementStats
-      }
    ];
 
    if (isLoading) {
@@ -122,99 +107,62 @@ export function CollegeDashboard() {
 
          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 group/cards">
             {tracks.map((track) => (
-               <Card key={track.title} className="w-full border-none p-0 shadow-none relative overflow-hidden transition-all duration-300 group-hover/cards:blur-[2px] group-hover/cards:scale-[0.98] hover:!blur-none hover:!scale-[1.02] hover:z-10 bg-black">
-                  <MagicCard
-                     gradientColor={theme === "dark" ? "#262626" : "#D9D9D955"}
-                     className="p-1 cursor-pointer hover:bg-accent/50 group h-full border-none"
-                     onClick={() => navigate(track.path)}
-                  >
-                     <CardHeader className="pb-2">
-                        <div className="flex flex-row items-center justify-between pb-2">
-                           <CardTitle className="text-sm font-medium">{track.title}</CardTitle>
-                           <track.icon className={`h-4 w-4 ${track.color} group-hover:scale-110 transition-transform`} />
-                        </div>
-                        <div>
-                           <CardDescription className="text-xs text-muted-foreground mb-3">{track.description}</CardDescription>
-                           <div className="text-sm font-semibold">{track.stats}</div>
-                        </div>
-                     </CardHeader>
-                  </MagicCard>
+               <Card
+                  key={track.title}
+                  className="w-full border-zinc-800 p-1 shadow-none relative overflow-hidden transition-all duration-300 group-hover/cards:blur-[2px] group-hover/cards:scale-[0.98] hover:!blur-none hover:!scale-[1.02] hover:z-10 bg-zinc-900/50 cursor-pointer hover:bg-zinc-800/50"
+                  onClick={() => navigate(track.path)}
+               >
+                  <CardHeader className="pb-2">
+                     <div className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium">{track.title}</CardTitle>
+                        <track.icon className={`h-4 w-4 ${track.color} group-hover/cards:scale-110 transition-transform`} />
+                     </div>
+                     <div>
+                        <CardDescription className="text-xs text-muted-foreground mb-3">{track.description}</CardDescription>
+                        <div className="text-sm font-semibold">{track.stats}</div>
+                     </div>
+                  </CardHeader>
                </Card>
             ))}
          </div>
 
-         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 group/sections">
-            <Card className="col-span-4 border-none p-0 shadow-none relative overflow-hidden transition-all duration-300 group-hover/sections:blur-[2px] group-hover/sections:scale-[0.98] hover:!blur-none hover:!scale-[1.01] hover:z-10 bg-black">
-               <MagicCard
-                  gradientColor={theme === "dark" ? "#262626" : "#D9D9D955"}
-                  className="p-1 h-full border-none"
-               >
-                  <CardHeader>
-                     <CardTitle className="mb-4">Interview Roadmap</CardTitle>
-                     <div className="space-y-6">
-                        {[
-                           { step: "1", title: "DSA Fundamentals", status: "Pending", date: "Not started" },
-                           { step: "2", title: "System Design Basics", status: "Pending", date: "Not started" },
-                           { step: "3", title: "Mock Interview #1", status: "Pending", date: "Not started" },
-                        ].map((item, i) => (
-                           <div key={i} className="flex items-start gap-4">
-                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
-                                 {item.step}
-                              </div>
-                              <div className="flex-1 space-y-1">
-                                 <p className="text-sm font-medium leading-none">{item.title}</p>
-                                 <CardDescription className="text-xs text-muted-foreground">{item.date}</CardDescription>
-                              </div>
-                              <div className={`text-xs font-medium ${item.status === 'Completed' ? 'text-green-500' : item.status === 'In Progress' ? 'text-blue-500' : 'text-muted-foreground'}`}>
-                                 {item.status}
-                              </div>
-                           </div>
-                        ))}
-                     </div>
-                  </CardHeader>
-               </MagicCard>
-            </Card>
+         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 group/sections">
 
-            <Card className="col-span-3 border-none p-0 shadow-none relative overflow-hidden transition-all duration-300 group-hover/sections:blur-[2px] group-hover/sections:scale-[0.98] hover:!blur-none hover:!scale-[1.01] hover:z-10 bg-black">
-               <MagicCard
-                  gradientColor={theme === "dark" ? "#262626" : "#D9D9D955"}
-                  className="p-1"
-               >
-                  <CardHeader>
-                     <div className="flex flex-row items-center justify-between mb-4">
-                        <CardTitle>Top Resources</CardTitle>
-                     </div>
-                     <div className="space-y-4">
-                        <div className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
-                           <div className="h-10 w-10 flex items-center justify-center rounded overflow-hidden">
-                              <img src="/resource-pdf.jpeg" alt="PDF" className="h-full w-full object-cover" />
-                           </div>
-                           <div className="flex-1">
-                              <div className="text-sm font-medium">DSA Cheat Sheet</div>
-                              <div className="text-xs text-muted-foreground">Master sheet for common patterns</div>
-                           </div>
+            <Card className="col-span-full border border-zinc-800 p-1 shadow-none relative overflow-hidden transition-all duration-300 group-hover/sections:blur-[2px] group-hover/sections:scale-[0.98] hover:!blur-none hover:!scale-[1.01] hover:z-10 bg-zinc-900/50">
+               <CardHeader>
+                  <div className="flex flex-row items-center justify-between mb-4">
+                     <CardTitle>Top Resources</CardTitle>
+                  </div>
+                  <div className="space-y-4">
+                     <div className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
+                        <div className="h-10 w-10 flex items-center justify-center rounded overflow-hidden">
+                           <img src="/resource-pdf.jpeg" alt="PDF" className="h-full w-full object-cover" />
                         </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
-                           <div className="h-10 w-10 flex items-center justify-center rounded overflow-hidden text-green-500 font-bold">
-                              <img src="/resource-web.jpeg" alt="WEB" className="h-full w-full object-cover" />
-                           </div>
-                           <div className="flex-1">
-                              <div className="text-sm font-medium">System Design Primer</div>
-                              <div className="text-xs text-muted-foreground">Most popular SD resource</div>
-                           </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
-                           <div className="h-10 w-10 flex items-center justify-center rounded overflow-hidden text-purple-500 font-bold">
-                              <img src="/resource-leetcode.jpeg" alt="EXT" className="h-full w-full object-cover" />
-                           </div>
-                           <div className="flex-1">
-                              <div className="text-sm font-medium">LeetCode Patterns</div>
-                              <div className="text-xs text-muted-foreground">Interactive practice sets</div>
-                           </div>
+                        <div className="flex-1">
+                           <div className="text-sm font-medium">DSA Cheat Sheet</div>
+                           <div className="text-xs text-muted-foreground">Master sheet for common patterns</div>
                         </div>
                      </div>
-                  </CardHeader>
-               </MagicCard>
+                     <div className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
+                        <div className="h-10 w-10 flex items-center justify-center rounded overflow-hidden text-green-500 font-bold">
+                           <img src="/resource-web.jpeg" alt="WEB" className="h-full w-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                           <div className="text-sm font-medium">System Design Primer</div>
+                           <div className="text-xs text-muted-foreground">Most popular SD resource</div>
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
+                        <div className="h-10 w-10 flex items-center justify-center rounded overflow-hidden text-purple-500 font-bold">
+                           <img src="/resource-leetcode.jpeg" alt="EXT" className="h-full w-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                           <div className="text-sm font-medium">LeetCode Patterns</div>
+                           <div className="text-xs text-muted-foreground">Interactive practice sets</div>
+                        </div>
+                     </div>
+                  </div>
+               </CardHeader>
             </Card>
          </div>
       </div>

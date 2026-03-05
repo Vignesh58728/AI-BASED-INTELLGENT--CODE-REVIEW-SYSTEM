@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/Card";
-import { MagicCard } from "@/components/ui/magic-card";
-import { useTheme } from "next-themes";
+import { BorderBeam } from "@/components/ui/BorderBeam";
 import pythonIcon from "@/assets/images/python.png";
 import bookIcon from "@/assets/images/book.png";
 import aiIcon from "@/assets/images/ai-assistant.png";
+import consoleIcon from "@/assets/images/console-icon.png";
+import itIcon from "@/assets/images/it.png";
 
 export function ExplorePage() {
-   const { theme } = useTheme();
+   const navigate = useNavigate();
    const [articles, setArticles] = useState<any[]>([]);
    const [loading, setLoading] = useState(true);
 
    useEffect(() => {
       const fetchArticles = async () => {
          try {
-            const response = await fetch('https://dev.to/api/articles?tag=coding&per_page=6');
+            // Increased to 12 articles for a richer grid
+            const response = await fetch('https://dev.to/api/articles?tag=coding&per_page=12');
             const data = await response.json();
             setArticles(data);
          } catch (error) {
@@ -53,11 +56,11 @@ export function ExplorePage() {
          detail: 'Python & Logic'
       },
       {
-         title: 'Learn DSA',
-         image: bookIcon,
-         desc: 'Master algorithms',
-         path: '/college',
-         detail: 'Structured Thinking'
+         title: 'AI BASED INTELLGENCE',
+         image: aiIcon,
+         desc: 'Code Review',
+         path: '/ai/practice',
+         detail: 'CODE REVIEW SYSTEM'
       },
       {
          title: 'AIVISO Assistant',
@@ -69,55 +72,56 @@ export function ExplorePage() {
    ];
 
    return (
-      <div className="min-h-screen bg-black text-white space-y-12 p-12">
-         <div className="space-y-2">
-            <h1 className="text-4xl font-black tracking-tighter uppercase text-white">
+      <div className="min-h-screen bg-black text-white space-y-12 p-8 md:p-12">
+         {/* --- Hero Header --- */}
+         <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase text-white leading-none">
                Explore <span className="text-primary">Now</span>
             </h1>
          </div>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl">
+         {/* --- Main Modules Grid --- */}
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl">
             {mainModules.map((item, i) => (
-               <Card key={i} className="w-full border-none p-0 shadow-none relative overflow-hidden bg-black group/card">
-                  <MagicCard
-                     gradientColor={theme === "dark" ? "#262626" : "#D9D9D955"}
-                     className="p-1 cursor-pointer transition-all duration-300 h-full border-none"
-                  >
-                     <CardContent className="p-8 flex items-center gap-8 relative z-10 h-full">
-                        <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center border border-zinc-200 group-hover/card:scale-110 transition-transform duration-500 shadow-xl shrink-0">
-                           <img src={item.image} alt={item.title} className="h-10 w-10 object-contain" />
-                        </div>
-                        <div>
-                           <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-1">{item.title}</h3>
-                           <p className="text-zinc-400 text-xs font-medium">{item.desc}</p>
-                           <div className="mt-4 text-primary/60 text-[10px] font-black uppercase tracking-[0.2em]">{item.detail}</div>
-                        </div>
-                     </CardContent>
-                  </MagicCard>
+               <Card key={i} className="group/card w-full border border-zinc-800/50 p-0 shadow-xl relative overflow-hidden bg-zinc-900/30 backdrop-blur-sm transition-all duration-500 hover:border-zinc-700/50">
+                  <CardContent className="p-6 flex items-center gap-6 relative z-10 h-full cursor-pointer" onClick={() => navigate(item.path)}>
+                     <div className="bg-white/90 p-3 rounded-xl flex items-center justify-center border border-zinc-200 group-hover/card:scale-105 transition-all duration-500 shadow-lg shrink-0">
+                        <img src={item.image} alt={item.title} className="h-8 w-8 object-contain" />
+                     </div>
+                     <div>
+                        <h3 className="text-xl font-black text-white uppercase tracking-tight">{item.title}</h3>
+                     </div>
+                  </CardContent>
                </Card>
             ))}
          </div>
 
+
          {/* --- Daily Thirukkural Section --- */}
-         <div className="py-12 text-center max-w-4xl mx-auto mb-16 relative overflow-hidden">
-            <h2 className="text-2xl md:text-3xl font-medium text-white mb-6 leading-relaxed px-4 italic font-serif">
+         <div className="py-12 text-center max-w-4xl mx-auto relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-800/5 to-transparent blur-3xl opacity-30" />
+            <h2 className="text-lg md:text-2xl font-light text-white mb-6 leading-tight px-4 italic font-serif">
                "{dailyKural.tamil}"
             </h2>
-            <p className="text-zinc-400 text-sm md:text-base font-medium max-w-2xl mx-auto px-6 leading-relaxed opacity-80">
+            <div className="h-px w-16 bg-zinc-800 mx-auto mb-6" />
+            <p className="text-zinc-500 text-xs md:text-base font-medium max-w-xl mx-auto px-6 leading-relaxed">
                {dailyKural.meaning}
             </p>
          </div>
 
          {/* --- Latest Articles Section --- */}
-         <div className="max-w-4xl space-y-8">
-            <h2 className="text-xl font-black uppercase tracking-tight">Latest Articles</h2>
-            <div className="space-y-4 bg-zinc-900/10 rounded-3xl p-4">
+         <div className="space-y-8 pb-16">
+            <div className="flex items-end justify-between border-b border-zinc-900 pb-6">
+               <div className="space-y-1">
+                  <h2 className="text-2xl font-black uppercase tracking-tighter">Latest Articles</h2>
+               </div>
+            </div>
+
+            <div className="max-w-5xl space-y-6">
                {loading ? (
-                  <div className="space-y-4 animate-pulse">
-                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-24 bg-white/5 rounded-2xl" />
-                     ))}
-                  </div>
+                  Array.from({ length: 6 }).map((_, i) => (
+                     <div key={i} className="h-20 bg-zinc-900/10 rounded-lg animate-pulse" />
+                  ))
                ) : (
                   articles.map((article: any) => (
                      <a
@@ -125,21 +129,52 @@ export function ExplorePage() {
                         href={article.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex gap-6 p-6 rounded-2xl border border-white/5 hover:bg-white/5 transition-all cursor-pointer group/article block"
+                        className="group/article block border-b border-zinc-900/50 pb-6 last:border-0"
                      >
-                        <div className="hidden sm:block h-20 w-32 rounded-lg bg-zinc-800 overflow-hidden shrink-0">
-                           {article.cover_image && (
-                              <img src={article.cover_image} alt={article.title} className="h-full w-full object-cover grayscale group-hover/article:grayscale-0 transition-all" />
-                           )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                           <h3 className="text-lg font-bold text-white mb-1 group-hover/article:text-primary transition-colors truncate">
-                              {article.title}
-                           </h3>
-                           <div className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-zinc-500">
-                              <span>{article.user.name}</span>
-                              <span className="opacity-20">//</span>
-                              <span>{article.reading_time_minutes} min read</span>
+                        <div className="flex gap-5">
+                           <div className="hidden sm:block h-20 w-32 rounded-lg bg-zinc-900 overflow-hidden shrink-0 border border-white/5">
+                              {article.cover_image ? (
+                                 <img
+                                    src={article.cover_image}
+                                    alt={article.title}
+                                    className="h-full w-full object-cover grayscale transition-all duration-500 group-hover/article:grayscale-0 group-hover/article:scale-105"
+                                 />
+                              ) : (
+                                 <div className="h-full w-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
+                              )}
+                           </div>
+
+                           <div className="flex-1 flex flex-col justify-center min-w-0">
+                              <div className="flex gap-2 mb-1.5">
+                                 {article.tag_list?.slice(0, 3).map((tag: string) => (
+                                    <span key={tag} className="text-[8px] font-black uppercase tracking-[0.15em] text-zinc-600">
+                                       #{tag}
+                                    </span>
+                                 ))}
+                              </div>
+
+                              <h3 className="text-lg font-bold text-white leading-snug mb-2 group-hover/article:text-primary transition-colors truncate">
+                                 {article.title}
+                              </h3>
+
+                              <div className="flex items-center justify-between">
+                                 <div className="flex items-center gap-2.5">
+                                    {article.user?.profile_image_90 && (
+                                       <img src={article.user.profile_image_90} className="h-4 w-4 rounded-full grayscale opacity-70" alt={article.user.name} />
+                                    )}
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">
+                                       {article.user.name}
+                                    </span>
+                                    <span className="text-zinc-800">/</span>
+                                    <span className="text-[9px] font-bold text-zinc-600 tabular-nums uppercase tracking-widest">
+                                       {article.reading_time_minutes} min read
+                                    </span>
+                                 </div>
+
+                                 <div className="hidden md:flex items-center text-primary text-[9px] font-black uppercase tracking-[0.2em] opacity-0 group-hover/article:opacity-100 transition-opacity">
+                                    Read Article →
+                                 </div>
+                              </div>
                            </div>
                         </div>
                      </a>

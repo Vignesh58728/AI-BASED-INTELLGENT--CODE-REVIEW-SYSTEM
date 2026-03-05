@@ -16,8 +16,24 @@ async def create(*, obj_in: UserCreate) -> User:
         hashed_password=get_password_hash(obj_in.password),
         full_name=obj_in.full_name,
         role=obj_in.role,
+        bio=obj_in.bio,
+        lang=obj_in.lang,
+        photo=obj_in.photo,
     )
     await db_obj.insert()
+    return db_obj
+
+async def update(*, db_obj: User, obj_in: UserUpdate) -> User:
+    update_data = obj_in.dict(exclude_unset=True)
+    if "password" in update_data and update_data["password"]:
+        hashed_password = get_password_hash(update_data["password"])
+        del update_data["password"]
+        update_data["hashed_password"] = hashed_password
+    
+    for field, value in update_data.items():
+        setattr(db_obj, field, value)
+        
+    await db_obj.save()
     return db_obj
 
 async def authenticate(*, email: str, password: str) -> Optional[User]:

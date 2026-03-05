@@ -21,30 +21,21 @@ import { Practice } from '@/pages/Practice';
 
 // New Pages
 import { SkillAnalysis } from '@/pages/SkillAnalysis';
-import { ReviewHistory } from '@/pages/ReviewHistory';
 import { AdminPanel } from '@/pages/AdminPanel';
 import { Profile } from '@/pages/Profile';
 
-// College Module Pages
 import { DataStructuresPractice } from '@/pages/college/DataStructuresPractice';
 import { AlgorithmsPractice } from '@/pages/college/AlgorithmsPractice';
 import { CollegePracticePage } from '@/pages/college/CollegePracticePage';
-import { PlacementPreparation } from '@/pages/college/PlacementPreparation';
 import { CSCoreSubjects } from '@/pages/college/CSCoreSubjects';
-import { InterviewPrep } from '@/pages/college/InterviewPrep';
-import { MockInterviewPage } from '@/pages/college/MockInterviewPage';
-import { PlacementAnalytics } from '@/pages/college/PlacementAnalytics';
 
 // IT Module Pages
 import { FullStackPractice } from '@/pages/it/FullStackPractice';
 import { CloudComputingPractice } from '@/pages/it/CloudComputingPractice';
 import { SecurityPractice } from '@/pages/it/SecurityPractice';
-
-import { ProblemsListPage } from '@/pages/shared/ProblemsListPage';
 import { ExplorePage } from '@/pages/shared/ExplorePage';
+
 import { DiscussPage } from '@/pages/shared/DiscussPage';
-import { InterviewPrepPage } from '@/pages/shared/InterviewPrepPage';
-import { InterviewAssessmentPage } from '@/pages/shared/InterviewAssessmentPage';
 import { AIPage } from '@/pages/shared/AIPage';
 import { AIPracticePage } from '@/pages/shared/AIPracticePage';
 
@@ -74,14 +65,10 @@ function App() {
                         {/* Protected Routes */}
                         <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
                            <Route path="/explore" element={<ExplorePage />} />
-                           <Route path="/problems" element={<ProblemsListPage />} />
                            <Route path="/discuss" element={<DiscussPage />} />
                            <Route path="/skill-analysis" element={<SkillAnalysis />} />
-                           <Route path="/history" element={<ReviewHistory />} />
                            <Route path="/admin" element={<AdminPanel />} />
 
-                           <Route path="/interview/preparation" element={<InterviewPrepPage />} />
-                           <Route path="/interview/assessment" element={<InterviewAssessmentPage />} />
 
                            <Route path="/school" element={<SchoolDashboard />} />
                            <Route path="/school/beginner" element={<BeginnerPractice />} />
@@ -96,10 +83,6 @@ function App() {
                            <Route path="/college/algorithms" element={<AlgorithmsPractice />} />
                            <Route path="/college/practice/:id" element={<CollegePracticePage />} />
                            <Route path="/college/core" element={<CSCoreSubjects />} />
-                           <Route path="/college/placement" element={<PlacementPreparation />} />
-                           <Route path="/college/interview" element={<InterviewPrep />} />
-                           <Route path="/college/mock" element={<MockInterviewPage />} />
-                           <Route path="/college/analytics" element={<PlacementAnalytics />} />
                            <Route path="/it" element={<ITDashboard />} />
                            <Route path="/it/fullstack" element={<FullStackPractice />} />
                            <Route path="/it/cloud" element={<CloudComputingPractice />} />

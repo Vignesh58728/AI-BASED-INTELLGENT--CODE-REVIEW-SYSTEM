@@ -1,11 +1,12 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from pydantic import BaseModel
 
 class AIReviewRequest(BaseModel):
     code: str
     language: str
-    problem_id: Optional[str] = None
-    user_id: Optional[str] = None
+    problem_id: Optional[Union[str, int]] = None
+    user_id: Optional[Union[str, int]] = None
+    model: Optional[str] = "default"
 
 class AIItem(BaseModel):
     line: int
@@ -27,7 +28,9 @@ class ComplexityResponse(BaseModel):
 class ExplainRequest(BaseModel):
     code: str
     language: str
+    line: Optional[int] = None
     model: Optional[str] = "default"
+    language_hint: Optional[str] = "english"
 
 class ExplainResponse(BaseModel):
     explanation: str
@@ -49,6 +52,7 @@ class EdgeCaseResponse(BaseModel):
 class FixRequest(BaseModel):
     code: str
     language: str
+    model: Optional[str] = "default"
 
 class FixResponse(BaseModel):
     fixed_code: str
@@ -64,9 +68,37 @@ class PlagiarismResponse(BaseModel):
 class CodeGenRequest(BaseModel):
     prompt: str
     language: str
-    problem_id: Optional[str] = None
+    problem_id: Optional[Union[str, int]] = None
+    model: Optional[str] = "default"
 
 class CodeGenResponse(BaseModel):
     code: str
     explanation: str
     status: str = "completed"
+
+class TestCase(BaseModel):
+    input: str
+    expectedOutput: str
+
+class CodeReviewSubmitRequest(BaseModel):
+    code: str
+    problemContext: str
+    testCases: List[TestCase]
+    requiredFunctions: Optional[List[str]] = None
+    language: Optional[str] = "python"
+
+class TestResult(BaseModel):
+    input: str
+    expected: str
+    actual: str
+    passed: bool
+    error: Optional[str] = None
+    executor_status: Optional[str] = None
+
+class CodeReviewSubmitResponse(BaseModel):
+    status: str # "passed", "failed", "rejected"
+    type: Optional[str] = None # For rejection types
+    message: Optional[str] = None
+    aiReview: Optional[str] = None
+    runResult: Optional[dict] = None
+    reviewStatus: str # "no_correct", "no_meaningless", "proceed"

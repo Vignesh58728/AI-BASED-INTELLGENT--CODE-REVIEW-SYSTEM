@@ -8,7 +8,7 @@ from app.services import llm_service
 
 async def analyze_code(request: AIReviewRequest) -> AIReviewResponse:
     """Analyzes code using real AI."""
-    result = await llm_service.analyze_code_with_llm(request.code, request.language)
+    result = await llm_service.analyze_code_with_llm(request.code, request.language, model=request.model or "default")
     
     detailed_reviews = [
         AIItem(line=item.get("line", 1), comment=item.get("comment", ""), severity=item.get("severity", "info"))
@@ -24,7 +24,7 @@ async def analyze_code(request: AIReviewRequest) -> AIReviewResponse:
 
 async def analyze_complexity(request: AIReviewRequest) -> ComplexityResponse:
     """Calculates Big-O notation using real AI."""
-    result = await llm_service.analyze_complexity_with_llm(request.code, request.language)
+    result = await llm_service.analyze_complexity_with_llm(request.code, request.language, model=request.model or "default")
     
     return ComplexityResponse(
         time_complexity=result.get("time_complexity", "O(?)"),

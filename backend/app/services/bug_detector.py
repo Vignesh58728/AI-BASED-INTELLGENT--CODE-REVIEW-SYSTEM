@@ -7,7 +7,7 @@ from app.services import llm_service
 
 async def predict_edge_cases(request: AIReviewRequest) -> EdgeCaseResponse:
     """Predicts potential edge cases using real AI."""
-    result = await llm_service.predict_edge_cases_with_llm(request.code, request.language)
+    result = await llm_service.predict_edge_cases_with_llm(request.code, request.language, model=request.model or "default")
     
     cases = [
         EdgeCaseItem(input=item.get("input", ""), reason=item.get("reason", ""))
@@ -17,5 +17,5 @@ async def predict_edge_cases(request: AIReviewRequest) -> EdgeCaseResponse:
     return EdgeCaseResponse(cases=cases, status="completed")
 
 async def detect_bugs_ml(code: str) -> list:
-    """Placeholder for ML-based bug detection."""
-    return []
+    """ML-based bug detection using the integrated model."""
+    return ml_service.predict_bugs(code)

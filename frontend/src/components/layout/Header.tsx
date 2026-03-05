@@ -75,9 +75,6 @@ export function Header() {
                               <Link to="/skill-analysis" className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 text-sm rounded-lg transition-colors">
                                  <Activity className="h-4 w-4" /> Skill Analysis
                               </Link>
-                              <Link to="/history" className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 text-sm rounded-lg transition-colors">
-                                 <Clock className="h-4 w-4" /> Review History
-                              </Link>
                               <Link to="/admin" className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 text-sm rounded-lg transition-colors">
                                  <ShieldCheck className="h-4 w-4" /> Admin Panel
                               </Link>

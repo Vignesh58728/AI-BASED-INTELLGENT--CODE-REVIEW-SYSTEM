@@ -19,7 +19,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       <div className="relative">
          <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-white transition-all text-[11px] font-bold tracking-tight"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-zinc-600 hover:text-white transition-all text-[11px] font-bold tracking-tight"
          >
             <img
                src="/artificial-intelligence.png"

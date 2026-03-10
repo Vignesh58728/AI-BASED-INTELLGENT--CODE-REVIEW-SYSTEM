@@ -13,7 +13,7 @@ export function SecurityPractice() {
       <div className="space-y-6 container mx-auto py-8">
          <div>
             <h1 className="text-3xl font-bold tracking-tight mb-2">Cyber Security</h1>
-            <p className="text-muted-foreground">Protect systems and data with ethical hacking and defensive strategies.</p>
+            <p className="text-black">Protect systems and data with ethical hacking and defensive strategies.</p>
          </div>
 
          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BookOpen, Star, GitFork, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { fetchAiBackground } from '@/services/unsplashService';
+
 import { Card, CardContent } from "@/components/ui/Card";
 import { BorderBeam } from "@/components/ui/BorderBeam";
 import pythonIcon from "@/assets/images/python.png";
@@ -11,13 +15,22 @@ import itIcon from "@/assets/images/it.png";
 export function ExplorePage() {
    const navigate = useNavigate();
    const [articles, setArticles] = useState<any[]>([]);
+   const [repos, setRepos] = useState<any[]>([]);
    const [loading, setLoading] = useState(true);
+   const [reposLoading, setReposLoading] = useState(true);
+
+   const [unsplashBg, setUnsplashBg] = useState<string | null>(null);
 
    useEffect(() => {
+      const getBg = async () => {
+         const bg = await fetchAiBackground();
+         if (bg) setUnsplashBg(bg);
+      };
+      getBg();
+
       const fetchArticles = async () => {
          try {
-            // Increased to 12 articles for a richer grid
-            const response = await fetch('https://dev.to/api/articles?tag=coding&per_page=12');
+            const response = await fetch('https://dev.to/api/articles?tag=coding&per_page=10');
             const data = await response.json();
             setArticles(data);
          } catch (error) {
@@ -26,7 +39,22 @@ export function ExplorePage() {
             setLoading(false);
          }
       };
+
+      const fetchTrendingRepos = async () => {
+         try {
+            // Fetching repositories with >1000 stars (as a proxy for trending)
+            const response = await fetch('https://api.github.com/search/repositories?q=stars:>1000+pushed:>2024-01-01&sort=stars&order=desc&per_page=6');
+            const data = await response.json();
+            setRepos(data.items || []);
+         } catch (error) {
+            console.error('Error fetching repos:', error);
+         } finally {
+            setReposLoading(false);
+         }
+      };
+
       fetchArticles();
+      fetchTrendingRepos();
    }, []);
 
    // --- Daily Thirukkural Logic ---
@@ -51,76 +79,156 @@ export function ExplorePage() {
       {
          title: 'New to Coding?',
          image: pythonIcon,
-         desc: 'Start your journey here',
-         path: '/school',
-         detail: 'Python & Logic'
+         path: '/school'
       },
       {
-         title: 'AI BASED INTELLGENCE',
-         image: aiIcon,
-         desc: 'Code Review',
-         path: '/ai/practice',
-         detail: 'CODE REVIEW SYSTEM'
+         title: 'Data Structures',
+         image: bookIcon,
+         path: '/college/ds'
       },
       {
          title: 'AIVISO Assistant',
          image: aiIcon,
-         desc: 'AI-powered reviews',
-         path: '/ai-coach',
-         detail: 'Smart Guidance'
+         path: '/ai-coach'
       }
    ];
 
    return (
-      <div className="min-h-screen bg-black text-white space-y-12 p-8 md:p-12">
-         {/* --- Hero Header --- */}
-         <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase text-white leading-none">
-               Explore <span className="text-primary">Now</span>
-            </h1>
-         </div>
+      <div className="min-h-screen bg-white text-black space-y-12 px-4 md:px-12 py-20 relative overflow-hidden">
+         {/* Premium background layer (Unsplash) */}
+         {unsplashBg && (
+            <motion.div
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 0.85 }}
+               className="absolute inset-0 z-0 pointer-events-none"
+               style={{
+                  backgroundImage: `url(${unsplashBg})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  filter: 'grayscale(100%) brightness(1.5) contrast(100%)',
+                  mixBlendMode: 'multiply'
+               }}
+            />
+         )}
 
-         {/* --- Main Modules Grid --- */}
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl">
+         {/* Premium background mesh gradients - Refined for Code Visibility */}
+         <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-white/10 via-white/40 to-white/80 z-[1]" />
+         <div className="absolute -top-[10%] -right-[10%] w-[60%] h-[60%] rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40 z-[2]" />
+         <div className="absolute -bottom-[10%] -left-[10%] w-[60%] h-[60%] rounded-full bg-gradient-to-tr from-white/20 via-transparent to-transparent blur-[120px] pointer-events-none opacity-40 z-[2]" />
+
+         {/* --- Main Modules Section --- */}
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full relative z-10 px-0">
             {mainModules.map((item, i) => (
-               <Card key={i} className="group/card w-full border border-zinc-800/50 p-0 shadow-xl relative overflow-hidden bg-zinc-900/30 backdrop-blur-sm transition-all duration-500 hover:border-zinc-700/50">
-                  <CardContent className="p-6 flex items-center gap-6 relative z-10 h-full cursor-pointer" onClick={() => navigate(item.path)}>
-                     <div className="bg-white/90 p-3 rounded-xl flex items-center justify-center border border-zinc-200 group-hover/card:scale-105 transition-all duration-500 shadow-lg shrink-0">
-                        <img src={item.image} alt={item.title} className="h-8 w-8 object-contain" />
+               <Card
+                  key={i}
+                  className="group/card w-full p-0 shadow-lg relative overflow-hidden bg-white transition-all duration-500 hover:-translate-y-1 rounded-none cursor-pointer"
+                  onClick={() => navigate(item.path)}
+               >
+                  <CardContent className="p-8 flex items-center gap-6 relative z-10 w-full">
+                     <div className="bg-white p-4 rounded-none flex items-center justify-center group-hover/card:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.05)] transition-all duration-300 shrink-0 border border-zinc-100">
+                        <img src={item.image} alt={item.title} className="h-10 w-10 object-contain" />
                      </div>
-                     <div>
-                        <h3 className="text-xl font-black text-white uppercase tracking-tight">{item.title}</h3>
+                     <div className="flex-1">
+                        <h3 className="text-[14px] md:text-[16px] font-bold text-black uppercase leading-tight tracking-wider" style={{ fontFamily: "'Syncopate', sans-serif" }}>
+                           {item.title}
+                        </h3>
                      </div>
                   </CardContent>
                </Card>
             ))}
          </div>
 
-
          {/* --- Daily Thirukkural Section --- */}
-         <div className="py-12 text-center max-w-4xl mx-auto relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-800/5 to-transparent blur-3xl opacity-30" />
-            <h2 className="text-lg md:text-2xl font-light text-white mb-6 leading-tight px-4 italic font-serif">
+         <div className="py-24 text-center max-w-5xl mx-auto relative z-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/5 to-transparent blur-[120px] opacity-60 -z-1" />
+
+            <h2 className="text-2xl md:text-3xl font-bold text-black mb-8 leading-tight px-4 tracking-[-0.02em]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                "{dailyKural.tamil}"
             </h2>
-            <div className="h-px w-16 bg-zinc-800 mx-auto mb-6" />
-            <p className="text-zinc-500 text-xs md:text-base font-medium max-w-xl mx-auto px-6 leading-relaxed">
+
+            <p className="text-zinc-600 text-lg font-light max-w-3xl mx-auto px-6 leading-relaxed" style={{ fontFamily: "'Outfit', sans-serif" }}>
                {dailyKural.meaning}
             </p>
          </div>
 
+         {/* --- GitHub Trending Repositories --- */}
+         <div className="space-y-12 relative z-10">
+            <div className="flex items-center justify-between border-b border-black/10 pb-8">
+               <h2 className="text-3xl font-bold tracking-tight text-black uppercase" style={{ fontFamily: "'Syncopate', sans-serif" }}>Trending Repos</h2>
+               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest"></span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+               {reposLoading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                     <div key={i} className="h-48 bg-zinc-50 rounded-none animate-pulse border border-black/5" />
+                  ))
+               ) : (
+                  repos.map((repo, idx) => (
+                     <motion.div
+                        key={repo.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="group/repo bg-white/40 backdrop-blur-2xl border-2 border-black/5 p-8 rounded-none hover:border-black/20 hover:shadow-xl transition-all duration-500 flex flex-col justify-between"
+                     >
+                        <div className="space-y-4">
+                           <div className="flex items-center justify-between">
+                              <div className="h-10 w-10 rounded-none overflow-hidden border border-black/10">
+                                 <img src={repo.owner?.avatar_url} alt={repo.owner?.login} className="h-full w-full object-cover" />
+                              </div>
+                              <a href={repo.html_url} target="_blank" rel="noopener noreferrer" className="p-2 bg-black/5 rounded-full hover:bg-black text-black hover:text-white transition-all">
+                                 <ExternalLink size={14} />
+                              </a>
+                           </div>
+
+                           <div>
+                              <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">{repo.owner?.login}</h4>
+                              <h3 className="text-lg font-bold text-black group-hover/repo:text-primary leading-tight truncate">
+                                 {repo.name}
+                              </h3>
+                           </div>
+
+                           <p className="text-zinc-500 text-sm line-clamp-2 min-h-[40px]">
+                              {repo.description || "No description provided for this repository."}
+                           </p>
+                        </div>
+
+                        <div className="mt-8 flex items-center justify-between pt-6 border-t border-black/5">
+                           <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1.5">
+                                 <Star size={14} className="text-yellow-500 fill-yellow-500" />
+                                 <span className="text-xs font-bold text-black tracking-tight">{(repo.stargazers_count / 1000).toFixed(1)}k</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                 <GitFork size={14} className="text-zinc-400" />
+                                 <span className="text-xs font-bold text-black tracking-tight">{repo.forks_count}</span>
+                              </div>
+                           </div>
+                           {repo.language && (
+                              <span className="text-[9px] font-black uppercase tracking-wider bg-black/5 px-3 py-1 rounded-full text-black">
+                                 {repo.language}
+                              </span>
+                           )}
+                        </div>
+                     </motion.div>
+                  ))
+               )}
+            </div>
+         </div>
+
          {/* --- Latest Articles Section --- */}
-         <div className="space-y-8 pb-16">
-            <div className="flex items-end justify-between border-b border-zinc-900 pb-6">
-               <div className="space-y-1">
-                  <h2 className="text-2xl font-black uppercase tracking-tighter">Latest Articles</h2>
+         <div className="space-y-10 pb-16 relative z-10">
+            <div className="flex items-end justify-between border-b border-black/10 pb-8">
+               <div className="space-y-2">
+                  <h2 className="text-3xl font-bold tracking-tight text-black uppercase" style={{ fontFamily: "'Syncopate', sans-serif" }}>Latest Insights</h2>
                </div>
             </div>
 
-            <div className="max-w-5xl space-y-6">
+            <div className="max-w-5xl space-y-10">
                {loading ? (
-                  Array.from({ length: 6 }).map((_, i) => (
-                     <div key={i} className="h-20 bg-zinc-900/10 rounded-lg animate-pulse" />
+                  Array.from({ length: 10 }).map((_, i) => (
+                     <div key={i} className="h-32 bg-zinc-100/50 rounded-none animate-pulse" />
                   ))
                ) : (
                   articles.map((article: any) => (
@@ -129,50 +237,54 @@ export function ExplorePage() {
                         href={article.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/article block border-b border-zinc-900/50 pb-6 last:border-0"
+                        className="group/article block border-b border-black/10 py-10 last:border-0 transition-all duration-500"
                      >
-                        <div className="flex gap-5">
-                           <div className="hidden sm:block h-20 w-32 rounded-lg bg-zinc-900 overflow-hidden shrink-0 border border-white/5">
-                              {article.cover_image ? (
+                        <div className="flex flex-col sm:flex-row gap-8 items-center">
+                           <div className="h-40 sm:h-28 sm:w-48 rounded-none overflow-hidden shrink-0 border border-black/5 shadow-md">
+                              {(article.cover_image || article.social_image) ? (
                                  <img
-                                    src={article.cover_image}
+                                    src={article.cover_image || article.social_image}
                                     alt={article.title}
-                                    className="h-full w-full object-cover grayscale transition-all duration-500 group-hover/article:grayscale-0 group-hover/article:scale-105"
+                                    className="h-full w-full object-cover transition-all duration-700 group-hover/article:scale-105"
                                  />
                               ) : (
-                                 <div className="h-full w-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
+                                 <div className="h-full w-full bg-zinc-50 flex items-center justify-center">
+                                    <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">No Image</span>
+                                 </div>
                               )}
                            </div>
 
                            <div className="flex-1 flex flex-col justify-center min-w-0">
-                              <div className="flex gap-2 mb-1.5">
+                              <div className="flex flex-wrap gap-3 mb-3">
                                  {article.tag_list?.slice(0, 3).map((tag: string) => (
-                                    <span key={tag} className="text-[8px] font-black uppercase tracking-[0.15em] text-zinc-600">
+                                    <span key={tag} className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-500">
                                        #{tag}
                                     </span>
                                  ))}
                               </div>
 
-                              <h3 className="text-lg font-bold text-white leading-snug mb-2 group-hover/article:text-primary transition-colors truncate">
+                              <h3 className="text-xl font-bold text-black leading-tight mb-4 group-hover/article:underline decoration-black/20 underline-offset-8 transition-all" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                  {article.title}
                               </h3>
 
                               <div className="flex items-center justify-between">
-                                 <div className="flex items-center gap-2.5">
+                                 <div className="flex items-center gap-3">
                                     {article.user?.profile_image_90 && (
-                                       <img src={article.user.profile_image_90} className="h-4 w-4 rounded-full grayscale opacity-70" alt={article.user.name} />
+                                       <img src={article.user.profile_image_90} className="h-6 w-6 rounded-full border border-black/10" alt={article.user.name} />
                                     )}
-                                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">
-                                       {article.user.name}
-                                    </span>
-                                    <span className="text-zinc-800">/</span>
-                                    <span className="text-[9px] font-bold text-zinc-600 tabular-nums uppercase tracking-widest">
-                                       {article.reading_time_minutes} min read
-                                    </span>
+                                    <div className="flex items-center gap-3">
+                                       <span className="text-[10px] font-bold uppercase tracking-wider text-black" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                                          {article.user.name}
+                                       </span>
+                                       <span className="w-1 h-1 bg-black/20 rounded-full" />
+                                       <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
+                                          {article.reading_time_minutes} min read
+                                       </span>
+                                    </div>
                                  </div>
 
-                                 <div className="hidden md:flex items-center text-primary text-[9px] font-black uppercase tracking-[0.2em] opacity-0 group-hover/article:opacity-100 transition-opacity">
-                                    Read Article →
+                                 <div className="hidden md:block text-black font-bold uppercase tracking-[0.2em] text-[10px] opacity-0 group-hover/article:opacity-100 transition-all duration-500">
+                                    Read Article <span className="ml-2">→</span>
                                  </div>
                               </div>
                            </div>

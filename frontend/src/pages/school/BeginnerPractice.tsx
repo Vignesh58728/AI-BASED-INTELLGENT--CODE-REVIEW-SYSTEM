@@ -17,7 +17,7 @@ function ProgramCard({ item, completed, onClick, index }: {
             transition-all duration-500 overflow-hidden
             ${completed
                ? "bg-emerald-500/5 border-emerald-500/30 hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]"
-               : "bg-black/90 border-zinc-800/50 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)]"}
+               : "bg-white border-zinc-200 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)]"}
          `}
       >
          {/* Subtle gradient background on hover */}
@@ -27,14 +27,14 @@ function ProgramCard({ item, completed, onClick, index }: {
          <div className={`shrink-0 text-sm font-black transition-all duration-300 w-6
             ${completed
                ? "text-emerald-400"
-               : "text-zinc-500 group-hover:text-primary"}`}>
+               : "text-black group-hover:text-primary"}`}>
             {completed ? <CheckCircle2 className="w-5 h-5" /> : index}
          </div>
 
          {/* Title Section */}
          <div className="flex-1 min-w-0 relative z-10">
             <p className={`text-base font-bold tracking-tight transition-colors duration-300 truncate
-               ${completed ? "text-emerald-400/90" : "text-zinc-200 group-hover:text-white"}`}>
+               ${completed ? "text-emerald-400/90" : "text-black group-hover:text-black"}`}>
                {item.title}
             </p>
          </div>
@@ -71,7 +71,7 @@ export function BeginnerPractice() {
 
 
    return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-white">
          <div className="container mx-auto px-4 py-8 max-w-4xl">
 
             {/* Header Section */}
@@ -84,23 +84,23 @@ export function BeginnerPractice() {
                </div>
                <div>
                   <h1 className="text-3xl font-bold tracking-tight text-foreground">Beginner Practice</h1>
-                  <p className="text-muted-foreground text-sm">Learn syntax & symbols • Programs 1–35</p>
+                  <p className="text-black text-sm">Learn syntax & symbols • Programs 1–35</p>
                </div>
             </div>
 
             {/* Search (Premium OLED) */}
             <div className="relative mb-8 group">
                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none z-20">
-                  <Search className="w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors duration-300" />
+                  <Search className="w-4 h-4 text-black group-focus-within:text-primary transition-colors duration-300" />
                </div>
                <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="e.g Find prime number, swap numbers..."
-                  className="pl-11 pr-4 py-6 bg-black/40 border-zinc-800/50 text-zinc-200 placeholder:text-zinc-600 rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all duration-300 group-hover:border-zinc-700 shadow-inner"
+                  className="pl-11 pr-4 py-6 bg-white border-zinc-200 text-black placeholder:text-black rounded-xl focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all duration-300 group-hover:border-zinc-700 shadow-inner"
                />
                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
-                  <span className="text-[10px] text-zinc-500 font-bold border border-zinc-800 px-1.5 py-0.5 rounded bg-zinc-900/50">ESC</span>
+                  <span className="text-[10px] text-black font-bold border border-zinc-200 px-1.5 py-0.5 rounded bg-white">ESC</span>
                </div>
             </div>
 
@@ -108,11 +108,11 @@ export function BeginnerPractice() {
 
             {/* ── Result count ── */}
             <div className="flex items-center justify-between mb-3">
-               <p className="text-sm text-muted-foreground">
+               <p className="text-sm text-black">
                   Showing <span className="text-foreground font-semibold">{filtered.length}</span> programs
                   {search && <> matching "<span className="text-primary">{search}</span>"</>}
                </p>
-               <div className="flex items-center gap-1 text-xs text-muted-foreground">
+               <div className="flex items-center gap-1 text-xs text-black">
                   <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
                   <span>{completedIds.size} / {problems.length}</span>
                </div>
@@ -122,7 +122,7 @@ export function BeginnerPractice() {
             {isLoading ? (
                <div className="flex flex-col items-center justify-center py-24 text-center">
                   <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
-                  <p className="text-muted-foreground text-sm">Loading problems...</p>
+                  <p className="text-black text-sm">Loading problems...</p>
                </div>
             ) : filtered.length > 0 ? (
                <div className="flex flex-col gap-2">
@@ -135,9 +135,9 @@ export function BeginnerPractice() {
                </div>
             ) : (
                <div className="flex flex-col items-center justify-center py-24 text-center">
-                  <Search className="w-7 h-7 text-muted-foreground mb-3" />
+                  <Search className="w-7 h-7 text-black mb-3" />
                   <h3 className="text-foreground font-semibold mb-1">No programs found</h3>
-                  <p className="text-muted-foreground text-sm">Try a different search term.</p>
+                  <p className="text-black text-sm">Try a different search term.</p>
                </div>
             )}
 

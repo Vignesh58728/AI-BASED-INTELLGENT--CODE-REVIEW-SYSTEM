@@ -17,7 +17,6 @@ import {
    X,
    Paperclip,
    Loader2,
-   Globe,
    Languages,
    Link2,
    ImageIcon,
@@ -34,7 +33,12 @@ import {
    Telescope,
    ShoppingBag,
    MoreHorizontal,
-   BookOpen
+   BookOpen,
+   Play,
+   Presentation,
+   FileSpreadsheet,
+   FileArchive,
+   File
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -42,8 +46,12 @@ import { submissionService } from '@/services/submissionService';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import * as XLSX from 'xlsx';
+import pptxgen from 'pptxgenjs';
 import { Search } from 'lucide-react';
 import VoiceLoader from '@/components/ui/VoiceLoader';
+import { notificationService } from '@/services/notificationService';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
    role: 'user' | 'assistant';
@@ -66,7 +74,6 @@ export function AIPage() {
    const [searchValue, setSearchValue] = useState("");
    const [isModelOpen, setIsModelOpen] = useState(false);
    const [selectedModel, setSelectedModel] = useState("gpt-oss");
-   const [useWebSearch, setUseWebSearch] = useState(false);
    const [languageHint, setLanguageHint] = useState<'english' | 'tamil'>('english');
    const [attachedFileName, setAttachedFileName] = useState('');
    const [attachedFileContent, setAttachedFileContent] = useState('');
@@ -99,6 +106,21 @@ export function AIPage() {
    ];
    const models = [
       "Gemini 2.5 Flash", "Gemma 3", "gpt-oss", "Llama 3.1 8b"
+   ];
+
+   const handleQuickAction = (text: string) => {
+      setSearchValue(text);
+      setIsActionMenuOpen(false);
+      // Optional: Auto-send if you want it to be immediate
+      // setTimeout(() => handleSend(), 100); 
+   };
+
+   const actionItems = [
+      { icon: <img src="/ppt.png" className="w-5 h-5 object-contain" />, label: "Create PPT", subtitle: "Generate presentation", color: "text-orange-500", onClick: () => handleQuickAction("Create PPT presentation about ") },
+      { icon: <img src="/sheets.png" className="w-5 h-5 object-contain" />, label: "Create Excel", subtitle: "Export research data", color: "text-green-500", onClick: () => handleQuickAction("Create Excel spreadsheet") },
+      { icon: <img src="/pdf.png" className="w-5 h-5 object-contain" />, label: "Create PDF", subtitle: "Export to study document", color: "text-red-500", onClick: () => handleQuickAction("Create PDF report") },
+      { icon: <img src="/newbie.png" className="w-5 h-5 object-contain" />, label: "Analyze", subtitle: "Deep code & architectural review", color: "text-blue-500", onClick: () => handleQuickAction("Analyze this code: ") },
+      { icon: <Paperclip size={18} />, label: "Attach", subtitle: "Upload code, PDF or documents", color: "text-zinc-500", onClick: () => { fileInputRef.current?.click(); setIsActionMenuOpen(false); } },
    ];
 
    const { isAuthenticated } = useAuth();
@@ -218,11 +240,11 @@ export function AIPage() {
       target.parentElement?.querySelector('.image-loader')?.classList.add('hidden');
    };
 
-   const handleExportPDF = async () => {
-      const element = document.getElementById('chat-messages-container');
+   const handleExportPDF = async (elementId: string = 'chat-messages-container') => {
+      const element = document.getElementById(elementId);
       if (!element) return;
 
-      const canvas = await html2canvas(element, { backgroundColor: '#050505' });
+      const canvas = await html2canvas(element, { backgroundColor: '#FFFFFF' });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgProps = pdf.getImageProperties(imgData);
@@ -230,11 +252,12 @@ export function AIPage() {
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`chat-export-${Date.now()}.pdf`);
+      pdf.save(`AIVISO-Edu-${Date.now()}.pdf`);
+      notificationService.triggerDownloadEvent(`Export PDF`);
    };
 
-   const handleExportExcel = () => {
-      const data = messages.map(m => ({
+   const handleExportExcel = (specificMsg?: Message, customTitle?: string) => {
+      const data = specificMsg ? [{ Role: specificMsg.role, Content: specificMsg.content, Time: new Date().toLocaleTimeString() }] : messages.map(m => ({
          Role: m.role,
          Content: m.content,
          Time: new Date().toLocaleTimeString()
@@ -242,20 +265,118 @@ export function AIPage() {
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "ChatHistory");
-      XLSX.writeFile(wb, `chat-data-${Date.now()}.xlsx`);
+      const fileName = customTitle ? `AIVISO-${customTitle.replace(/\s+/g, '-')}-${Date.now()}.xlsx` : `AIVISO-Data-${Date.now()}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      notificationService.triggerDownloadEvent(`Export Excel`);
    };
 
-   const handleExportWord = () => {
-      const content = messages.map(m => `${m.role.toUpperCase()}:\n${m.content}\n\n`).join('');
-      const blob = new Blob(['\ufeff', content], {
+   const handleExportWord = (content?: string, customTitle?: string) => {
+      const contentToExport = content || messages.map(m => `${m.role.toUpperCase()}:\n${m.content}\n\n`).join('');
+      const blob = new Blob(['\ufeff', contentToExport], {
          type: 'application/msword'
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `chat-export-${Date.now()}.doc`;
+      const fileName = customTitle ? `AIVISO-${customTitle.replace(/\s+/g, '-')}-${Date.now()}.doc` : `AIVISO-Doc-${Date.now()}.doc`;
+      link.download = fileName;
       link.click();
       URL.revokeObjectURL(url);
+      notificationService.triggerDownloadEvent(`Chat Export Word`);
+   };
+
+   const handleExportPPT = (specificMsg?: Message, userTopic?: string) => {
+      const pres = new pptxgen();
+      const topic = userTopic || "Educational Research";
+      const primaryColor = "3B82F6"; // AIVISO Blue
+      const secondaryColor = "000000";
+      
+      // 1. Premium Title Slide
+      let titleSlide = pres.addSlide();
+      // Add background accent shape
+      titleSlide.addShape(pres.ShapeType.rect, { x: 0, y: 0, w: "30%", h: "100%", fill: { color: primaryColor } });
+      
+      titleSlide.addText("AIVISO", { 
+         x: 0.5, y: 0.5, w: 2, h: 0.5, 
+         fontSize: 24, bold: true, color: "FFFFFF", fontFace: "Poppins"
+      });
+
+      titleSlide.addText(topic, { 
+         x: "35%", y: "35%", w: "60%", h: 1.5, 
+         align: "left", fontSize: 42, bold: true, color: secondaryColor, fontFace: "Poppins"
+      });
+
+      titleSlide.addText("Comprehensive Intelligence Report & Presentation", { 
+         x: "35%", y: "55%", w: "60%", h: 0.5, 
+         align: "left", fontSize: 16, color: "666666", fontFace: "Poppins"
+      });
+
+      titleSlide.addShape(pres.ShapeType.line, { x: "35%", y: "65%", w: "20%", h: 0, line: { color: primaryColor, width: 3 } });
+
+      titleSlide.addText(`Generated on ${new Date().toLocaleDateString()}`, { 
+         x: "35%", y: "85%", w: "60%", h: 0.4, 
+         align: "left", fontSize: 12, color: "999999", fontFace: "Poppins"
+      });
+
+      // 2. Content Structure Logic
+      const content = specificMsg ? specificMsg.content : messages.map(m => m.content).join("\n\n");
+      
+      // Filter out code blocks for clean slides if necessary, or put them in specific slides
+      const sections = content.split(/\n### |\n## |\n# |\n\n\n/);
+
+      sections.forEach((section, idx) => {
+         const lines = section.trim().split('\n');
+         if (lines.length < 1 || section.trim().length < 20) return;
+
+         const sectionTitle = lines[0].replace(/#+|\*+/g, '').trim();
+         const sectionBody = lines.slice(1).join('\n').trim();
+
+         // Add a Slide
+         let slide = pres.addSlide();
+         
+         // Slide Header
+         slide.addShape(pres.ShapeType.rect, { x: 0, y: 0, w: "100%", h: 0.8, fill: { color: "F8FAFC" } });
+         slide.addText(sectionTitle || topic, { 
+            x: 0.5, y: 0.2, w: 8, h: 0.4, 
+            fontSize: 22, bold: true, color: primaryColor, fontFace: "Poppins"
+         });
+
+         // Slide Footer
+         slide.addText(`AIVISO Intelligence | ${topic}`, { 
+            x: 0.5, y: 5.2, w: 5, h: 0.3, 
+            fontSize: 10, color: "cbd5e1", fontFace: "Poppins"
+         });
+         slide.addText(`${idx + 1}`, { 
+            x: 9, y: 5.2, w: 0.5, h: 0.3, 
+            align: "right", fontSize: 10, color: "cbd5e1", fontFace: "Poppins"
+         });
+
+         // Content Layout
+         if (sectionBody.includes('```')) {
+            // Code Slide Layout
+            const code = sectionBody.match(/```(?:[\w]*\n)?([\s\S]*?)```/)?.[1] || sectionBody;
+            slide.addShape(pres.ShapeType.rect, { x: 0.5, y: 1, w: 9, h: 4, fill: { color: "1E1E1E" }, line: { color: primaryColor, width: 1 } });
+            slide.addText(code.slice(0, 1000), { 
+               x: 0.7, y: 1.2, w: 8.6, h: 3.6, 
+               fontSize: 10, color: "CCCCCC", fontFace: "Courier New", valign: "top"
+            });
+         } else {
+            // Standard Bullet Layout
+            const bullets = sectionBody.split('\n')
+               .filter(l => l.trim().length > 0)
+               .map(l => ({ text: l.replace(/^[*-]\s+/, '').trim(), options: { bullet: true, indentLevel: l.startsWith('  ') ? 1 : 0 } }));
+
+            slide.addText(bullets.length > 0 ? bullets : sectionBody.slice(0, 1200), { 
+               x: 0.5, y: 1.2, w: 9, h: 3.8, 
+               fontSize: 14, color: "334155", valign: "top", fontFace: "Poppins",
+               lineSpacing: 24
+            });
+         }
+      });
+
+      const fileName = `PPT-${topic.replace(/\s+/g, '-')}-${Date.now()}.pptx`;
+      pres.writeFile({ fileName });
+      notificationService.triggerDownloadEvent(`Export Premium PPT`);
    };
 
    const handleSend = async () => {
@@ -265,18 +386,31 @@ export function AIPage() {
       const lowerQuery = userQuery.toLowerCase();
 
       // Smart Command Detection
-      if (lowerQuery.includes('pdf')) {
+      const pptKeywords = ['create ppt', 'make ppt', 'generate presentation', 'ppt format', 'powerpoint'];
+      const excelKeywords = ['create excel', 'make excel', 'generate spreadsheet', 'xlsx format', 'excel report'];
+      const pdfKeywords = ['create pdf', 'make pdf', 'generate document', 'pdf format'];
+      const wordKeywords = ['create word', 'make word', 'generate doc', 'word format'];
+
+      if (pptKeywords.some(kw => lowerQuery.includes(kw))) {
+         const topic = userQuery.replace(/create ppt|make ppt|generate presentation|ppt format|powerpoint/gi, '').trim() || "Research Analysis";
+         handleExportPPT(undefined, topic);
+         setSearchValue("");
+         return;
+      }
+      if (excelKeywords.some(kw => lowerQuery.includes(kw))) {
+         const topic = userQuery.replace(/create excel|make excel|generate spreadsheet|xlsx format|excel report/gi, '').trim() || "Research Data";
+         handleExportExcel(undefined, topic);
+         setSearchValue("");
+         return;
+      }
+      if (pdfKeywords.some(kw => lowerQuery.includes(kw))) {
          handleExportPDF();
          setSearchValue("");
          return;
       }
-      if (lowerQuery.includes('excel') || lowerQuery.includes('xlsx')) {
-         handleExportExcel();
-         setSearchValue("");
-         return;
-      }
-      if (lowerQuery.includes('word') || lowerQuery.includes('doc')) {
-         handleExportWord();
+      if (wordKeywords.some(kw => lowerQuery.includes(kw))) {
+         const topic = userQuery.replace(/create word|make word|generate doc|word format/gi, '').trim() || "AIVISO Research";
+         handleExportWord(undefined, topic);
          setSearchValue("");
          return;
       }
@@ -306,14 +440,29 @@ export function AIPage() {
       setIsChatActive(true);
       setIsLoading(true);
 
+      const sendWithRetry = async (retryCount = 0): Promise<any> => {
+         try {
+            return await submissionService.getChatResponse(userQuery, {
+               model: selectedModel,
+               history: priorHistory,
+               fileContext: attachedFileContent || undefined,
+               languageHint,
+            });
+         } catch (err: any) {
+            console.warn(`Attempt ${retryCount + 1} failed:`, err);
+            // Retry once if it's a timeout or network error (no response)
+            if (retryCount < 1 && (err.code === 'ECONNABORTED' || !err.response)) {
+               console.log("Retrying AI connection...");
+               // Briefly wait before retry
+               await new Promise(resolve => setTimeout(resolve, 1000));
+               return sendWithRetry(retryCount + 1);
+            }
+            throw err;
+         }
+      };
+
       try {
-         const response = await submissionService.getChatResponse(userQuery, {
-            model: selectedModel,
-            history: priorHistory,
-            fileContext: attachedFileContent || undefined,
-            languageHint,
-            useWebSearch: useWebSearch,
-         });
+         const response = await sendWithRetry();
          const assistantMessage: Message = { role: 'assistant', content: response.answer, sources: response.sources };
 
          if (isVoiceSession) {
@@ -321,14 +470,27 @@ export function AIPage() {
             setIsVoiceSession(false);
          }
 
-         setMessages(prev => {
-            const newMessages = [...prev, assistantMessage];
-            // Save history asynchronously
-            submissionService.saveChatHistory(newMessages.map(m => ({ role: m.role, content: m.content })));
-            return newMessages;
-         });
-      } catch (error) {
-         setMessages(prev => [...prev, { role: 'assistant', content: "Error: Could not reach the AI core. Please check your connection." }]);
+         // Update messages UI
+         setMessages(prev => [...prev, assistantMessage]);
+
+         // Save history asynchronously (now safely outside the state updater)
+         const updatedMessagesForHistory = [...messages, { role: 'user' as const, content: userQuery }, assistantMessage];
+         submissionService.saveChatHistory(updatedMessagesForHistory.map(m => ({ role: m.role, content: m.content })));
+
+      } catch (error: any) {
+         console.error("AI Core Error:", error);
+         let errorMsg = "Error: Could not reach the AI core. Please check if the backend is running and your internet connection.";
+
+         if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+            errorMsg = "Error: AI core connection timed out. The response is taking longer than expected. Please try again.";
+         } else if (!error.response) {
+            errorMsg = "Error: Backend server is unreachable. Please ensure the backend is running on port 5001.";
+         }
+
+         setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: errorMsg
+         }]);
       } finally {
          setIsLoading(false);
       }
@@ -427,16 +589,19 @@ export function AIPage() {
    };
 
    return (
-      <div className="flex h-screen bg-[#050505] text-[#e4e4e7] overflow-hidden selection:bg-primary/30 selection:text-white">
+      <div className="flex h-screen bg-white text-black overflow-hidden selection:bg-black/20 selection:text-black relative font-['Poppins']">
+         {/* Premium subtle gradient for depth */}
+         <div className="absolute inset-0 z-0 bg-radial-gradient from-black/[0.03] to-transparent pointer-events-none" />
+         
          <AnimatePresence>
             {(isVoiceReplaying || isListening) && (
                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                  className="fixed inset-0 z-[200] flex items-center justify-center bg-white/90 backdrop-blur-md"
                >
-                  <VoiceLoader label={isListening ? "Listening..." : "Speaking..."} />
+                  <VoiceLoader label={isListening ? "LISTENING..." : "Speaking..."} />
                   <button
                      onClick={() => {
                         if (isListening) {
@@ -447,34 +612,23 @@ export function AIPage() {
                            setIsVoiceReplaying(false);
                         }
                      }}
-                     className="absolute bottom-20 text-zinc-500 hover:text-white text-xs font-bold transition-all uppercase tracking-widest"
+                     className="absolute bottom-20 text-black hover:text-primary text-xs font-bold transition-all uppercase tracking-widest"
                   >
                      {isListening ? "Stop Listening" : "Stop Speaking"}
                   </button>
                </motion.div>
             )}
          </AnimatePresence>
-         {/* Premium Blur Background */}
-         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full" />
 
-            {/* Subtle Indian Pattern */}
-            <div className="absolute inset-0 opacity-[0.03] invert" style={{
-               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l5.878 18.09h19.022l-15.388 11.18 5.878 18.09L30 36.18l-15.39 11.18 5.878-18.09L5.1 18.09h19.022L30 0z' fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
-               backgroundSize: '120px 120px'
-            }} />
-         </div>
 
-         {/* Sidebar - Ultra Minimalist */}
-         <aside className="w-16 lg:w-[72px] flex flex-col items-center py-6 border-r border-white/5 z-50 bg-black/20 backdrop-blur-3xl">
+         {/* Sidebar - Ultra Minimalist White */}
+         <aside className="w-16 lg:w-[72px] flex flex-col items-center py-6 border-r border-zinc-100 z-50 bg-white">
             <div className="mb-10 cursor-pointer group" onClick={() => navigate('/explore')}>
                <div className="w-10 h-10 flex items-center justify-center">
                   <img
                      src="/artificial-intelligence.png"
                      alt="AI"
                      className="w-10 h-10 object-contain"
-                     style={{ filter: 'brightness(0) invert(1)' }}
                   />
                </div>
             </div>
@@ -482,10 +636,10 @@ export function AIPage() {
             <nav className="flex flex-col gap-8 items-center flex-1 w-full px-2">
                <button
                   onClick={handleNewChat}
-                  className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 hover:border-primary/50 transition-all duration-300 group relative mb-2"
+                  className="w-10 h-10 rounded-2xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-black hover:text-black hover:bg-white hover:border-black/50 transition-all duration-300 group relative mb-2"
                >
                   <Plus size={20} />
-                  <div className="absolute left-full ml-4 px-3 py-1.5 bg-zinc-900 border border-white/5 rounded-lg text-[10px] uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 pointer-events-none whitespace-nowrap z-[100]">
+                  <div className="absolute left-full ml-4 px-3 py-1.5 bg-white border-2 border-black rounded-lg text-[10px] uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 pointer-events-none whitespace-nowrap z-[100] shadow-xl text-black">
                      New Chat
                   </div>
                </button>
@@ -494,29 +648,32 @@ export function AIPage() {
                   <button
                      key={idx}
                      onClick={() => navigate(item.path)}
-                     className="text-zinc-500 hover:text-white transition-all duration-300 group relative"
+                     className="text-black hover:text-black transition-all duration-300 group relative"
                   >
                      {item.icon}
-                     <div className="absolute left-full ml-4 px-3 py-1.5 bg-zinc-900 border border-white/5 rounded-lg text-[10px] uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 pointer-events-none whitespace-nowrap z-[100]">
+                     <div className="absolute left-full ml-4 px-3 py-1.5 bg-white border-2 border-black rounded-lg text-[10px] uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 pointer-events-none whitespace-nowrap z-[100] shadow-xl text-black">
                         {item.label}
                      </div>
                   </button>
                ))}
 
-               <button className="text-zinc-500 hover:text-white transition-all duration-300 group relative mt-auto mb-4">
+               <button 
+                  onClick={() => navigate('/settings')}
+                  className="text-black hover:text-black transition-all duration-300 group relative mt-auto mb-4"
+               >
                   <Settings2 size={20} />
-                  <div className="absolute left-full ml-4 px-3 py-1.5 bg-zinc-900 border border-white/5 rounded-lg text-[10px] uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 pointer-events-none whitespace-nowrap z-[100]">
+                  <div className="absolute left-full ml-4 px-3 py-1.5 bg-white border-2 border-black rounded-lg text-[10px] uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100 pointer-events-none whitespace-nowrap z-[100] shadow-xl text-black">
                      Settings
                   </div>
                </button>
             </nav>
 
-            <div className="relative mt-auto pt-6 border-t border-white/5 w-full flex flex-col items-center gap-6">
+            <div className="relative mt-auto pt-6 border-t border-zinc-200 w-full flex flex-col items-center gap-6">
                <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="w-9 h-9 rounded-full bg-zinc-900 border border-white/10 overflow-hidden hover:border-primary/50 transition-colors"
+                  className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 overflow-hidden hover:border-black transition-colors focus:ring-2 focus:ring-primary/20"
                >
-                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-400">
+                  <div className="w-full h-full flex items-center justify-center text-xs font-bold text-black">
                      {user?.name?.charAt(0) || "U"}
                   </div>
                </button>
@@ -526,16 +683,16 @@ export function AIPage() {
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 10 }}
-                        className="absolute bottom-0 left-full ml-4 w-48 bg-zinc-900/90 border border-white/10 rounded-2xl backdrop-blur-2xl shadow-2xl p-2 z-[100]"
+                        className="absolute bottom-0 left-full ml-4 w-48 bg-white border-2 border-black rounded-2xl shadow-2xl p-2 z-[100]"
                      >
-                        <div className="px-3 py-2 border-b border-white/5 mb-1">
-                           <p className="text-[11px] font-bold text-white truncate">{user?.name}</p>
-                           <p className="text-[9px] text-zinc-500 truncate">{user?.email}</p>
+                        <div className="px-3 py-2 border-b border-zinc-100 mb-1">
+                           <p className="text-[11px] font-bold text-black truncate">{user?.name}</p>
+                           <p className="text-[9px] text-black truncate">{user?.email}</p>
                         </div>
-                        <button onClick={() => navigate('/profile')} className="w-full text-left px-3 py-2 hover:bg-white/5 rounded-lg text-xs flex items-center gap-2 transition-colors">
+                        <button onClick={() => navigate('/profile')} className="w-full text-left px-3 py-2 hover:bg-zinc-50 rounded-lg text-xs flex items-center gap-2 transition-colors text-black">
                            <UserIcon size={14} /> Profile
                         </button>
-                        <button onClick={() => { logout(); navigate('/login'); }} className="w-full text-left px-3 py-2 hover:bg-red-500/10 rounded-lg text-xs text-red-400 flex items-center gap-2 transition-colors">
+                        <button onClick={() => { logout(); navigate('/login'); }} className="w-full text-left px-3 py-2 hover:bg-red-50 rounded-lg text-xs text-red-500 flex items-center gap-2 transition-colors">
                            <LogOut size={14} /> Sign out
                         </button>
                      </motion.div>
@@ -568,37 +725,49 @@ export function AIPage() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98 }}
-                        className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-5xl mx-auto w-full"
+                        className="flex-1 flex flex-col items-center justify-center p-6 text-center"
                      >
-                        <motion.div
-                           initial={{ scale: 0.8, opacity: 0 }}
-                           animate={{ scale: 1, opacity: 1 }}
-                           className="mb-8"
-                        >
-                           <h1 className="text-xl md:text-3xl lg:text-4xl font-black tracking-[0.15em] bg-clip-text text-transparent bg-gradient-to-b from-white to-white/10 select-none font-['Orbitron'] uppercase whitespace-nowrap">
-                              AI BASED INTELLIGENCE CODE REVIEW SYSTEM
-                           </h1>
-                        </motion.div>
+                         <motion.div
+                             initial={{ scale: 0.8, opacity: 0 }}
+                             animate={{ scale: 1, opacity: 1 }}
+                             className="mb-12 relative z-10"
+                          >
+                             <h1 className="text-xl md:text-3xl lg:text-6xl font-black tracking-[-0.02em] text-black select-none font-['Syncopate'] uppercase drop-shadow-sm leading-tight max-w-4xl">
+                                 AI BASED INTELLIGENCE <br/>
+                                 <span className="text-zinc-400">CODE REVIEW SYSTEM</span>
+                             </h1>
+                          </motion.div>
 
-
+                          {/* Dynamic Greeting */}
+                          <motion.div 
+                             initial={{ opacity: 0, y: 10 }}
+                             animate={{ opacity: 1, y: 0 }}
+                             transition={{ delay: 0.2 }}
+                             className="mb-10 text-center"
+                          >
+                             <h2 className="text-3xl font-light text-zinc-800">
+                                Good to see you, <span className="font-bold">{user?.name?.split(' ')[0]}</span>.
+                             </h2>
+                          </motion.div>
                         {/* Centered Minimal Input */}
-                        <div className="w-full max-w-2xl group flex flex-col gap-8">
-                           <div className="relative transform-gpu bg-zinc-900/40 backdrop-blur-3xl border border-white/5 p-4 rounded-[32px] transition-all duration-500 focus-within:border-primary/30 focus-within:shadow-[0_0_80px_-12px_rgba(59,130,246,0.1)] ring-1 ring-transparent focus-within:ring-primary/10">
+                        <div className="w-full max-w-2xl group flex flex-col gap-8 relative z-20">
+                           <div className="relative transform-gpu bg-white border-2 border-black shadow-none p-4 rounded-[32px] transition-all duration-500 focus-within:border-black focus-within:shadow-xl ring-2 ring-transparent focus-within:ring-black/5">
                               <textarea
-                                 placeholder={isListening ? "Listening..." : "Ask aiviso anything..."}
+                                 placeholder={isListening ? "LISTENING..." : "ASK AIVISO ANYTHING..."}
                                  value={searchValue}
                                  onChange={(e) => setSearchValue(e.target.value)}
                                  onKeyDown={handleKeyDown}
-                                 className="w-full bg-transparent border-none outline-none resize-none text-lg leading-relaxed text-zinc-100 placeholder-zinc-700 min-h-[44px] p-2"
+                                 className="w-full bg-transparent border-none outline-none resize-none text-lg leading-relaxed text-black placeholder-zinc-500 min-h-[44px] p-2"
                               />
                               <div className="flex items-center justify-between mt-4">
                                  <div className="flex items-center gap-2">
                                     <div className="relative">
                                        <button
                                           onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
-                                          className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isActionMenuOpen ? 'bg-white/10 text-white' : 'hover:bg-white/5 text-zinc-500 hover:text-zinc-300'}`}
+                                          className={`p-2.5 transition-all rounded-2xl border border-transparent ${isActionMenuOpen ? 'bg-zinc-100 text-black' : 'text-black hover:bg-zinc-50'}`}
+                                          title="More Actions"
                                        >
-                                          <Plus size={18} className={`transition-transform duration-300 ${isActionMenuOpen ? 'rotate-45' : ''}`} />
+                                          <Plus size={20} className={`transition-transform duration-300 ${isActionMenuOpen ? 'rotate-45' : ''}`} />
                                        </button>
 
                                        <AnimatePresence>
@@ -606,50 +775,26 @@ export function AIPage() {
                                              <>
                                                 <div className="fixed inset-0 z-40" onClick={() => setIsActionMenuOpen(false)} />
                                                 <motion.div
-                                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                   className="absolute bottom-full left-0 mb-4 w-60 bg-zinc-900/90 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-50 p-2"
+                                                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                   animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                   className="absolute bottom-full mb-4 left-0 w-72 bg-white border border-black rounded-3xl shadow-[0_-30px_60px_rgba(0,0,0,0.12)] overflow-hidden z-50 p-2 text-left"
                                                 >
-                                                   <div className="flex flex-col gap-1">
+                                                   {actionItems.map((item, idx) => (
                                                       <button
-                                                         onClick={() => { fileInputRef.current?.click(); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
+                                                         key={idx}
+                                                         onClick={item.onClick}
+                                                         className="w-full flex items-start gap-4 p-3.5 rounded-2xl hover:bg-zinc-50 transition-all group"
                                                       >
-                                                         <img src="/clip.png" alt="clip" className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" style={{ filter: 'brightness(0) invert(1)' }} />
-                                                         <span className="font-medium">Add photos & files</span>
+                                                          <div className={`mt-0.5 p-2 rounded-xl bg-zinc-50 ${item.color} group-hover:scale-110 transition-transform duration-300`}>
+                                                             {item.icon}
+                                                          </div>
+                                                          <div className="flex-1">
+                                                             <p className="text-sm font-bold text-black font-['Poppins']">{item.label}</p>
+                                                             <p className="text-[10px] text-zinc-400 font-medium font-['Poppins'] leading-tight">{item.subtitle}</p>
+                                                          </div>
                                                       </button>
-                                                      <div className="h-px bg-white/5 mx-4 my-1" />
-                                                      <button
-                                                         onClick={() => { setAiMode('image'); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
-                                                      >
-                                                         <img src="/gallery.png" alt="gallery" className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" style={{ filter: 'brightness(0) invert(1)' }} />
-                                                         <span className="font-medium">Create image</span>
-                                                      </button>
-                                                      <button
-                                                         onClick={() => { setSearchValue('Thinking: '); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
-                                                      >
-                                                         <img src="/thinking.png" alt="thinking" className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" style={{ filter: 'brightness(0) invert(1)' }} />
-                                                         <span className="font-medium">Thinking</span>
-                                                      </button>
-                                                      <div className="h-px bg-white/5 mx-4 my-1" />
-                                                      <button
-                                                         onClick={() => { setSearchValue('Research: '); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
-                                                      >
-                                                         <img src="/research.png" alt="research" className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" style={{ filter: 'brightness(0) invert(1)' }} />
-                                                         <span className="font-medium">Deep research</span>
-                                                      </button>
-                                                      <button
-                                                         onClick={() => { navigate('/explore'); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
-                                                      >
-                                                         <img src="/graduation-cap.png" alt="education" className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity" style={{ filter: 'brightness(0) invert(1)' }} />
-                                                         <span className="font-medium">Education</span>
-                                                      </button>
-                                                   </div>
+                                                   ))}
                                                 </motion.div>
                                              </>
                                           )}
@@ -657,59 +802,109 @@ export function AIPage() {
                                     </div>
                                     <button
                                        onClick={toggleVoice}
-                                       className={`p-2.5 rounded-xl hover:bg-white/5 transition-all ${isListening ? 'text-primary animate-pulse' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                       className={`p-2.5 rounded-2xl transition-all border ${isListening ? 'bg-black/20 border-black/40 text-black shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 'text-black hover:text-black border-transparent hover:bg-zinc-50'}`}
+                                       title="Voice Input"
                                     >
-                                       <Mic size={18} />
-                                    </button>
-                                    <button
-                                       onClick={handleLiveVoiceClick}
-                                       className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isVoiceReplaying ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
-                                    >
-                                       <AudioLines size={18} />
+                                       <Mic size={20} />
                                     </button>
                                  </div>
                                  <div className="flex items-center gap-3">
-                                    <button
-                                       onClick={() => setLanguageHint(prev => prev === 'english' ? 'tamil' : 'english')}
-                                       className={`flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all ${languageHint === 'tamil' ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-transparent text-zinc-500 hover:bg-white/5 hover:text-white border border-transparent'}`}
-                                       title="Toggle Language (English / Tamil)"
-                                    >
-                                       <Languages size={14} />
-                                       <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">
-                                          {languageHint === 'english' ? 'ENG' : 'தமிழ்'}
-                                       </span>
-                                    </button>
-                                    <button
-                                       onClick={() => setIsModelOpen(!isModelOpen)}
-                                       className="flex items-center gap-2 px-1 py-1.5 text-zinc-500 hover:text-white transition-all"
-                                    >
-                                       <span className="text-[10px] font-bold uppercase tracking-widest">{selectedModel}</span>
-                                       <ChevronDown size={14} />
-                                    </button>
+                                    <div className="relative">
+                                       <button
+                                           onClick={() => setIsModelOpen(!isModelOpen)}
+                                           className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-zinc-50 border-none text-black text-sm font-bold hover:bg-zinc-100 transition-all active:scale-95"
+                                        >
+                                            <div className="w-3.5 h-3.5 flex items-center justify-center">
+                                              {selectedModel.toLowerCase().includes('gemini') || selectedModel.toLowerCase().includes('gemma') ? (
+                                                 <img src="/google.png" alt="Google" className="w-full h-full object-contain" />
+                                              ) : selectedModel.toLowerCase().includes('gpt') ? (
+                                                 <img src="/chat-gpt-v2.png" alt="ChatGPT" className="w-full h-full object-contain" />
+                                              ) : (
+                                                 <img src="/meta.png" alt="Meta" className="w-full h-full object-contain" />
+                                              )}
+                                           </div>
+                                            <span className="uppercase tracking-widest text-[10px]">{selectedModel}</span>
+                                            <ChevronDown size={14} className={`transition-transform duration-300 ${isModelOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+                                       <AnimatePresence>
+                                          {isModelOpen && (
+                                             <>
+                                                <div className="fixed inset-0 z-40" onClick={() => setIsModelOpen(false)} />
+                                                <motion.div
+                                                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                   animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                   className="absolute bottom-full mb-4 right-0 w-64 bg-white border-2 border-black rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden z-50 p-1.5 text-left"
+                                                >
+                                                   <div className="p-3 border-b border-zinc-50 mb-1">
+                                                      <div className="relative">
+                                                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
+                                                          <input 
+                                                             type="text" 
+                                                             placeholder="Search models..."
+                                                             value={modelSearch}
+                                                             onChange={(e) => setModelSearch(e.target.value)}
+                                                             className="w-full bg-zinc-50 border border-zinc-100 rounded-xl py-2 pl-9 pr-3 text-xs text-black placeholder-zinc-500 outline-none focus:border-zinc-200 transition-all"
+                                                          />
+                                                      </div>
+                                                   </div>
+                                                   <div className="max-h-60 overflow-y-auto custom-scrollbar">
+                                                       {models.filter(m => m.toLowerCase().includes(modelSearch.toLowerCase())).map((model) => (
+                                                          <button
+                                                             key={model}
+                                                             onClick={() => {
+                                                                setSelectedModel(model);
+                                                                setIsModelOpen(false);
+                                                             }}
+                                                             className={`w-full flex items-center justify-between p-3 rounded-xl transition-all group ${selectedModel === model ? 'bg-zinc-50 text-black' : 'hover:bg-zinc-50 text-zinc-600 hover:text-black'}`}
+                                                          >
+                                                             <div className="flex items-center gap-3">
+                                                                <div className="w-5 h-5 flex items-center justify-center">
+                                                                   {model.toLowerCase().includes('gemini') || model.toLowerCase().includes('gemma') ? (
+                                                                      <img src="/google.png" alt="Google" className="w-full h-full object-contain" />
+                                                                   ) : model.toLowerCase().includes('gpt') ? (
+                                                                      <img src="/chat-gpt-v2.png" alt="ChatGPT" className="w-full h-full object-contain" />
+                                                                   ) : (
+                                                                      <img src="/meta.png" alt="Meta" className="w-full h-full object-contain" />
+                                                                   )}
+                                                                </div>
+                                                                <span className="text-sm font-semibold font-['Poppins']">{model}</span>
+                                                             </div>
+                                                             {selectedModel === model && <Check size={14} className="text-black" />}
+                                                          </button>
+                                                       ))}
+                                                   </div>
+                                                </motion.div>
+                                              </>
+                                          )}
+                                       </AnimatePresence>
+                                    </div>
                                     <button
                                        onClick={handleSend}
-                                       disabled={!searchValue.trim() || isGeneratingImage}
-                                       className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-500 ${searchValue.trim() ? 'bg-primary text-white' : 'bg-zinc-800 text-zinc-600 scale-90 opacity-20'}`}
+                                       disabled={isLoading}
+                                       className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-500 bg-black text-white shadow-xl rotate-0"
                                     >
-                                       {isGeneratingImage ? <Loader2 size={20} className="animate-spin" /> : <ArrowUp size={20} strokeWidth={3} />}
+                                       <ArrowUp size={22} strokeWidth={3} />
                                     </button>
                                  </div>
                               </div>
                               {attachedFileName && (
-                                 <div className="mt-2 px-2 flex items-center gap-2 text-[11px] text-zinc-400 bg-white/5 w-fit rounded-full py-1 pr-3">
-                                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                                       <FileText size={10} className="text-primary" />
+                                 <div className="mt-4 px-4 py-2 flex items-center gap-2 text-[11px] text-black bg-zinc-50 border border-zinc-100 w-fit rounded-full pr-4">
+                                    <div className="w-6 h-6 rounded-full bg-black/10 flex items-center justify-center">
+                                       <FileText size={12} className="text-black" />
                                     </div>
-                                    <span className="truncate max-w-[150px]">{attachedFileName}</span>
-                                    <button onClick={clearAttachedFile} className="ml-1 text-zinc-500 hover:text-red-400 transition-colors">
-                                       <X size={12} />
+                                    <span className="truncate max-w-[150px] font-medium">{attachedFileName}</span>
+                                    <button onClick={clearAttachedFile} className="ml-1 text-zinc-400 hover:text-red-500 transition-colors">
+                                       <X size={14} />
                                     </button>
                                  </div>
                               )}
                            </div>
-                        </div>
-                     </motion.div>
-                  ) : (
+
+
+                           </div>
+                       </motion.div>
+                   ) : (
                      <motion.div
                         key="chat"
                         initial={{ opacity: 0 }}
@@ -720,52 +915,103 @@ export function AIPage() {
                            {messages.map((msg, i) => (
                               <motion.div
                                  key={i}
+                                 id={`msg-${i}`}
                                  initial={{ opacity: 0, y: 10 }}
                                  animate={{ opacity: 1, y: 0 }}
-                                 className={`flex gap-6 ${msg.role === 'assistant' ? 'bg-white/2 backdrop-blur-3xl p-8 rounded-[32px] border border-white/5' : 'px-8'}`}
+                                 className={`flex gap-6 ${msg.role === 'assistant' ? 'bg-white p-8 rounded-[32px] border-2 border-black shadow-sm' : 'px-8 py-2'}`}
                               >
                                  <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1">
                                     {msg.role === 'user' ? (
-                                       <div className="w-full h-full rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold">U</div>
+                                       <div className="w-full h-full rounded-full bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-black">U</div>
                                     ) : (
-                                       <div className="w-full h-full rounded-full bg-zinc-800 flex items-center justify-center">
+                                       <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
                                           <img
                                              src="/artificial-intelligence.png"
                                              alt="Assistant"
-                                             className="w-4 h-4"
-                                             style={{ filter: 'brightness(0) invert(1)' }}
+                                             className="w-4 h-4 brightness-0 invert"
                                           />
                                        </div>
                                     )}
                                  </div>
                                  <div className="flex-1 space-y-4">
-                                    <p className="text-[15px] leading-relaxed text-zinc-200 whitespace-pre-wrap font-sans">
-                                       {msg.content}
-                                    </p>
+                                    <div className="text-[15px] leading-relaxed text-black font-['Outfit'] markdown-content">
+                                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                          {msg.content.replace(/^\s*#+\s*/gm, '')}
+                                       </ReactMarkdown>
+                                    </div>
 
-                                    {msg.role === 'assistant' && msg.content.includes('```') && (
-                                       <button
-                                          onClick={() => {
-                                             const code = msg.content.match(/```(?:[\w]*\n)?([\s\S]*?)```/)?.[1] || msg.content;
-                                             setPreviewCode(code);
-                                             setIsPreviewOpen(true);
-                                          }}
-                                          className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl border border-primary/20 transition-all text-xs font-bold w-fit mt-2"
-                                       >
-                                          <Wand2 size={14} /> Live Preview
-                                       </button>
+                                    {msg.role === 'assistant' && (
+                                       <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-zinc-50">
+                                          {msg.content.includes('```') && (
+                                             <>
+                                                <button
+                                                   onClick={() => {
+                                                      const code = msg.content.match(/```(?:[\w]*\n)?([\s\S]*?)```/)?.[1] || msg.content;
+                                                      setPreviewCode(code);
+                                                      setIsPreviewOpen(true);
+                                                   }}
+                                                   className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-50 text-black rounded-xl border-2 border-black shadow-sm transition-all text-xs font-bold w-fit"
+                                                >
+                                                   <Wand2 size={14} /> Live Preview
+                                                </button>
+                                                <button
+                                                   onClick={() => {
+                                                      const match = msg.content.match(/```([\w]*)\n/);
+                                                      const lang = match ? match[1] : 'python';
+                                                      const code = msg.content.match(/```(?:[\w]*\n)?([\s\S]*?)```/)?.[1] || msg.content;
+                                                      navigate('/ai/practice', { state: { code, language: lang } });
+                                                   }}
+                                                   className="flex items-center gap-2 px-4 py-2 bg-black text-white hover:bg-black/90 rounded-xl border-2 border-black transition-all text-xs font-bold w-fit"
+                                                >
+                                                   <Play size={14} fill="currentColor" /> Compile & Run
+                                                </button>
+                                             </>
+                                          )}
+                                          
+                                          {/* Education Export Buttons per message */}
+                                          <div className="flex items-center gap-1.5 ml-auto">
+                                             <button
+                                                onClick={() => handleExportPDF(`msg-${i}`)}
+                                                className="p-1.5 hover:bg-zinc-50 rounded-lg transition-colors border border-transparent hover:border-zinc-100"
+                                                title="Export message as PDF"
+                                             >
+                                                <img src="/pdf.png" className="w-4 h-4 object-contain" />
+                                             </button>
+                                             <button
+                                                onClick={() => handleExportPPT(msg)}
+                                                className="p-1.5 hover:bg-zinc-50 rounded-lg transition-colors border border-transparent hover:border-zinc-100"
+                                                title="Generate PPT for this topic"
+                                             >
+                                                <img src="/ppt.png" className="w-4 h-4 object-contain" />
+                                             </button>
+                                             <button
+                                                onClick={() => handleExportExcel(msg)}
+                                                className="p-1.5 hover:bg-zinc-50 rounded-lg transition-colors border border-transparent hover:border-zinc-100"
+                                                title="Export to Excel"
+                                             >
+                                                <img src="/sheets.png" className="w-4 h-4 object-contain" />
+                                             </button>
+                                             <button
+                                                onClick={() => handleExportWord(msg.content)}
+                                                className="p-1.5 hover:bg-zinc-50 rounded-lg transition-colors border border-transparent hover:border-zinc-100 text-blue-500"
+                                                title="Export to Word"
+                                             >
+                                                <FileArchive size={16} />
+                                             </button>
+                                          </div>
+                                       </div>
                                     )}
 
 
                                     {msg.type === 'image' && msg.imageUrl && (
                                        <div className="relative group/image max-w-lg mt-4">
-                                          <div className="rounded-2xl overflow-hidden border border-white/5 bg-zinc-900 shadow-2xl relative min-h-[300px] flex items-center justify-center">
-                                             <div className="image-loader absolute inset-0 flex items-center justify-center bg-zinc-900 z-20">
-                                                <Loader2 size={24} className="text-primary animate-spin" />
+                                          <div className="rounded-2xl overflow-hidden border-2 border-black bg-white shadow-2xl relative min-h-[300px] flex items-center justify-center">
+                                             <div className="image-loader absolute inset-0 flex items-center justify-center bg-white z-20">
+                                                <Loader2 size={24} className="text-black animate-spin" />
                                              </div>
-                                             <div className="image-error hidden absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 z-30 p-4 text-center">
+                                             <div className="image-error hidden absolute inset-0 flex flex-col items-center justify-center bg-white z-30 p-4 text-center">
                                                 <X size={32} className="text-red-500 mb-2" />
-                                                <p className="text-xs text-zinc-400">Failed to generate image. Please try a different prompt.</p>
+                                                <p className="text-xs text-black font-bold uppercase tracking-tight">Failed to generate image. Please try a different prompt.</p>
                                              </div>
                                              <img
                                                 src={msg.imageUrl}
@@ -817,14 +1063,14 @@ export function AIPage() {
                                     )}
                                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && msg.sources[0].url !== '#' && (
                                        <div className="pt-2 border-t border-white/5 space-y-1">
-                                          <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Sources</p>
+                                          <p className="text-[10px] uppercase tracking-wider text-black font-bold">Sources</p>
                                           {msg.sources.map((source, idx) => (
                                              <a
                                                 key={`${source.url}-${idx}`}
                                                 href={source.url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="text-[11px] text-primary/90 hover:text-primary flex items-center gap-1 truncate"
+                                                className="text-[11px] text-black/90 hover:text-black flex items-center gap-1 truncate"
                                              >
                                                 <Link2 size={10} /> {source.title}
                                              </a>
@@ -835,8 +1081,8 @@ export function AIPage() {
                               </motion.div>
                            ))}
                            {isLoading && (
-                              <div className="flex gap-6 bg-white/2 backdrop-blur-3xl p-8 rounded-[32px] border border-white/5">
-                                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary animate-pulse">
+                              <div className="flex gap-6 bg-white border-2 border-black p-8 rounded-[32px] shadow-sm">
+                                 <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-black animate-pulse">
                                     <Loader2 size={16} className="animate-spin" />
                                  </div>
                                  <div className="flex items-center gap-1">
@@ -848,14 +1094,14 @@ export function AIPage() {
                         </div>
 
                         <div className="absolute bottom-10 left-6 right-6 flex flex-col items-center pointer-events-none">
-                           <div className={`w-full max-w-3xl pointer-events-auto bg-zinc-900/60 border-2 ${isListening ? 'border-primary shadow-[0_0_30px_rgba(59,130,246,0.3)]' : 'border-white/10'} rounded-[32px] backdrop-blur-3xl shadow-[0_32px_80px_-16px_rgba(0,0,0,0.6)] p-3 flex flex-col transition-all duration-500 focus-within:border-white/20 focus-within:bg-zinc-900/80`}>
+                           <div className={`w-full max-w-3xl pointer-events-auto bg-white border-2 border-black shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[32px] p-3 flex flex-col transition-all duration-500 focus-within:shadow-[0_20px_60px_rgba(0,0,0,0.15)]`}>
                               <textarea
                                  rows={1}
-                                 placeholder={isListening ? "Listening..." : "Ask aiviso anything..."}
+                                 placeholder={isListening ? "LISTENING..." : "ASK AIVISO ANYTHING..."}
                                  value={searchValue}
                                  onChange={(e) => setSearchValue(e.target.value)}
                                  onKeyDown={handleKeyDown}
-                                 className="w-full bg-transparent border-none outline-none resize-none text-base text-zinc-200 placeholder-zinc-600 px-3 py-3 min-h-[52px] leading-relaxed"
+                                 className="w-full bg-transparent border-none outline-none resize-none text-base text-black placeholder-zinc-400 px-3 py-3 min-h-[52px] leading-relaxed"
                               />
 
                               <div className="flex items-center justify-between px-1 pb-1">
@@ -863,9 +1109,10 @@ export function AIPage() {
                                     <div className="relative">
                                        <button
                                           onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
-                                          className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isActionMenuOpen ? 'bg-white/10 text-white' : 'hover:bg-white/5 text-zinc-500 hover:text-white'}`}
+                                          className={`p-2.5 transition-all rounded-xl ${isActionMenuOpen ? 'bg-zinc-100 text-black' : 'text-black hover:bg-zinc-100'}`}
+                                          title="More Actions"
                                        >
-                                          <Plus size={18} className={`transition-transform duration-300 ${isActionMenuOpen ? 'rotate-45' : ''}`} />
+                                          <Plus size={19} className={`transition-transform duration-300 ${isActionMenuOpen ? 'rotate-45' : ''}`} />
                                        </button>
 
                                        <AnimatePresence>
@@ -873,44 +1120,26 @@ export function AIPage() {
                                              <>
                                                 <div className="fixed inset-0 z-40" onClick={() => setIsActionMenuOpen(false)} />
                                                 <motion.div
-                                                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                   className="absolute bottom-full left-0 mb-4 w-64 bg-zinc-900/90 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-50 p-2"
+                                                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                   animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                   className="absolute bottom-full mb-4 left-0 w-72 bg-white border-2 border-black rounded-3xl shadow-[0_-30px_60px_rgba(0,0,0,0.1)] overflow-hidden z-50 p-2 text-left"
                                                 >
-                                                   <div className="flex flex-col gap-1">
+                                                   {actionItems.map((item, idx) => (
                                                       <button
-                                                         onClick={() => { fileInputRef.current?.click(); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
+                                                         key={idx}
+                                                         onClick={item.onClick}
+                                                         className="w-full flex items-start gap-4 p-3.5 rounded-2xl hover:bg-zinc-50 transition-all group"
                                                       >
-                                                         <span className="font-medium">Add photos & files</span>
+                                                         <div className={`mt-0.5 p-2 rounded-xl bg-zinc-50 ${item.color} group-hover:scale-110 transition-transform duration-300`}>
+                                                            {item.icon}
+                                                         </div>
+                                                         <div className="flex-1">
+                                                            <p className="text-sm font-bold text-black font-['Poppins']">{item.label}</p>
+                                                            <p className="text-[10px] text-zinc-400 font-medium font-['Poppins'] leading-tight">{item.subtitle}</p>
+                                                         </div>
                                                       </button>
-                                                      <div className="h-px bg-white/5 mx-4 my-1" />
-                                                      <button
-                                                         onClick={() => { setAiMode('image'); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
-                                                      >
-                                                         <span className="font-medium">Create image</span>
-                                                      </button>
-                                                      <button
-                                                         onClick={() => { setSearchValue('Thinking: '); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
-                                                      >
-                                                         <span className="font-medium">Thinking</span>
-                                                      </button>
-                                                      <button
-                                                         onClick={() => { setSearchValue('Research: '); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
-                                                      >
-                                                         <span className="font-medium">Deep research</span>
-                                                      </button>
-                                                      <button
-                                                         onClick={() => { navigate('/explore'); setIsActionMenuOpen(false); }}
-                                                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 text-zinc-300 hover:text-white rounded-2xl transition-all text-sm group"
-                                                      >
-                                                         <span className="font-medium">Education</span>
-                                                      </button>
-                                                   </div>
+                                                   ))}
                                                 </motion.div>
                                              </>
                                           )}
@@ -918,48 +1147,103 @@ export function AIPage() {
                                     </div>
                                     <button
                                        onClick={toggleVoice}
-                                       className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isListening ? 'bg-primary/20 text-primary animate-pulse' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
+                                       className={`p-2.5 rounded-xl transition-all ${isListening ? 'text-black bg-black/10' : 'text-black hover:text-black hover:bg-zinc-100'}`}
+                                       title="Voice Input"
                                     >
-                                       <Mic size={18} />
+                                       <Mic size={19} />
                                     </button>
                                     <button
                                        onClick={handleLiveVoiceClick}
-                                       className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isVoiceReplaying ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                                       className="p-2.5 text-black hover:text-black transition-all hover:bg-zinc-100 rounded-xl"
+                                       title="Read Last Message"
                                     >
-                                       <AudioLines size={18} />
+                                       <AudioLines size={19} />
                                     </button>
                                  </div>
 
                                  <div className="flex items-center gap-3">
-                                    <button
-                                       onClick={() => setIsModelOpen(!isModelOpen)}
-                                       className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/5 text-zinc-500 hover:text-white hover:bg-white/10 transition-all ml-1"
-                                    >
-                                       <span className="text-[10px] font-bold uppercase tracking-wider">{selectedModel}</span>
-                                       <ChevronDown size={14} />
-                                    </button>
+                                    <div className="relative">
+                                       <button
+                                          onClick={() => setIsModelOpen(!isModelOpen)}
+                                          className="flex items-center gap-2 px-4 py-2 rounded-2xl border-2 border-black bg-white text-black hover:bg-zinc-50 transition-all text-[10px] font-bold uppercase tracking-widest font-['Poppins']"
+                                       >
+                                          <div className="w-3.5 h-3.5 flex items-center justify-center">
+                                             {selectedModel.toLowerCase().includes('gemini') || selectedModel.toLowerCase().includes('gemma') ? (
+                                                <img src="/google.png" alt="Google" className="w-full h-full object-contain" />
+                                             ) : selectedModel.toLowerCase().includes('gpt') ? (
+                                                <img src="/chat-gpt-v2.png" alt="ChatGPT" className="w-full h-full object-contain" />
+                                             ) : (
+                                                <img src="/meta.png" alt="Meta" className="w-full h-full object-contain" />
+                                             )}
+                                          </div>
+                                          {selectedModel}
+                                          <ChevronDown size={14} className={`opacity-40 transition-transform ${isModelOpen ? 'rotate-180' : ''}`} />
+                                       </button>
+
+                                       <AnimatePresence>
+                                          {isModelOpen && (
+                                             <>
+                                                <div className="fixed inset-0 z-40" onClick={() => setIsModelOpen(false)} />
+                                                <motion.div
+                                                   initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                   animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                   className="absolute bottom-full mb-4 right-0 w-64 bg-white border-2 border-black rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden z-50 p-1.5 text-left"
+                                                >
+                                                   <div className="px-3 py-2 border-b border-zinc-50 mb-1">
+                                                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-['Poppins']"></span>
+                                                   </div>
+                                                   {models.map((model) => (
+                                                      <button
+                                                         key={model}
+                                                         onClick={() => {
+                                                            setSelectedModel(model);
+                                                            setIsModelOpen(false);
+                                                         }}
+                                                         className={`w-full flex items-center justify-between p-3 rounded-xl transition-all group ${selectedModel === model ? 'bg-zinc-50 text-black' : 'hover:bg-zinc-50 text-zinc-600 hover:text-black'}`}
+                                                      >
+                                                         <div className="flex items-center gap-3">
+                                                            <div className="w-5 h-5 flex items-center justify-center">
+                                                               {model.toLowerCase().includes('gemini') || model.toLowerCase().includes('gemma') ? (
+                                                                  <img src="/google.png" alt="Google" className="w-full h-full object-contain" />
+                                                               ) : model.toLowerCase().includes('gpt') ? (
+                                                                  <img src="/chat-gpt-v2.png" alt="ChatGPT" className="w-full h-full object-contain" />
+                                                               ) : (
+                                                                  <img src="/meta.png" alt="Meta" className="w-full h-full object-contain" />
+                                                               )}
+                                                            </div>
+                                                            <span className="text-sm font-semibold font-['Poppins']">{model}</span>
+                                                         </div>
+                                                         {selectedModel === model && <Check size={14} className="text-black" />}
+                                                      </button>
+                                                   ))}
+                                                </motion.div>
+                                             </>
+                                          )}
+                                       </AnimatePresence>
+                                    </div>
                                     <button
                                        onClick={handleSend}
                                        disabled={!searchValue.trim() || isLoading || isGeneratingImage}
-                                       className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-500 ${searchValue.trim() ? 'bg-primary text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-zinc-800 text-zinc-700 opacity-50 scale-90'}`}
+                                       className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-500 ${searchValue.trim() ? 'bg-black text-white shadow-xl' : 'bg-black/20 text-black scale-90'}`}
                                     >
                                        {isGeneratingImage || isLoading ? <Loader2 size={20} className="animate-spin" /> : <ArrowUp size={22} strokeWidth={2.5} />}
                                     </button>
                                  </div>
                               </div>
                               {attachedFileName && (
-                                 <div className="absolute -top-10 left-4 text-[11px] text-zinc-400 bg-zinc-900/90 border border-white/10 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-2xl backdrop-blur-xl">
-                                    <FileText size={12} className="text-primary" />
+                                 <div className="absolute -top-10 left-4 text-[11px] text-black bg-white border-2 border-black rounded-full px-4 py-1.5 flex items-center gap-2 shadow-xl">
+                                    <FileText size={12} className="text-black" />
                                     <span className="max-w-[180px] truncate font-medium">{attachedFileName}</span>
-                                    <button onClick={clearAttachedFile} className="ml-1 text-zinc-600 hover:text-red-400 transition-colors">
+                                    <button onClick={clearAttachedFile} className="ml-1 text-black hover:text-red-400 transition-colors">
                                        <X size={12} />
                                     </button>
                                  </div>
                               )}
                            </div>
                         </div>
-                     </motion.div>
-                  )}
+                       </motion.div>
+                    )}
                </AnimatePresence>
             </div>
          </main>
@@ -978,7 +1262,7 @@ export function AIPage() {
                      initial={{ scale: 0.9, opacity: 0, y: 20 }}
                      animate={{ scale: 1, opacity: 1, y: 0 }}
                      exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                     className="bg-zinc-900 border border-white/10 w-full max-w-6xl h-[85vh] rounded-[40px] overflow-hidden flex flex-col relative"
+                     className="bg-white border-2 border-black w-full max-w-6xl h-[85vh] rounded-[40px] overflow-hidden flex flex-col relative shadow-2xl"
                      onClick={(e) => e.stopPropagation()}
                   >
                      <div className="h-16 border-b border-white/5 px-8 flex items-center justify-between shrink-0">
@@ -988,7 +1272,7 @@ export function AIPage() {
                               <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
                               <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50" />
                            </div>
-                           <h3 className="text-sm font-bold text-zinc-400">UI Design Preview</h3>
+                           <h3 className="text-sm font-bold text-black">UI Design Preview</h3>
                         </div>
                         <div className="flex items-center gap-3">
                            <button
@@ -1000,14 +1284,14 @@ export function AIPage() {
                                  a.download = 'ui-design.html';
                                  a.click();
                               }}
-                              className="p-2 text-zinc-500 hover:text-white transition-colors"
+                              className="p-2 text-black hover:text-white transition-colors"
                               title="Download HTML"
                            >
                               <Download size={20} />
                            </button>
                            <button
                               onClick={() => setIsPreviewOpen(false)}
-                              className="w-10 h-10 rounded-full hover:bg-white/5 flex items-center justify-center text-zinc-500 hover:text-white transition-all"
+                              className="w-10 h-10 rounded-full hover:bg-white/5 flex items-center justify-center text-black hover:text-white transition-all"
                            >
                               <X size={20} />
                            </button>
@@ -1042,63 +1326,92 @@ export function AIPage() {
             )}
          </AnimatePresence>
 
-         {/* Model Selection Modal */}
-         <AnimatePresence>
-            {isModelOpen && (
-               <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-[400] bg-black/60 backdrop-blur-md flex items-center justify-center p-6"
-                  onClick={() => setIsModelOpen(false)}
-               >
-                  <motion.div
-                     initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                     animate={{ scale: 1, opacity: 1, y: 0 }}
-                     exit={{ scale: 0.95, opacity: 0, y: 10 }}
-                     className="bg-zinc-900 border border-white/10 w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl"
-                     onClick={(e) => e.stopPropagation()}
-                  >
-                     <div className="p-2 py-3 bg-[#0a0a0a]">
-                        <div className="space-y-0.5">
-                           {models.map((model) => (
-                              <button
-                                 key={model}
-                                 onClick={() => {
-                                    setSelectedModel(model);
-                                    setIsModelOpen(false);
-                                 }}
-                                 className={`w-full flex items-center justify-between p-2.5 px-4 rounded-xl transition-all group ${selectedModel === model ? 'bg-white/5 text-white' : 'hover:bg-white/5 text-zinc-500 hover:text-zinc-300'}`}
-                              >
-                                 <div className="flex items-center gap-4">
-                                    <div className={`w-5 h-5 flex items-center justify-center transition-opacity ${selectedModel === model ? 'opacity-100' : 'opacity-40 group-hover:opacity-80'}`}>
-                                       {model === "Gemma 3" ? <img src="/google.png" alt="Google" className="w-full h-full object-contain" /> :
-                                          model === "gpt-oss" ? <img src="/chat-gpt-v2.png" alt="GPT" className="w-full h-full object-contain" /> :
-                                             <img src="/meta.png" alt="Meta" className="w-full h-full object-contain" />}
-                                    </div>
-                                    <span className="text-sm font-medium tracking-tight">{model}</span>
-                                 </div>
-                                 {selectedModel === model && (
-                                    <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                       <Check size={14} className="text-primary" />
-                                    </motion.div>
-                                 )}
-                              </button>
-                           ))}
-                        </div>
-                     </div>
-                  </motion.div>
-               </motion.div>
-            )}
-         </AnimatePresence>
+
 
 
          <style dangerouslySetInnerHTML={{
             __html: `
             @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
             .no-scrollbar::-webkit-scrollbar { display: none; }
             .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
- 
+
+            .markdown-content {
+               font-family: 'Outfit', sans-serif;
+            }
+            .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+               font-family: 'Outfit', sans-serif;
+               font-weight: 700;
+               margin-top: 1.5rem;
+               margin-bottom: 0.75rem;
+               color: #000;
+               letter-spacing: -0.02em;
+            }
+            .markdown-content h1 { font-size: 1.5rem; }
+            .markdown-content h2 { font-size: 1.25rem; }
+            .markdown-content h3 { font-size: 1.125rem; }
+            .markdown-content p {
+               margin-bottom: 1rem;
+               line-height: 1.7;
+               color: #374151;
+            }
+            .markdown-content strong {
+               font-weight: 600;
+               color: #000;
+            }
+            .markdown-content ul, .markdown-content ol {
+               margin-bottom: 1rem;
+               padding-left: 1.5rem;
+            }
+            .markdown-content li {
+               margin-bottom: 0.5rem;
+            }
+            .markdown-content code {
+               background-color: #f3f4f6;
+               padding: 0.2rem 0.4rem;
+               border-radius: 0.375rem;
+               font-family: 'Fira Code', monospace;
+               font-size: 0.875em;
+               color: #ef4444;
+            }
+            .markdown-content pre {
+               background-color: #f9fafb;
+               border: 1px border #e5e7eb;
+               padding: 1rem;
+               border-radius: 1rem;
+               overflow-x: auto;
+               margin-bottom: 1rem;
+            }
+            .markdown-content pre code {
+               background-color: transparent;
+               padding: 0;
+               color: inherit;
+               font-size: 0.9rem;
+            }
+            .markdown-content blockquote {
+               border-left: 4px solid #000;
+               padding-left: 1rem;
+               font-style: italic;
+               color: #4b5563;
+               margin-bottom: 1rem;
+            }
+            .markdown-content table {
+               width: 100%;
+               border-collapse: collapse;
+               margin-bottom: 1rem;
+            }
+            .markdown-content th, .markdown-content td {
+               border: 1px solid #e5e7eb;
+               padding: 0.75rem;
+               text-align: left;
+            }
+            .markdown-content th {
+               background-color: #f9fafb;
+               font-weight: 600;
+            }
+  
          `}} />
       </div>
    );

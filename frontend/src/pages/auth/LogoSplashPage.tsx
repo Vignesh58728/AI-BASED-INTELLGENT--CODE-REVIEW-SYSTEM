@@ -2,17 +2,89 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BrandIcon } from "@/components/ui/BrandIcon";
+import { useAuth } from "@/context/AuthContext";
+import api from "@/services/api";
 
 export function LogoSplashPage() {
    const navigate = useNavigate();
+   const { login } = useAuth();
 
    useEffect(() => {
       const timer = setTimeout(() => {
-         navigate("/register");
+         navigate("/login");
       }, 10000);
 
       return () => clearTimeout(timer);
    }, [navigate]);
+
+   const handleGuestLogin = async () => {
+      const guestEmail = "guest_official@aiviso.ai";
+      const guestPass = "guest-password-123";
+      const guestUsername = "guest_official";
+
+      try {
+         try {
+            const response = await api.post('/auth/login', new URLSearchParams({
+               username: guestEmail,
+               password: guestPass
+            }), {
+               headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            const { access_token } = response.data;
+            const payload = JSON.parse(atob(access_token.split('.')[1]));
+            login({
+               id: payload.sub,
+               name: payload.name || "Guest User",
+               email: guestEmail,
+               role: payload.role || 'student',
+               token: access_token,
+               username: payload.username || guestUsername
+            });
+         } catch (loginErr: any) {
+            try {
+               await api.post('/auth/register', {
+                  email: guestEmail,
+                  username: guestUsername,
+                  full_name: "Guest User",
+                  password: guestPass,
+                  role: "student"
+               });
+               const response = await api.post('/auth/login', new URLSearchParams({
+                  username: guestEmail,
+                  password: guestPass
+               }), {
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+               });
+               const { access_token } = response.data;
+               const payload = JSON.parse(atob(access_token.split('.')[1]));
+               login({
+                  id: payload.sub,
+                  name: payload.name || "Guest User",
+                  email: guestEmail,
+                  role: payload.role || 'student',
+                  token: access_token,
+                  username: payload.username || guestUsername
+               });
+            } catch (regErr: any) {
+               throw regErr;
+            }
+         }
+         navigate('/explore');
+      } catch (err: any) {
+         console.warn("Splash Guest login failed, using local mode:", err);
+         login({
+            id: "local-guest-splash",
+            name: "Guest User",
+            email: guestEmail,
+            role: 'student',
+            token: "offline-guest-token",
+            username: guestUsername,
+            photo: null,
+            isOffline: true
+         });
+         navigate('/explore');
+      }
+   };
 
    return (
       <div className="relative flex items-center justify-center min-h-screen w-full overflow-hidden bg-black">
@@ -72,6 +144,26 @@ export function LogoSplashPage() {
                <p className="mt-4 text-white/40 text-sm tracking-[0.5em] uppercase font-light">
                   Initializing Intelligence
                </p>
+
+               <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.5, duration: 1 }}
+                  className="mt-12 flex flex-col items-center gap-4"
+               >
+                  <button
+                     onClick={handleGuestLogin}
+                     className="px-8 py-3 bg-white text-black font-bold rounded-full tracking-widest text-xs hover:bg-white/90 transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                  >
+                     CONTINUE AS GUEST
+                  </button>
+                  <button
+                     onClick={() => navigate("/login")}
+                     className="text-white/40 text-[10px] tracking-[0.3em] uppercase hover:text-white transition-colors"
+                  >
+                     Or Sign In
+                  </button>
+               </motion.div>
             </motion.div>
 
          </div>

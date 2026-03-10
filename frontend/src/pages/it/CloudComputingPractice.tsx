@@ -13,7 +13,7 @@ export function CloudComputingPractice() {
       <div className="space-y-6 container mx-auto py-8">
          <div>
             <h1 className="text-3xl font-bold tracking-tight mb-2">Cloud Computing</h1>
-            <p className="text-muted-foreground">Learn to scale and deploy applications on global cloud infrastructure.</p>
+            <p className="text-black">Learn to scale and deploy applications on global cloud infrastructure.</p>
          </div>
 
          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

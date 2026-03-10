@@ -27,54 +27,55 @@ MODEL_PROVIDER_MAP: Dict[str, Tuple[str, str]] = {
     "gpt-4o-mini": ("openai", "gpt-4o-mini"),
     "gpt-4-turbo": ("openai", "gpt-4-turbo"),
     "gpt-3.5-turbo": ("openai", "gpt-3.5-turbo"),
-    "gemma 3": ("openrouter", "google/gemma-3-2b-it:free"),
-    "gpt-oss": ("gpt_oss", "gpt-oss"),
-    "openai/gpt-oss-120b": ("gpt_oss", "gpt-oss"),
-    "gemini 2.5 flash": ("google", "gemini-1.5-flash"), # Correcting invalid name to stable flash model
+    "gemma 3": ("openrouter", "google/gemma-3-27b:free"),
+    "gpt-oss": ("openrouter", "meta-llama/llama-3.1-8b-instruct:free"), # Fallback for custom provider
+    "openai/gpt-oss-120b": ("openrouter", "meta-llama/llama-3.1-8b-instruct:free"),
+    "gemini 2.5 flash": ("google", "gemini-1.5-flash"),
 }
 
 PROVIDER_SYSTEM_PROMPTS: Dict[str, str] = {
     "groq": (
-        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "You are an expert AIVISO Professional Code Reviewer. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
         "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
         "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
     "openai": (
-        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "You are an expert AIVISO Professional Code Reviewer. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
         "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
         "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
     "anthropic": (
-        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "You are an expert AIVISO Professional Code Reviewer. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
         "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
         "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
     "deepseek": (
-        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "You are an expert AIVISO Professional Code Reviewer. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
         "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
         "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
     "openrouter": (
-        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "You are an expert AIVISO Professional Code Reviewer. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
         "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
         "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
     "gpt_oss": (
-        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "You are an expert AIVISO Professional Code Reviewer. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
         "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
         "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
     "google": (
-        "You are an expert AI Assistant and Tutor. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
+        "You are an expert AIVISO Professional Code Reviewer. You must answer any questions the user has, from A to Z, on any topic, not just coding. "
         "If the user asks a coding question, provide clear step-by-step reasoning and tradeoffs. "
         "For non-coding questions, be as helpful, knowledgeable, and detailed as possible."
     ),
 }
 
 FALLBACK_ORDER: List[Tuple[str, str]] = [
-    ("groq", "llama-3.3-70b-versatile"),
-    ("openai", "gpt-4o"),
-    ("deepseek", "deepseek-chat"),
+    ("groq", "llama-3.1-8b-instant"),
+    ("openrouter", "meta-llama/llama-3.1-8b-instruct:free"),
+    ("google", "gemini-1.5-flash"),
+    ("openai", "gpt-4o-mini"),
 ]
 
 
@@ -94,14 +95,22 @@ def _provider_key(provider: str) -> Optional[str]:
 
 def _resolve_provider(model_name: Optional[str], use_web_search: bool) -> Tuple[str, str]:
     normalized = (model_name or "default").strip().lower()
-    provider, model = MODEL_PROVIDER_MAP.get(normalized, MODEL_PROVIDER_MAP["default"])
+    
+    # Priority 1: Explicitly requested model if valid key exists
+    if normalized in MODEL_PROVIDER_MAP:
+        provider, model = MODEL_PROVIDER_MAP[normalized]
+        if _provider_key(provider):
+            return provider, model
 
-    if _provider_key(provider):
-        return provider, model
-
+    # Priority 2: Go through Fallback Order to find ANY working key
     for fallback_provider, fallback_model in FALLBACK_ORDER:
         if _provider_key(fallback_provider):
             return fallback_provider, fallback_model
+
+    # Priority 3: Check "default" entry if nothing else worked
+    provider, model = MODEL_PROVIDER_MAP.get("default", ("none", "none"))
+    if _provider_key(provider):
+        return provider, model
 
     return "none", "none"
 
@@ -344,49 +353,63 @@ async def _execute_chat_provider(provider: str, model: str, messages: List[Dict[
 
 
 async def get_chat_response(request: AIChatRequest) -> AIChatResponse:
-    provider, model = _resolve_provider(request.model, request.use_web_search)
-    if provider == "none":
+    try:
+        provider, model = _resolve_provider(request.model, request.use_web_search)
+        if provider == "none":
+            return AIChatResponse(
+                answer="⚠️ **AI Engine Offline**: No valid API keys found in the server's `.env` configuration. Please add your GROQ_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to start the intelligence core.",
+                sources=[AIChatSource(title="Configuration Required", url="#")],
+                suggested_questions=["How do I add API keys?", "Where is the .env file?"],
+                status="failed",
+            )
+
+        # Build a list of all possibly working configs to try in sequence
+        configs_to_try = [(provider, model)]
+        for f_provider, f_model in FALLBACK_ORDER:
+            if (f_provider, f_model) not in configs_to_try and _provider_key(f_provider):
+                configs_to_try.append((f_provider, f_model))
+
+        errors = []
+        for current_provider, current_model in configs_to_try:
+            try:
+                messages = _build_messages(request, current_provider)
+                answer, sources = await _execute_chat_provider(current_provider, current_model, messages, request)
+                
+                return AIChatResponse(
+                    answer=answer,
+                    sources=sources,
+                    suggested_questions=_suggested_questions(current_provider),
+                    status="completed",
+                )
+            except Exception as exc:
+                err_detail = f"{current_provider}({current_model}): {str(exc)}"
+                print(f"DEBUG: Provider Fallback - {err_detail}")
+                errors.append(err_detail)
+                continue
+
+        # If we reach here, everything failed
+        error_history = "\n".join([f"- {e}" for e in errors])
         return AIChatResponse(
-            answer="No LLM API key is configured on the server. Add at least one provider key in backend .env.",
-            sources=[AIChatSource(title="Configuration Required", url="#")],
-            suggested_questions=["How do I set the .env keys?", "Which provider should I start with?"],
+            answer=(
+                "❌ **AI Connection Failure**: All configured AI providers are currently unreachable.\n\n"
+                "**Potential Causes:**\n"
+                "1. API rate limits exceeded\n"
+                "2. Invalid or expired API handles\n"
+                "3. Network restrictions on the server\n\n"
+                f"**Technical Details:**\n{error_history}"
+            ),
+            sources=[AIChatSource(title="System Error", url="#")],
+            suggested_questions=["Check API Billing Status", "Verify Server Internet", "Try a different model"],
             status="failed",
         )
-
-    # Prepare a list of providers to try: [Initial choice] + [Fallbacks if not already tried]
-    providers_to_try = [(provider, model)]
-    for f_provider, f_model in FALLBACK_ORDER:
-        if (f_provider, f_model) not in providers_to_try:
-            if _provider_key(f_provider):
-                providers_to_try.append((f_provider, f_model))
-
-    last_error = ""
-    for current_provider, current_model in providers_to_try:
-        messages = _build_messages(request, current_provider)
-        try:
-            answer, sources = await _execute_chat_provider(current_provider, current_model, messages, request)
-            
-            # Silently return the answer even if we fell back
-            return AIChatResponse(
-                answer=answer,
-                sources=sources,
-                suggested_questions=_suggested_questions(current_provider),
-                status="completed",
-            )
-        except Exception as exc:
-            error_msg = str(exc)
-            last_error = f"{current_provider}: {error_msg}"
-            # Log the error (optional, but good for debugging)
-            print(f"Fallback triggered: Provider {current_provider} failed with: {error_msg}")
-            # Continue to next provider in loop
-            continue
-
-    return AIChatResponse(
-        answer=f"All available AI providers failed. Last error ({last_error}). Please try again later.",
-        sources=[AIChatSource(title="System Error", url="#")],
-        suggested_questions=["Try again in a minute", "Check server logs", "Check API keys"],
-        status="failed",
-    )
+    except Exception as fatal_e:
+        print(f"CRITICAL: Fatal error in get_chat_response: {fatal_e}")
+        return AIChatResponse(
+            answer="🚨 **System Crash**: The AI engine encountered a critical internal error. Please restart the backend server.",
+            sources=[],
+            suggested_questions=[],
+            status="failed"
+        )
 
 
 async def explain_code(request: ExplainRequest) -> ExplainResponse:

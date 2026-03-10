@@ -23,6 +23,10 @@ export const problemsApi = {
       const response = await api.get(`/problems/${id}`);
       return response.data;
    },
+   getLeetCodeProblems: async (skip: number = 0, limit: number = 2000): Promise<any[]> => {
+      const response = await api.get('/problems/leetcode/all', { params: { skip, limit } });
+      return response.data;
+   },
    submitSolution: async (submissionData: any): Promise<Submission> => {
       const response = await api.post('/submissions', submissionData);
       return response.data;

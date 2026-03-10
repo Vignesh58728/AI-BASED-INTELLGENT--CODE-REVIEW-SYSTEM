@@ -79,7 +79,7 @@ Action: Please whitelist your current IP Address in the MongoDB Atlas dashboard.
 Currently, the backend mostly uses Groq. I need to:
 
 Create a Model Router that switches between different providers based on the user's selection in the frontend.
-Implement specialized System Prompts for each model so they act like expert tutors.
+Implement specialized System Prompts for each model so they act like expert reviewers.
 4. 📂 File/Code Context Uploads
 To make it a true "AI Code Reviewer," students should be able to upload a 
 .py

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import {
    ChevronLeft, Play, RefreshCw, Maximize2,
@@ -10,6 +10,8 @@ import {
    Send
 } from 'lucide-react';
 import { submissionService, type ChatMessage } from '../../services/submissionService';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // ── Models & Constants ────────────────────────────────────────────────────────
 type Language = 'python' | 'java' | 'javascript' | 'cpp' | 'csharp' | 'html' | 'css';
@@ -69,10 +71,11 @@ const EXAMPLES: Example[] = [
 // ── Component ─────────────────────────────────────────────────────────────────
 export function AIPracticePage() {
    const navigate = useNavigate();
+   const location = useLocation();
 
    // Code state
-   const [lang, setLang] = useState<Language>('python');
-   const [code, setCode] = useState(EXAMPLES[0].code);
+   const [lang, setLang] = useState<Language>((location.state?.language as Language) || 'python');
+   const [code, setCode] = useState(location.state?.code || EXAMPLES[0].code);
 
    // Execution state
    const [running, setRunning] = useState(false);
@@ -196,14 +199,46 @@ export function AIPracticePage() {
 
    return (
       <div className="h-screen bg-white text-slate-800 font-['Inter',sans-serif] flex flex-col overflow-hidden">
-         <style dangerouslySetInnerHTML={{ __html: "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');" }} />
+         <style dangerouslySetInnerHTML={{ __html: `
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+            
+            .markdown-content {
+               font-family: 'Outfit', sans-serif;
+            }
+            .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+               font-family: 'Outfit', sans-serif;
+               font-weight: 700;
+               margin-top: 1rem;
+               margin-bottom: 0.5rem;
+               color: #000;
+            }
+            .markdown-content p {
+               margin-bottom: 0.75rem;
+               line-height: 1.6;
+            }
+            .markdown-content ul, .markdown-content ol {
+               margin-bottom: 0.75rem;
+               padding-left: 1.25rem;
+            }
+            .markdown-content li {
+               margin-bottom: 0.25rem;
+            }
+            .markdown-content code {
+               background-color: #f3f4f6;
+               padding: 0.1rem 0.3rem;
+               border-radius: 0.25rem;
+               font-family: monospace;
+               font-size: 0.9em;
+               color: #ef4444;
+            }
+         ` }} />
          {/* ── Main Workspace ────────────────────────────────────────────────── */}
-         <div className="flex-1 flex overflow-hidden p-1 gap-1 bg-[#f0f0f0]">
+         <div className="flex-1 flex overflow-hidden p-1 gap-1 bg-white">
 
             {/* ── Left Pane: Editor & Console ── */}
             <div className="flex-[2] flex flex-col min-w-0 gap-1">
                {/* Editor Section */}
-               <div className="flex-1 flex flex-col bg-white border border-[#ccc] shadow-sm relative focus-within:ring-1 focus-within:ring-[#007fd4] overflow-hidden">
+               <div className="flex-1 flex flex-col bg-white border border-zinc-100 shadow-sm relative focus-within:ring-1 focus-within:ring-black/5 overflow-hidden">
                   <div className="h-[35px] bg-white border-b border-[#eee] flex items-center px-3 justify-between shrink-0">
                      <div className="flex items-center gap-6">
                         <button onClick={() => navigate(-1)} className="text-[#333] hover:text-[#007fd4]" title="Back">
@@ -263,7 +298,7 @@ export function AIPracticePage() {
                </div>
 
                {/* Console/Output Section (Separate) */}
-               <div className="h-[200px] bg-white border border-[#ccc] shadow-sm flex flex-col">
+               <div className="h-[200px] bg-white border border-zinc-100 shadow-sm flex flex-col">
                   <div className="h-[30px] bg-[#f8f9fa] border-b border-[#eee] flex items-center px-4 justify-between">
                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-['Outfit']">Console Output</span>
                      <button onClick={() => setResult(null)} className="text-[#999] hover:text-red-500"><X size={14} /></button>
@@ -281,14 +316,14 @@ export function AIPracticePage() {
             </div>
 
             {/* ── Right Pane: AI Assistant ── */}
-            <div className="flex-1 min-w-[350px] bg-white border border-[#ccc] shadow-sm flex flex-col">
+            <div className="flex-1 min-w-[350px] bg-white border border-zinc-100 shadow-sm flex flex-col">
                <div className="h-[40px] px-4 border-b border-[#eee] flex items-center justify-between bg-white shrink-0">
                   <div className="flex items-center gap-2">
                      <span className="text-[14px] font-bold text-slate-800 font-['Outfit'] uppercase tracking-wider">AI CODE REVIEW SYSTEM</span>
                   </div>
                </div>
 
-               <div className="flex-1 overflow-y-auto p-5 space-y-6 bg-slate-50/30">
+               <div className="flex-1 overflow-y-auto p-5 space-y-6 bg-white">
                   {/* Line Specific Insight (Pinned if no history) */}
                   {chatHistory.length === 0 && (
                      <div className="space-y-4">
@@ -303,9 +338,11 @@ export function AIPracticePage() {
                                  <Loader2 size={14} className="animate-spin" /> Analyzing code...
                               </div>
                            ) : (
-                              <div className="prose prose-sm prose-indigo font-['Inter'] whitespace-pre-wrap prose-li:list-none prose-ul:list-none prose-ol:list-none prose-headings:before:content-none">
-                                 {explanation || "Click on any line to get instant AI explanation."}
-                              </div>
+                                <div className="markdown-content text-slate-700 font-['Outfit']">
+                                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                      {(explanation || "Click on any line to get instant AI explanation.").replace(/^\s*#+\s*/gm, '')}
+                                   </ReactMarkdown>
+                                </div>
                            )}
                         </div>
                      </div>
@@ -316,9 +353,11 @@ export function AIPracticePage() {
                      {chatHistory.map((msg, i) => (
                         <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                            <div className={`max-w-[90%] p-3 rounded-2xl text-[13px] leading-relaxed ${msg.role === 'user' ? 'bg-violet-600 text-white rounded-tr-none' : 'bg-white text-slate-800 border border-slate-100 rounded-tl-none shadow-sm'}`}>
-                              <div className="prose prose-sm font-['Inter'] whitespace-pre-wrap prose-p:my-1 prose-li:list-none prose-ul:list-none prose-ol:list-none prose-headings:before:content-none">
-                                 {msg.content}
-                              </div>
+                                <div className="markdown-content font-['Outfit']">
+                                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                      {msg.content.replace(/^\s*#+\s*/gm, '')}
+                                   </ReactMarkdown>
+                                </div>
                            </div>
                         </div>
                      ))}

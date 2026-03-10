@@ -18,7 +18,7 @@ export function DiscussPage() {
             <div className="lg:col-span-3 space-y-4">
                {/* Search bar */}
                <div className="relative mb-6">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black" />
                   <Input placeholder="Search discussions..." className="pl-10 h-10" />
                </div>
 
@@ -43,10 +43,10 @@ export function DiscussPage() {
                            <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">
                               {i === 1 ? "Mastering Dynamic Programming | Comprehensive Guide" : `Question about Track ${i} | Help needed`}
                            </h3>
-                           <p className="text-muted-foreground text-sm line-clamp-1 mb-2">
+                           <p className="text-black text-sm line-clamp-1 mb-2">
                               I recently interviewed with Amazon for an SDE-1 role. The process consisted of an OA followed by 3 virtual onsite rounds...
                            </p>
-                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                           <div className="flex items-center gap-4 text-xs text-black">
                               <span className="flex items-center gap-1 font-medium">
                                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`} className="w-5 h-5 rounded-full" alt="avatar" />
                                  user_{i * 123}

@@ -43,4 +43,18 @@ async def create(*, obj_in: SubmissionCreate) -> Submission:
     db_obj.feedback = eval_result.get("feedback")
     
     await db_obj.insert()
+    
+    # Update user progress in the background
+    try:
+        from app.crud.progress import recalculate_user_progress
+        # The problem belongs to a module and difficulty.
+        # Recalculate based on that problem's context.
+        await recalculate_user_progress(
+            user_id=str(user.id), 
+            module=problem.module, 
+            difficulty=problem.difficulty
+        )
+    except Exception as e:
+        print(f"Failed to update progress: {e}")
+        
     return db_obj

@@ -46,7 +46,7 @@ export function ForgotPasswordPage() {
                <form onSubmit={handleSubmit} className="flex flex-col space-y-10" noValidate>
                   <div className="text-center space-y-2">
                      <h2 className="text-2xl font-normal text-black tracking-tight">Forgot Password?</h2>
-                     <p className="text-neutral-500 text-sm">
+                     <p className="text-black text-sm">
                         Enter your email address and we'll send you a link to reset your password.
                      </p>
                   </div>
@@ -72,9 +72,9 @@ export function ForgotPasswordPage() {
                            />
                            <label
                               htmlFor="email"
-                              className="absolute left-0 top-3 text-neutral-500 text-base transition-all duration-200 pointer-events-none origin-left 
-                                         peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-primary
-                                         peer-[:not(:placeholder-shown)]:-translate-y-7 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:text-primary"
+                              className="absolute left-0 top-3 text-black text-base transition-all duration-200 pointer-events-none origin-left 
+                                         peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-black
+                                         peer-[:not(:placeholder-shown)]:-translate-y-7 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:text-black"
                            >
                               Email Address
                            </label>
@@ -100,7 +100,7 @@ export function ForgotPasswordPage() {
                   <div className="text-center pt-2">
                      <Link
                         to="/login"
-                        className="inline-flex items-center gap-2 text-neutral-500 hover:text-black transition-colors text-sm font-medium"
+                        className="inline-flex items-center gap-2 text-black hover:text-black transition-colors text-sm font-medium"
                      >
                         <ArrowLeft size={16} />
                         Back to Login
@@ -109,12 +109,12 @@ export function ForgotPasswordPage() {
                </form>
             ) : (
                <div className="flex flex-col items-center text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
-                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-2">
+                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-black mb-2">
                      <Mail size={40} />
                   </div>
                   <div className="space-y-4">
                      <h2 className="text-2xl font-bold text-black">Check your email</h2>
-                     <p className="text-neutral-500">
+                     <p className="text-black">
                         We've sent a password reset link to <span className="text-black font-semibold">{email}</span>.
                      </p>
                   </div>
@@ -122,7 +122,7 @@ export function ForgotPasswordPage() {
                      Didn't receive the email? Check your spam folder or{" "}
                      <button
                         onClick={() => setIsSubmitted(false)}
-                        className="text-primary font-semibold hover:underline"
+                        className="text-black font-semibold hover:underline"
                      >
                         try again
                      </button>
@@ -143,11 +143,8 @@ export function ForgotPasswordPage() {
 function HeaderSection() {
    return (
       <div className="flex flex-col items-center mb-10">
-         <div className="relative mb-6">
-            <BrandIcon size={70} className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.1)]" dark={false} />
-         </div>
-         <h1 className="text-2xl font-bold text-black tracking-[0.2em] uppercase" style={{ fontFamily: "'Syncopate', sans-serif" }}>
-            Aiviso <span className="text-black">AI</span>
+         <h1 className="text-xl md:text-2xl font-bold text-black tracking-[0.2em] uppercase text-center" style={{ fontFamily: "'Syncopate', sans-serif" }}>
+            AI BASED CODE REVIEW SYSTEM
          </h1>
       </div>
    );

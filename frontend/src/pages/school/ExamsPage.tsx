@@ -14,7 +14,7 @@ export function ExamsPage() {
          <div className="flex items-center justify-between">
             <div>
                <h1 className="text-3xl font-bold tracking-tight mb-2">Mock Exams</h1>
-               <p className="text-muted-foreground">Test your knowledge under timed conditions.</p>
+               <p className="text-black">Test your knowledge under timed conditions.</p>
             </div>
          </div>
 

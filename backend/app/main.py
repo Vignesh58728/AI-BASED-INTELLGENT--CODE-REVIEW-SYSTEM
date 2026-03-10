@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.session import init_db
 from app.core.config import settings
-from app.api import auth, problems, submissions, skill, code_review, reviewer, image_gen
+from app.api import auth, problems, submissions, skill, code_review, reviewer, image_gen, notifications, reporting
 
 app = FastAPI(
     title="CodeMentor AI API",
@@ -46,6 +46,8 @@ app.include_router(skill.router, prefix="/api/skill", tags=["Skill Progress"])
 app.include_router(reviewer.router, prefix="/api/reviewer", tags=["AI Reviewer"])
 app.include_router(code_review.router, prefix="/api/code-review", tags=["Code Review"])
 app.include_router(image_gen.router, prefix="/api/image-gen", tags=["Image Generation"])
+app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
+app.include_router(reporting.router, prefix="/api/reporting", tags=["Reporting"])
 
 @app.get("/")
 async def root():

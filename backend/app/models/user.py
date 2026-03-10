@@ -1,5 +1,6 @@
 from beanie import Document, Link
 from pydantic import Field
+from datetime import datetime
 from typing import Optional, List
 import enum
 
@@ -17,14 +18,11 @@ class User(Document):
     bio: Optional[str] = None
     lang: Optional[str] = "Python"
     photo: Optional[str] = None
-
-    # Relationships (Beanie uses Link for references)
-    # We might want to keep these as references or embed depending on query patterns
-    # For now, let's use Link for consistency with SQL relationships
-    # Note: These actually need to be linked to the specific document classes
-    # progress: Optional[Link["Progress"]] = None
-    # submissions: List[Link["Submission"]] = []
-    # skill_progress: List[Link["SkillProgress"]] = []
+    
+    # Gamification
+    streak_count: int = 0
+    last_login: Optional[datetime] = None
+    badges: List[str] = []
 
     class Settings:
         name = "users"

@@ -9,6 +9,7 @@ from app.models.skill_progress import SkillProgress
 from app.models.chat_history import ChatHistory
 
 from app.models.review import Review
+from app.models.notification import Notification
 
 async def init_db():
     client = AsyncIOMotorClient(
@@ -25,6 +26,7 @@ async def init_db():
             Review,
             Progress,
             SkillProgress,
-            ChatHistory
+            ChatHistory,
+            Notification
         ]
     )

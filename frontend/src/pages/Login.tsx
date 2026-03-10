@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { BrandIcon } from "@/components/ui/BrandIcon";
 import { GoogleLogin } from "@react-oauth/google";
 import api from "@/services/api";
+import { notificationService } from "@/services/notificationService";
 
 export function Login() {
    const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -38,22 +39,125 @@ export function Login() {
       e.preventDefault();
       if (!validateForm()) return;
       setIsLoading(true);
+      setError(null);
 
-      // Simulate API call
-      setTimeout(() => {
-         login({ id: '1', name: 'Test User', email: usernameOrEmail, role: 'student', token: 'dummy-jwt-token' });
+      try {
+         // Real login call
+         const response = await api.post('/auth/login', new URLSearchParams({
+            username: usernameOrEmail,
+            password: password
+         }), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+         });
+
+         const { access_token } = response.data;
+         const payload = JSON.parse(atob(access_token.split('.')[1]));
+
+         login({
+            id: payload.sub,
+            name: payload.name || payload.email || usernameOrEmail,
+            email: payload.email || usernameOrEmail,
+            role: payload.role || 'student',
+            token: access_token,
+            username: payload.username,
+            photo: payload.photo
+         });
+
+         notificationService.triggerLoginEvent();
          navigate('/explore');
+      } catch (err: any) {
+         setError(err.response?.data?.detail || "Login failed. Please check your credentials.");
+      } finally {
          setIsLoading(false);
-      }, 1000);
+      }
    };
 
-   const handleGuestLogin = () => {
+   const handleGuestLogin = async () => {
       setIsLoading(true);
-      setTimeout(() => {
-         login({ id: 'guest', name: 'Guest User', email: 'guest@example.com', role: 'student', token: 'guest-jwt-token' });
+      setError(null);
+
+      const guestEmail = "guest_official@aiviso.ai";
+      const guestPass = "guest-password-123";
+      const guestUsername = "guest_official";
+
+      try {
+         try {
+            // Step 1: Attempt Login
+            const response = await api.post('/auth/login', new URLSearchParams({
+               username: guestEmail,
+               password: guestPass
+            }), {
+               headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            const { access_token } = response.data;
+            const payload = JSON.parse(atob(access_token.split('.')[1]));
+            login({
+               id: payload.sub,
+               name: payload.name || "Guest User",
+               email: guestEmail,
+               role: payload.role || 'student',
+               token: access_token,
+               username: payload.username || guestUsername,
+               photo: payload.photo
+            });
+         } catch (loginErr: any) {
+            // Step 2: Try Registering if login failed
+            try {
+               await api.post('/auth/register', {
+                  email: guestEmail,
+                  username: guestUsername,
+                  full_name: "Guest User",
+                  password: guestPass,
+                  role: "student"
+               });
+
+               // Step 3: Login after registration
+               const response = await api.post('/auth/login', new URLSearchParams({
+                  username: guestEmail,
+                  password: guestPass
+               }), {
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+               });
+               const { access_token } = response.data;
+               const payload = JSON.parse(atob(access_token.split('.')[1]));
+               login({
+                  id: payload.sub,
+                  name: payload.name || "Guest User",
+                  email: guestEmail,
+                  role: payload.role || 'student',
+                  token: access_token,
+                  username: payload.username || guestUsername
+               });
+            } catch (regErr: any) {
+               // Even if registration fails (e.g. server down or already exists but login failed), 
+               // we'll jump to the catch block and use Local Fallback.
+               throw regErr;
+            }
+         }
+
+         notificationService.triggerLoginEvent();
          navigate('/explore');
+      } catch (err: any) {
+         console.warn("Guest login server-side failed, using local fallback mode:", err);
+
+         // RESILIENT FALLBACK: Grant local guest session anyway
+         // This ensures the user "ulla poganum" (enters) no matter what.
+         login({
+            id: "local-guest",
+            name: "Guest User",
+            email: guestEmail,
+            role: 'student',
+            token: "offline-guest-token",
+            username: guestUsername,
+            photo: null,
+            isOffline: true
+         });
+
+         notificationService.triggerLoginEvent();
+         navigate('/explore');
+      } finally {
          setIsLoading(false);
-      }, 800);
+      }
    };
 
    const handleGoogleSuccess = async (credentialResponse: any) => {
@@ -69,12 +173,17 @@ export function Login() {
             id: payload.sub,
             name: payload.name || payload.email,
             email: payload.email,
-            role: 'student',
-            token: access_token
+            role: payload.role || 'student',
+            token: access_token,
+            username: payload.username,
+            photo: payload.photo
          });
+         notificationService.triggerLoginEvent();
          navigate('/explore');
-      } catch (err) {
-         setError('Google login failed. Please try again.');
+      } catch (err: any) {
+         console.error("Google login error:", err);
+         const errorMessage = err.response?.data?.detail || "Google login failed. Please try again.";
+         setError(errorMessage);
       } finally {
          setIsLoading(false);
       }
@@ -110,9 +219,9 @@ export function Login() {
                         />
                         <label
                            htmlFor="usernameOrEmail"
-                           className="absolute left-0 top-3 text-neutral-500 text-base transition-all duration-200 pointer-events-none origin-left 
-                                      peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-primary
-                                      peer-[:not(:placeholder-shown)]:-translate-y-7 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:text-primary"
+                           className="absolute left-0 top-3 text-black text-base transition-all duration-200 pointer-events-none origin-left 
+                                      peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-black
+                                      peer-[:not(:placeholder-shown)]:-translate-y-7 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:text-black"
                         >
                            Email or Username
                         </label>
@@ -134,20 +243,21 @@ export function Login() {
                         />
                         <label
                            htmlFor="password"
-                           className="absolute left-0 top-3 text-neutral-500 text-base transition-all duration-200 pointer-events-none origin-left
-                                      peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-primary
-                                      peer-[:not(:placeholder-shown)]:-translate-y-7 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:text-primary"
+                           className="absolute left-0 top-3 text-black text-base transition-all duration-200 pointer-events-none origin-left
+                                      peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-black
+                                      peer-[:not(:placeholder-shown)]:-translate-y-7 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:text-black"
                         >
                            Password
                         </label>
                         <button
                            type="button"
                            onClick={() => setShowPassword(!showPassword)}
-                           className="absolute right-0 top-3 text-neutral-400 hover:text-primary transition-colors p-1 rounded-full hover:bg-neutral-50"
+                           className="absolute right-0 top-3 text-neutral-400 hover:text-black transition-colors p-1 rounded-full hover:bg-neutral-50"
                            aria-label="Toggle password visibility"
                         >
                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
+
                         <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-focus-within:w-full"></div>
                      </div>
                   </div>
@@ -165,7 +275,7 @@ export function Login() {
                      </div>
                      <span>Stay signed in</span>
                   </label>
-                  <Link to="/forgot-password" className="text-primary font-medium uppercase tracking-wider text-[11px] hover:text-primary/80 transition-colors">
+                  <Link to="/forgot-password" className="text-black font-medium uppercase tracking-wider text-[11px] hover:text-black/80 transition-colors">
                      Forgot password?
                   </Link>
                </div>
@@ -184,19 +294,21 @@ export function Login() {
                      )}
                   </button>
 
-                  <button
-                     type="button"
-                     onClick={handleGuestLogin}
-                     disabled={isLoading}
-                     className="relative w-full bg-white text-black border-2 border-black font-bold h-12 rounded-md shadow-sm hover:bg-neutral-50 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center group uppercase tracking-widest text-xs"
-                  >
-                     GUEST LOGIN
-                  </button>
+                  <div className="flex flex-col items-center">
+                     <button
+                        type="button"
+                        onClick={handleGuestLogin}
+                        disabled={isLoading}
+                        className="text-black font-black uppercase tracking-[0.2em] text-[10px] py-3 px-6 border-2 border-black rounded-md hover:bg-black hover:text-white transition-all duration-300 w-full"
+                     >
+                        Enter as Guest
+                     </button>
+                  </div>
                </div>
 
                <div className="relative text-center">
                   <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-200"></div></div>
-                  <span className="relative px-3 bg-white text-neutral-500 text-xs uppercase tracking-widest font-medium">OR</span>
+                  <span className="relative px-3 bg-white text-black text-xs uppercase tracking-widest font-medium">OR</span>
                </div>
 
                <div className="grid grid-cols-1 gap-3">
@@ -216,7 +328,7 @@ export function Login() {
                </div>
 
                <div className="text-center pt-4">
-                  <p className="text-black/60 text-sm">
+                  <p className="text-black text-sm">
                      Don't have an account?{" "}
                      <Link to="/register" className="text-black font-black uppercase tracking-wider text-xs border-b-2 border-black pb-0.5 hover:text-black/70 hover:border-black/70 transition-all ml-1">
                         Create account
@@ -232,11 +344,8 @@ export function Login() {
 function HeaderSection() {
    return (
       <div className="flex flex-col items-center mb-10">
-         <div className="relative mb-6">
-            <BrandIcon size={70} className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.1)]" dark={false} />
-         </div>
-         <h1 className="text-2xl font-bold text-black tracking-[0.2em] uppercase" style={{ fontFamily: "'Syncopate', sans-serif" }}>
-            Aiviso <span className="text-black">AI</span>
+         <h1 className="text-xl md:text-2xl font-bold text-black tracking-[0.2em] uppercase text-center" style={{ fontFamily: "'Syncopate', sans-serif" }}>
+            AI BASED CODE REVIEW SYSTEM
          </h1>
       </div>
    );

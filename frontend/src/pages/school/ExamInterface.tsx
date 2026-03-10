@@ -62,7 +62,7 @@ export function ExamInterface() {
                </div>
             </div>
             <h1 className="text-3xl font-bold mb-2">Exam Submitted!</h1>
-            <p className="text-muted-foreground mb-8 text-lg">
+            <p className="text-black mb-8 text-lg">
                Well done on completing the <span className="text-foreground font-semibold">{exam.title}</span>.
                Your results are being analyzed by our AI reviewer.
             </p>
@@ -75,7 +75,7 @@ export function ExamInterface() {
    }
 
    return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-white flex flex-col">
          {/* Top Navigation / Status bar */}
          <div className="border-b bg-card sticky top-0 z-10">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -85,7 +85,7 @@ export function ExamInterface() {
                   </Button>
                   <div>
                      <h2 className="font-bold text-sm leading-none">{exam.title}</h2>
-                     <p className="text-[10px] text-muted-foreground mt-1">
+                     <p className="text-[10px] text-black mt-1">
                         Question {currentQuestionIndex + 1} of {exam.questions.length}
                      </p>
                   </div>
@@ -113,7 +113,7 @@ export function ExamInterface() {
                <Card>
                   <CardHeader>
                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
+                        <span className="text-[10px] uppercase tracking-widest font-bold text-black">
                            {currentQuestion.section || "Question"}
                         </span>
                         <span className="text-[10px] px-2 py-0.5 rounded bg-muted font-medium capitalize">
@@ -125,7 +125,7 @@ export function ExamInterface() {
                      </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                     <p className="text-sm text-muted-foreground italic">
+                     <p className="text-sm text-black italic">
                         Write your Python solution in the editor. Ensure your code handles the inputs correctly and matches the expected output format.
                      </p>
                   </CardContent>
@@ -151,21 +151,21 @@ export function ExamInterface() {
             <div className="md:col-span-2 space-y-4 flex flex-col">
                <div className="flex-1 border rounded-2xl bg-[#0d1117] flex flex-col overflow-hidden relative group">
                   {/* Editor Header */}
-                  <div className="h-10 border-b border-white/5 bg-white/5 flex items-center px-4 justify-between">
-                     <span className="text-[10px] font-mono text-white/50 uppercase tracking-widest">editor.py</span>
+                  <div className="h-10 border-b border-zinc-100 bg-white/5 flex items-center px-4 justify-between">
+                     <span className="text-[10px] font-mono text-black/50 uppercase tracking-widest">editor.py</span>
                   </div>
 
                   {/* Placeholder content showing it's an editor */}
                   <div className="flex-1 p-6 font-mono text-sm space-y-2 opacity-50 select-none">
                      <div className="text-emerald-500"># Start your solution for Question {currentQuestionIndex + 1} here</div>
                      <div className="text-blue-400">def solution():</div>
-                     <div className="ml-4 text-white/80"># Your code logic</div>
+                     <div className="ml-4 text-black/80"># Your code logic</div>
                      <div className="ml-4 text-purple-400">pass</div>
                   </div>
 
                   {/* Overlay showing it's a placeholder for now */}
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                     <p className="text-xs font-medium text-white bg-black/60 px-4 py-2 rounded-full border border-white/10">
+                  <div className="absolute inset-0 bg-white backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                     <p className="text-xs font-medium text-black bg-white/60 px-4 py-2 rounded-full border border-white/10">
                         Full Editor Coming Soon
                      </p>
                   </div>

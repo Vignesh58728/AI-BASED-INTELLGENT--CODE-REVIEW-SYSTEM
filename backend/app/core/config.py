@@ -43,6 +43,9 @@ class Settings(BaseSettings):
         """
         Dynamically load secrets from AWS Secrets Manager if AWS_SECRET_NAME is set.
         """
+        if not self.AWS_SECRET_NAME:
+            return
+            
         try:
             import boto3
             import json
@@ -56,7 +59,7 @@ class Settings(BaseSettings):
                     if hasattr(self, key):
                         setattr(self, key, value)
         except (ImportError, Exception) as e:
-            print(f"Error loading AWS secrets (boto3 may be crashing): {e}")
+            print(f"Note: AWS secrets not loaded or name invalid: {e}")
 
     class Config:
         env_file = ".env"

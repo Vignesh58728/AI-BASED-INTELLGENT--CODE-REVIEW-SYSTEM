@@ -26,7 +26,7 @@ export function CSCoreSubjects() {
       <div className="space-y-6 container mx-auto py-8">
          <div>
             <h1 className="text-3xl font-bold tracking-tight mb-2">CS Core Subjects</h1>
-            <p className="text-muted-foreground">Master Operating Systems, DBMS, and Computer Networks.</p>
+            <p className="text-black">Master Operating Systems, DBMS, and Computer Networks.</p>
          </div>
 
          {isLoading ? (

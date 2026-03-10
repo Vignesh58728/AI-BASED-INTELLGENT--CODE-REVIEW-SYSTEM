@@ -1,75 +1,117 @@
-
-import { Link } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { ChevronDown, Flame, Map, Target, Trophy, Sparkles, Clock } from 'lucide-react';
 import schoolIcon from "@/assets/images/school.png";
 import collegeIcon from "@/assets/images/college.png";
 import itIcon from "@/assets/images/it.png";
 
 
 const MegaMenu = () => {
+   const location = useLocation();
+
    return (
-      <nav className="hidden md:flex items-center gap-1">
+      <nav className="hidden md:flex items-center gap-10 h-full px-4 md:px-6">
+         {location.pathname !== '/explore' && (
+            <Link
+               to="/explore"
+               className="nav-link-custom text-lg font-medium"
+            >
+               Explore
+            </Link>
+         )}
 
          <Link
-            to="/explore"
-            className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-white"
+            to="/ai"
+            className="nav-link-custom text-lg font-medium flex items-center gap-1"
          >
-            Explore
+            AI Assistant
          </Link>
 
-
-         {/* Code Review */}
          <Link
             to="/ai/practice"
-            className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-white"
+            className="nav-link-custom text-lg font-medium"
          >
             Code Review
          </Link>
 
-
-         {/* 2. AI (Direct Link to Chat) */}
-         <Link
-            to="/ai"
-            className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-white"
-         >
-            AI
-         </Link>
-
-         {/* 2. Level Dropdown */}
+         {/* 1. Challenges Dropdown 🔥 */}
          <div className="relative group">
-            <button className="inline-flex h-10 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white focus:outline-none disabled:pointer-events-none disabled:opacity-50 text-white group-hover:text-primary">
-               Levels <ChevronDown className="ml-1 h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+            <button className="nav-link-custom flex items-center gap-1 text-lg font-medium">
+               Challenges <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
             </button>
-            <div className="absolute left-0 top-full pt-2 w-[400px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-               <div className="bg-neutral-900 rounded-xl border border-white/10 shadow-xl overflow-hidden p-4 grid gap-4 backdrop-blur-md">
+            <div className="absolute left-1/2 -translate-x-1/2 top-full pt-4 w-[350px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+               <div className="bg-white rounded-2xl border border-zinc-100 shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden p-4 grid gap-3 backdrop-blur-xl">
+                  <div className="space-y-3">
+                     <h4 className="font-bold text-base text-zinc-400 px-2 uppercase tracking-widest" style={{ fontFamily: "'Poppins', sans-serif" }}>Daily Missions</h4>
+                     <div className="grid gap-1">
+                        <Link to="/practice/lc-two-sum" className="group/item flex items-center gap-3 rounded-xl p-3 hover:bg-orange-50 transition-all duration-300">
+                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100/50">
+                              <img src="/24-hours.png" alt="Daily" className="h-6 w-6 object-contain" />
+                           </div>
+                           <div className="flex flex-col">
+                              <span className="text-sm font-bold text-black" style={{ fontFamily: "'Poppins', sans-serif" }}>Daily Coding Problem</span>
+                              <span className="text-[11px] text-zinc-500" style={{ fontFamily: "'Poppins', sans-serif" }}>New challenge every 24 hours</span>
+                           </div>
+                        </Link>
+                        <Link to="/practice/lc-generate-parentheses" className="group/item flex items-center gap-3 rounded-xl p-3 hover:bg-blue-50 transition-all duration-300">
+                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100/50">
+                              <img src="/week.png" alt="Weekly" className="h-6 w-6 object-contain" />
+                           </div>
+                           <div className="flex flex-col">
+                              <span className="text-sm font-bold text-black" style={{ fontFamily: "'Poppins', sans-serif" }}>Weekly Challenge</span>
+                              <span className="text-[11px] text-zinc-500" style={{ fontFamily: "'Poppins', sans-serif" }}>Master a new topic every week</span>
+                           </div>
+                        </Link>
+                        <Link to="/school" className="group/item flex items-center gap-3 rounded-xl p-3 hover:bg-green-50 transition-all duration-300">
+                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-100/50">
+                              <img src="/newbie.png" alt="Beginner" className="h-6 w-6 object-contain" />
+                           </div>
+                           <div className="flex flex-col">
+                              <span className="text-sm font-bold text-black" style={{ fontFamily: "'Poppins', sans-serif" }}>Beginner Rush</span>
+                              <span className="text-[11px] text-zinc-500" style={{ fontFamily: "'Poppins', sans-serif" }}>Perfect for starting your journey</span>
+                           </div>
+                        </Link>
+
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         {/* 2. Levels Dropdown */}
+         <div className="relative group">
+            <button className="nav-link-custom flex items-center gap-1 text-lg font-medium">
+               Levels <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+            </button>
+            <div className="absolute left-1/2 -translate-x-1/2 top-full pt-4 w-[400px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+               <div className="bg-white rounded-2xl border border-zinc-100 shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden p-5 grid gap-4 backdrop-blur-xl">
                   <div className="space-y-4">
-                     <h4 className="font-medium leading-none text-primary">Select Your Path</h4>
+                     <h4 className="font-bold text-lg text-black px-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Select Your Path</h4>
                      <div className="grid gap-2">
-                        <Link to="/school" className="group/item flex items-center gap-4 rounded-lg p-2 hover:bg-white/5 transition-colors">
-                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/5 group-hover/item:border-primary transition-colors">
-                              <img src={schoolIcon} alt="School" className="h-7 w-7 object-contain" />
+                        <Link to="/school" className="group/item flex items-center gap-4 rounded-xl p-3 hover:bg-zinc-50 transition-all duration-300">
+                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-zinc-50 group-hover/item:border-[#2192ff] transition-colors">
+                              <img src={schoolIcon} alt="School" className="h-8 w-8 object-contain" />
                            </div>
                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-white">School Level</span>
-                              <span className="text-xs text-zinc-400">Foundational concepts and basics</span>
+                              <span className="text-sm font-bold text-black" style={{ fontFamily: "'Poppins', sans-serif" }}>School Level</span>
+                              <span className="text-xs text-zinc-500" style={{ fontFamily: "'Poppins', sans-serif" }}>Foundational concepts and basics</span>
                            </div>
                         </Link>
-                        <Link to="/college" className="group/item flex items-center gap-4 rounded-lg p-2 hover:bg-white/5 transition-colors">
-                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/5 group-hover/item:border-primary transition-colors">
-                              <img src={collegeIcon} alt="College" className="h-7 w-7 object-contain" />
+                        <Link to="/college" className="group/item flex items-center gap-4 rounded-xl p-3 hover:bg-zinc-50 transition-all duration-300">
+                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-zinc-50 group-hover/item:border-[#2192ff] transition-colors">
+                              <img src={collegeIcon} alt="College" className="h-8 w-8 object-contain" />
                            </div>
                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-white">College Level</span>
-                              <span className="text-xs text-zinc-400">DSA, Algorithms, and Logic</span>
+                              <span className="text-sm font-bold text-black" style={{ fontFamily: "'Poppins', sans-serif" }}>College Level</span>
+                              <span className="text-xs text-zinc-500" style={{ fontFamily: "'Poppins', sans-serif" }}>DSA, Algorithms, and Logic</span>
                            </div>
                         </Link>
-                        <Link to="/it" className="group/item flex items-center gap-4 rounded-lg p-2 hover:bg-white/5 transition-colors">
-                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/5 group-hover/item:border-primary transition-colors">
-                              <img src={itIcon} alt="IT" className="h-7 w-7 object-contain" />
+                        <Link to="/it" className="group/item flex items-center gap-4 rounded-xl p-3 hover:bg-zinc-50 transition-all duration-300">
+                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-zinc-50 group-hover/item:border-[#2192ff] transition-colors">
+                              <img src={itIcon} alt="IT" className="h-8 w-8 object-contain" />
                            </div>
                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-white">Professional Level</span>
-                              <span className="text-xs text-zinc-400">System Design & Advanced Topics</span>
+                              <span className="text-sm font-bold text-black" style={{ fontFamily: "'Poppins', sans-serif" }}>Professional Level</span>
+                              <span className="text-xs text-zinc-500" style={{ fontFamily: "'Poppins', sans-serif" }}>System Design & Advanced Topics</span>
                            </div>
                         </Link>
                      </div>
@@ -77,6 +119,7 @@ const MegaMenu = () => {
                </div>
             </div>
          </div>
+
 
 
       </nav>

@@ -26,7 +26,7 @@ export function RegisterPage() {
 
    useEffect(() => {
       if (isAuthenticated) {
-         navigate('/ai');
+         navigate('/explore');
       }
    }, [isAuthenticated, navigate]);
 
@@ -51,20 +51,46 @@ export function RegisterPage() {
       e.preventDefault();
       if (!validateForm()) return;
       setIsLoading(true);
+      setError(null);
 
-      // Simulate API call
-      setTimeout(() => {
-         login({
-            id: '2',
-            name,
+      try {
+         // 1. Register user
+         await api.post('/auth/register', {
             email,
-            role,
-            token: 'dummy-jwt-token',
-            metadata: { username, phone, college, github }
+            username,
+            full_name: name,
+            password,
+            role
          });
+
+         // 2. Login user to get token
+         const loginResponse = await api.post('/auth/login', new URLSearchParams({
+            username: email,
+            password: password
+         }), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+         });
+
+         const { access_token } = loginResponse.data;
+         const payload = JSON.parse(atob(access_token.split('.')[1]));
+
+         login({
+            id: payload.sub,
+            name: name,
+            email: email,
+            role: role,
+            token: access_token,
+            username: username
+         });
+
          navigate('/explore');
+      } catch (err: any) {
+         console.error("Registration error:", err);
+         const errorMessage = err.response?.data?.detail || "Registration failed. Please check your network or try again.";
+         setError(errorMessage);
+      } finally {
          setIsLoading(false);
-      }, 1000);
+      }
    };
 
    const handleGoogleSuccess = async (credentialResponse: any) => {
@@ -80,11 +106,96 @@ export function RegisterPage() {
             name: payload.name || payload.email,
             email: payload.email,
             role: 'student',
-            token: access_token
+            token: access_token,
+            username: payload.username // Backend should include this if possible
          });
          navigate('/explore');
-      } catch (err) {
-         setError('Google sign-up failed. Please try again.');
+      } catch (err: any) {
+         console.error("Google sign-up error:", err);
+         const errorMessage = err.response?.data?.detail || "Google sign-up failed. Please try again.";
+         setError(errorMessage);
+      } finally {
+         setIsLoading(false);
+      }
+   };
+
+   const handleGuestLogin = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      const guestEmail = "guest_official@aiviso.ai";
+      const guestPass = "guest-password-123";
+      const guestUsername = "guest_official";
+
+      try {
+         try {
+            // Step 1: Attempt Login
+            const response = await api.post('/auth/login', new URLSearchParams({
+               username: guestEmail,
+               password: guestPass
+            }), {
+               headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+            const { access_token } = response.data;
+            const payload = JSON.parse(atob(access_token.split('.')[1]));
+            login({
+               id: payload.sub,
+               name: payload.name || "Guest User",
+               email: guestEmail,
+               role: payload.role || 'student',
+               token: access_token,
+               username: payload.username || guestUsername
+            });
+         } catch (loginErr: any) {
+            // Step 2: Try Registering if login failed
+            try {
+               await api.post('/auth/register', {
+                  email: guestEmail,
+                  username: guestUsername,
+                  full_name: "Guest User",
+                  password: guestPass,
+                  role: "student"
+               });
+
+               // Step 3: Login after registration
+               const response = await api.post('/auth/login', new URLSearchParams({
+                  username: guestEmail,
+                  password: guestPass
+               }), {
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+               });
+               const { access_token } = response.data;
+               const payload = JSON.parse(atob(access_token.split('.')[1]));
+               login({
+                  id: payload.sub,
+                  name: payload.name || "Guest User",
+                  email: guestEmail,
+                  role: payload.role || 'student',
+                  token: access_token,
+                  username: payload.username || guestUsername
+               });
+            } catch (regErr: any) {
+               throw regErr;
+            }
+         }
+
+         navigate('/explore');
+      } catch (err: any) {
+         console.warn("Guest login server-side failed, using local fallback mode:", err);
+
+         // RESILIENT FALLBACK: Grant local guest session anyway
+         login({
+            id: "local-guest",
+            name: "Guest User",
+            email: guestEmail,
+            role: 'student',
+            token: "offline-guest-token",
+            username: guestUsername,
+            photo: null,
+            isOffline: true
+         });
+
+         navigate('/explore');
       } finally {
          setIsLoading(false);
       }
@@ -164,7 +275,7 @@ export function RegisterPage() {
                            <option value="professional">Professional</option>
                            <option value="other">Other</option>
                         </select>
-                        <label className="absolute left-0 -translate-y-7 scale-75 text-primary text-base transition-all duration-200 pointer-events-none origin-left">
+                        <label className="absolute left-0 -translate-y-7 scale-75 text-black text-base transition-all duration-200 pointer-events-none origin-left">
                            Primary Role
                         </label>
                         <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-focus-within:w-full"></div>
@@ -224,7 +335,7 @@ export function RegisterPage() {
 
                <div className="relative text-center">
                   <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-200"></div></div>
-                  <span className="relative px-3 bg-white text-neutral-500 text-xs uppercase tracking-widest font-medium">OR</span>
+                  <span className="relative px-3 bg-white text-black text-xs uppercase tracking-widest font-medium">OR</span>
                </div>
 
                <div className="grid grid-cols-1 gap-3">
@@ -243,8 +354,22 @@ export function RegisterPage() {
                   <SocialButton provider="github" />
                </div>
 
+               <div className="relative text-center">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-neutral-200"></div></div>
+                  <span className="relative px-3 bg-white text-black text-xs uppercase tracking-widest font-medium">OR</span>
+               </div>
+
+               <button
+                  type="button"
+                  onClick={handleGuestLogin}
+                  disabled={isLoading}
+                  className="relative w-full bg-white text-black border-2 border-black font-bold h-12 rounded-md shadow-sm hover:bg-neutral-50 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center group uppercase tracking-widest text-xs"
+               >
+                  GUEST LOGIN
+               </button>
+
                <div className="text-center pt-4">
-                  <p className="text-black/60 text-sm">
+                  <p className="text-black text-sm">
                      Already have an account?{" "}
                      <Link to="/login" className="text-black font-black uppercase tracking-wider text-xs border-b-2 border-black pb-0.5 hover:text-black/70 hover:border-black/70 transition-all ml-1">
                         Sign In
@@ -260,11 +385,8 @@ export function RegisterPage() {
 function HeaderSection() {
    return (
       <div className="flex flex-col items-center mb-10">
-         <div className="relative mb-6">
-            <BrandIcon size={70} className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.1)]" dark={false} />
-         </div>
-         <h1 className="text-2xl font-bold text-black tracking-[0.2em] uppercase" style={{ fontFamily: "'Syncopate', sans-serif" }}>
-            Aiviso <span className="text-black">AI</span>
+         <h1 className="text-xl md:text-2xl font-bold text-black tracking-[0.2em] uppercase text-center" style={{ fontFamily: "'Syncopate', sans-serif" }}>
+            AI BASED CODE REVIEW SYSTEM
          </h1>
       </div>
    );
@@ -297,9 +419,9 @@ function MaterialInput({ id, label, value, onChange, type = "text", required = f
             />
             <label
                htmlFor={id}
-               className="absolute left-0 top-3 text-neutral-500 text-base transition-all duration-200 pointer-events-none origin-left 
-                          peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-primary
-                          peer-[:not(:placeholder-shown)]:-translate-y-7 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:text-primary"
+               className="absolute left-0 top-3 text-black text-base transition-all duration-200 pointer-events-none origin-left 
+                          peer-focus:-translate-y-7 peer-focus:scale-75 peer-focus:text-black
+                          peer-[:not(:placeholder-shown)]:-translate-y-7 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:text-black"
             >
                {label}
             </label>
@@ -307,7 +429,7 @@ function MaterialInput({ id, label, value, onChange, type = "text", required = f
                <button
                   type="button"
                   onClick={onToggle}
-                  className="absolute right-0 top-3 text-neutral-400 hover:text-primary transition-colors p-1 rounded-full hover:bg-neutral-50"
+                  className="absolute right-0 top-3 text-neutral-400 hover:text-black transition-colors p-1 rounded-full hover:bg-neutral-50"
                >
                   {isToggled ? <EyeOff size={20} /> : <Eye size={20} />}
                </button>

@@ -13,7 +13,7 @@ export function FullStackPractice() {
       <div className="space-y-6 container mx-auto py-8">
          <div>
             <h1 className="text-3xl font-bold tracking-tight mb-2">Full Stack Development</h1>
-            <p className="text-muted-foreground">End-to-end projects implementing modern web technologies.</p>
+            <p className="text-black">End-to-end projects implementing modern web technologies.</p>
          </div>
 
          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

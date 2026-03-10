@@ -28,6 +28,7 @@ import { DataStructuresPractice } from '@/pages/college/DataStructuresPractice';
 import { AlgorithmsPractice } from '@/pages/college/AlgorithmsPractice';
 import { CollegePracticePage } from '@/pages/college/CollegePracticePage';
 import { CSCoreSubjects } from '@/pages/college/CSCoreSubjects';
+import { LeetCodeChallenges } from '@/pages/levels/LeetCodeChallenges';
 
 // IT Module Pages
 import { FullStackPractice } from '@/pages/it/FullStackPractice';
@@ -38,6 +39,8 @@ import { ExplorePage } from '@/pages/shared/ExplorePage';
 import { DiscussPage } from '@/pages/shared/DiscussPage';
 import { AIPage } from '@/pages/shared/AIPage';
 import { AIPracticePage } from '@/pages/shared/AIPracticePage';
+import { NotificationsPage } from '@/pages/shared/NotificationsPage';
+import { SettingsPage } from '@/pages/shared/SettingsPage';
 
 
 import { ReactNode } from 'react';
@@ -50,7 +53,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
 function App() {
    return (
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
          <AuthProvider>
             <LevelProvider>
                <ProgressProvider>
@@ -68,6 +71,8 @@ function App() {
                            <Route path="/discuss" element={<DiscussPage />} />
                            <Route path="/skill-analysis" element={<SkillAnalysis />} />
                            <Route path="/admin" element={<AdminPanel />} />
+                           <Route path="/notifications" element={<NotificationsPage />} />
+                           <Route path="/settings" element={<SettingsPage />} />
 
 
                            <Route path="/school" element={<SchoolDashboard />} />

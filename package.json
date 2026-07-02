@@ -1,0 +1,15 @@
+{
+   "name": "ai-code-review-system",
+   "version": "1.0.0",
+   "description": "Unified runner for AI-Based Intelligent Code Review System",
+   "scripts": {
+      "install:all": "npm install --prefix frontend",
+      "dev": "concurrently \"npm run dev --prefix frontend\" \"cd backend && .\\venv\\Scripts\\python.exe -m app.main\""
+   },
+   "devDependencies": {
+      "concurrently": "^8.2.2"
+   },
+   "dependencies": {
+      "@monaco-editor/react": "^4.7.0"
+   }
+}

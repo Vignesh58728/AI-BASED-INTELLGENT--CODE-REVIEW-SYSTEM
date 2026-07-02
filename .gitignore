@@ -1,0 +1,89 @@
+# Environments & Local Configs
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.staging
+venv/
+.venv/
+env/
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build outputs
+dist/
+frontend/dist/
+build/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Databases
+*.db
+*.sqlite3
+backend/sql_app.db
+backend/test.db
+sql_app.db
+test.db
+
+# Logs & Temp files
+*.log
+*error*.txt
+*debug*.txt
+server_log.txt
+server_log_new.txt
+build_errors.txt
+build_errors_2.txt
+ts_errors.txt
+ts_fixed.txt
+api_tunnel.txt
+backend.txt
+frontend.txt
+backend_serveo.txt
+frontend_serveo.txt
+tunnel.txt
+AIPage_temp.txt
+push_debug.txt
+push_error.txt
+register_error.txt
+status.txt
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary scripts in root
+fix_*.js
+final_fix*.js
+check_*.py
+tmp/
+rebrand_*.js
+refine_*.js
+update_*.js
+check_deps.py
+check_health.py
+final_visibility_fix.py
+fix.py
+fix_auth_visibility.py
+fix_profile_icon.js
+fix_syntax.js
+fix_tags.js
+fix_tags_v*.js
+fix_ui.py
+rebrand_cursive.js
+rebrand_script.js
+refine_avatars.js
+test_*.py
+update_profile_icon.js
+verify_ml.py

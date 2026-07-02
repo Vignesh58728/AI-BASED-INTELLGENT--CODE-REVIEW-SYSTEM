@@ -1,0 +1,1490 @@
+[
+  {
+    "id": "1",
+    "title": "1. Print \"Hello World\"",
+    "description": "Write a Python program to print \"hello world\".",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 10,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "print(\"Hello, World!\")"
+    }
+  },
+  {
+    "id": "2",
+    "title": "2. Take a number and print it",
+    "description": "Write a Python program to take a number and print it.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 20,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nprint(\"You entered:\", num)"
+    }
+  },
+  {
+    "id": "3",
+    "title": "3. Take two numbers and print their sum",
+    "description": "Write a Python program to take two numbers and print their sum.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 30,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = int(input(\"Enter first number: \"))\nb = int(input(\"Enter second number: \"))\nprint(\"Sum:\", a + b)"
+    }
+  },
+  {
+    "id": "4",
+    "title": "4. Find the difference of two numbers",
+    "description": "Write a Python program to find the difference of two numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 40,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = int(input(\"Enter first number: \"))\nb = int(input(\"Enter second number: \"))\nprint(\"Difference:\", a - b)"
+    }
+  },
+  {
+    "id": "5",
+    "title": "5. Multiply two numbers",
+    "description": "Write a Python program to multiply two numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 50,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = int(input(\"Enter first number: \"))\nb = int(input(\"Enter second number: \"))\nprint(\"Product:\", a * b)"
+    }
+  },
+  {
+    "id": "6",
+    "title": "6. Divide two numbers",
+    "description": "Write a Python program to divide two numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 60,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = float(input(\"Enter dividend: \"))\nb = float(input(\"Enter divisor: \"))\nif b != 0:\n    print(\"Division:\", a / b)\nelse:\n    print(\"Cannot divide by zero!\")"
+    }
+  },
+  {
+    "id": "7",
+    "title": "7. Find remainder of two numbers",
+    "description": "Write a Python program to find remainder of two numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 70,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = int(input(\"Enter dividend: \"))\nb = int(input(\"Enter divisor: \"))\nif b != 0:\n    print(\"Remainder:\", a % b)\nelse:\n    print(\"Cannot divide by zero!\")"
+    }
+  },
+  {
+    "id": "8",
+    "title": "8. Find square of a number",
+    "description": "Write a Python program to find square of a number.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 80,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = float(input(\"Enter a number: \"))\nprint(\"Square:\", num ** 2)"
+    }
+  },
+  {
+    "id": "9",
+    "title": "9. Find cube of a number",
+    "description": "Write a Python program to find cube of a number.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 90,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = float(input(\"Enter a number: \"))\nprint(\"Cube:\", num ** 3)"
+    }
+  },
+  {
+    "id": "10",
+    "title": "10. Swap two numbers",
+    "description": "Write a Python program to swap two numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 100,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = int(input(\"Enter first number: \"))\nb = int(input(\"Enter second number: \"))\na, b = b, a\nprint(\"After swap: a =\", a, \", b =\", b)"
+    }
+  },
+  {
+    "id": "11",
+    "title": "11. Find average of 3 numbers",
+    "description": "Write a Python program to find average of 3 numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 110,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = float(input(\"Enter first number: \"))\nb = float(input(\"Enter second number: \"))\nc = float(input(\"Enter third number: \"))\navg = (a + b + c) / 3\nprint(\"Average:\", avg)"
+    }
+  },
+  {
+    "id": "12",
+    "title": "12. Convert Celsius to Fahrenheit",
+    "description": "Write a Python program to convert celsius to fahrenheit.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 120,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "celsius = float(input(\"Enter temperature in Celsius: \"))\nfahrenheit = (celsius * 9/5) + 32\nprint(\"Fahrenheit:\", fahrenheit)"
+    }
+  },
+  {
+    "id": "13",
+    "title": "13. Convert Fahrenheit to Celsius",
+    "description": "Write a Python program to convert fahrenheit to celsius.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 130,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "fahrenheit = float(input(\"Enter temperature in Fahrenheit: \"))\ncelsius = (fahrenheit - 32) * 5/9\nprint(\"Celsius:\", celsius)"
+    }
+  },
+  {
+    "id": "14",
+    "title": "14. Find area of a rectangle",
+    "description": "Write a Python program to find area of a rectangle.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 140,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "length = float(input(\"Enter length: \"))\nbreadth = float(input(\"Enter breadth: \"))\narea = length * breadth\nprint(\"Area of Rectangle:\", area)"
+    }
+  },
+  {
+    "id": "15",
+    "title": "15. Find area of a circle",
+    "description": "Write a Python program to find area of a circle.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 150,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "import math\nradius = float(input(\"Enter radius: \"))\narea = math.pi * radius ** 2\nprint(\"Area of Circle:\", round(area, 2))"
+    }
+  },
+  {
+    "id": "16",
+    "title": "16. Find perimeter of rectangle",
+    "description": "Write a Python program to find perimeter of rectangle.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 160,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "length = float(input(\"Enter length: \"))\nbreadth = float(input(\"Enter breadth: \"))\nperimeter = 2 * (length + breadth)\nprint(\"Perimeter:\", perimeter)"
+    }
+  },
+  {
+    "id": "17",
+    "title": "17. Find simple interest",
+    "description": "Write a Python program to find simple interest.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 170,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "principal = float(input(\"Enter principal amount: \"))\nrate = float(input(\"Enter rate of interest (%): \"))\ntime = float(input(\"Enter time (years): \"))\nsi = (principal * rate * time) / 100\nprint(\"Simple Interest:\", si)"
+    }
+  },
+  {
+    "id": "18",
+    "title": "18. Find compound interest",
+    "description": "Write a Python program to find compound interest.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 180,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "principal = float(input(\"Enter principal amount: \"))\nrate = float(input(\"Enter rate of interest (%): \"))\ntime = float(input(\"Enter time (years): \"))\namount = principal * (1 + rate / 100) ** time\nci = amount - principal\nprint(\"Compound Interest:\", round(ci, 2))"
+    }
+  },
+  {
+    "id": "19",
+    "title": "19. Check if number is even or odd",
+    "description": "Write a Python program to check if number is even or odd.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 190,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nif num % 2 == 0:\n    print(num, \"is Even\")\nelse:\n    print(num, \"is Odd\")"
+    }
+  },
+  {
+    "id": "20",
+    "title": "20. Check if number is positive or negative",
+    "description": "Write a Python program to check if number is positive or negative.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 200,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = float(input(\"Enter a number: \"))\nif num > 0:\n    print(num, \"is Positive\")\nelif num < 0:\n    print(num, \"is Negative\")\nelse:\n    print(\"The number is Zero\")"
+    }
+  },
+  {
+    "id": "21",
+    "title": "21. Find largest of two numbers",
+    "description": "Write a Python program to find largest of two numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 210,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = float(input(\"Enter first number: \"))\nb = float(input(\"Enter second number: \"))\nif a > b:\n    print(\"Largest:\", a)\nelif b > a:\n    print(\"Largest:\", b)\nelse:\n    print(\"Both numbers are equal\")"
+    }
+  },
+  {
+    "id": "22",
+    "title": "22. Find smallest of two numbers",
+    "description": "Write a Python program to find smallest of two numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 220,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = float(input(\"Enter first number: \"))\nb = float(input(\"Enter second number: \"))\nif a < b:\n    print(\"Smallest:\", a)\nelif b < a:\n    print(\"Smallest:\", b)\nelse:\n    print(\"Both numbers are equal\")"
+    }
+  },
+  {
+    "id": "23",
+    "title": "23. Check if number is divisible by 5",
+    "description": "Write a Python program to check if number is divisible by 5.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 230,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nif num % 5 == 0:\n    print(num, \"is divisible by 5\")\nelse:\n    print(num, \"is NOT divisible by 5\")"
+    }
+  },
+  {
+    "id": "24",
+    "title": "24. Check if number is divisible by 3 and 7",
+    "description": "Write a Python program to check if number is divisible by 3 and 7.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 240,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nif num % 3 == 0 and num % 7 == 0:\n    print(num, \"is divisible by both 3 and 7\")\nelse:\n    print(num, \"is NOT divisible by both 3 and 7\")"
+    }
+  },
+  {
+    "id": "25",
+    "title": "25. Print numbers from 1 to 10",
+    "description": "Write a Python program to print numbers from 1 to 10.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 250,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "print(\"Numbers from 1 to 10:\")\nfor i in range(1, 11):\n    print(i, end=\" \")\nprint()"
+    }
+  },
+  {
+    "id": "26",
+    "title": "26. Print numbers from 10 to 1",
+    "description": "Write a Python program to print numbers from 10 to 1.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 260,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "print(\"Numbers from 10 to 1:\")\nfor i in range(10, 0, -1):\n    print(i, end=\" \")\nprint()"
+    }
+  },
+  {
+    "id": "27",
+    "title": "27. Print even numbers from 1 to N",
+    "description": "Write a Python program to print even numbers from 1 to n.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 270,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "n = int(input(\"Enter N: \"))\nprint(\"Even numbers from 1 to\", n, \":\")\nfor i in range(2, n + 1, 2):\n    print(i, end=\" \")\nprint()"
+    }
+  },
+  {
+    "id": "28",
+    "title": "28. Print odd numbers from 1 to N",
+    "description": "Write a Python program to print odd numbers from 1 to n.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 280,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "n = int(input(\"Enter N: \"))\nprint(\"Odd numbers from 1 to\", n, \":\")\nfor i in range(1, n + 1, 2):\n    print(i, end=\" \")\nprint()"
+    }
+  },
+  {
+    "id": "29",
+    "title": "29. Find sum of first N numbers",
+    "description": "Write a Python program to find sum of first n numbers.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 290,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "n = int(input(\"Enter N: \"))\ntotal = n * (n + 1) // 2\nprint(\"Sum of first\", n, \"numbers:\", total)"
+    }
+  },
+  {
+    "id": "30",
+    "title": "30. Find factorial of a number",
+    "description": "Write a Python program to find factorial of a number.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 300,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nfactorial = 1\nif num < 0:\n    print(\"Factorial is not defined for negative numbers\")\nelif num == 0:\n    print(\"Factorial of 0 is 1\")\nelse:\n    for i in range(1, num + 1):\n        factorial *= i\n    print(\"Factorial of\", num, \"is:\", factorial)"
+    }
+  },
+  {
+    "id": "31",
+    "title": "31. Reverse a number",
+    "description": "Write a Python program to reverse a number.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 310,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nreversed_num = int(str(abs(num))[::-1])\nif num < 0:\n    reversed_num = -reversed_num\nprint(\"Reversed number:\", reversed_num)"
+    }
+  },
+  {
+    "id": "32",
+    "title": "32. Check if number is palindrome",
+    "description": "Write a Python program to check if number is palindrome.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 320,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nif str(num) == str(num)[::-1]:\n    print(num, \"is a Palindrome\")\nelse:\n    print(num, \"is NOT a Palindrome\")"
+    }
+  },
+  {
+    "id": "33",
+    "title": "33. Count digits in a number",
+    "description": "Write a Python program to count digits in a number.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 330,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\ncount = len(str(abs(num)))\nprint(\"Number of digits:\", count)"
+    }
+  },
+  {
+    "id": "34",
+    "title": "34. Find sum of digits",
+    "description": "Write a Python program to find sum of digits.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 340,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = input(\"Enter a number: \")\ntotal = sum(int(d) for d in num if d.isdigit())\nprint(\"Sum of digits:\", total)"
+    }
+  },
+  {
+    "id": "35",
+    "title": "35. Find product of digits",
+    "description": "Write a Python program to find product of digits.",
+    "module": "school",
+    "difficulty": "beginner",
+    "points": 350,
+    "tags": [
+      "beginner",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = input(\"Enter a number: \")\nproduct = 1\nfor d in num:\n    if d.isdigit():\n        product *= int(d)\nprint(\"Product of digits:\", product)\n\n\n# ============================================================\n# \u00f0\u0178\u0178\u00a1"
+    }
+  },
+  {
+    "id": "36",
+    "title": "36. Check if number is prime",
+    "description": "Write a Python program to check if number is prime.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 360,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nif num < 2:\n    print(num, \"is NOT prime\")\n    return\nfor i in range(2, int(num**0.5) + 1):\n    if num % i == 0:\n        print(num, \"is NOT prime\")\n        return\nprint(num, \"is Prime\")"
+    }
+  },
+  {
+    "id": "37",
+    "title": "37. Print prime numbers between 1 and N",
+    "description": "Write a Python program to print prime numbers between 1 and n.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 370,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "n = int(input(\"Enter N: \"))\nprint(\"Prime numbers from 1 to\", n, \":\")\nfor num in range(2, n + 1):\n    is_prime = all(num % i != 0 for i in range(2, int(num**0.5) + 1))\n    if is_prime:\n        print(num, end=\" \")\nprint()"
+    }
+  },
+  {
+    "id": "38",
+    "title": "38. Generate Fibonacci series up to N terms",
+    "description": "Write a Python program to generate fibonacci series up to n terms.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 380,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "n = int(input(\"Enter number of terms: \"))\na, b = 0, 1\nprint(\"Fibonacci series:\")\nfor _ in range(n):\n    print(a, end=\" \")\n    a, b = b, a + b\nprint()"
+    }
+  },
+  {
+    "id": "39",
+    "title": "39. Check Armstrong number",
+    "description": "Write a Python program to check armstrong number.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 390,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\ndigits = len(str(num))\ntotal = sum(int(d) ** digits for d in str(num))\nif total == num:\n    print(num, \"is an Armstrong number\")\nelse:\n    print(num, \"is NOT an Armstrong number\")"
+    }
+  },
+  {
+    "id": "40",
+    "title": "40. Find LCM of two numbers",
+    "description": "Write a Python program to find lcm of two numbers.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 400,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "import math\na = int(input(\"Enter first number: \"))\nb = int(input(\"Enter second number: \"))\nlcm = abs(a * b) // math.gcd(a, b)\nprint(\"LCM of\", a, \"and\", b, \"is:\", lcm)"
+    }
+  },
+  {
+    "id": "41",
+    "title": "41. Find HCF of two numbers",
+    "description": "Write a Python program to find hcf of two numbers.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 410,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "import math\na = int(input(\"Enter first number: \"))\nb = int(input(\"Enter second number: \"))\nprint(\"HCF of\", a, \"and\", b, \"is:\", math.gcd(a, b))"
+    }
+  },
+  {
+    "id": "42",
+    "title": "42. Find GCD using function\ndef gcd(a, b):\n    while b:\n        a, b = b, a % b\n    return a",
+    "description": "Write a Python program to find gcd using function\ndef gcd(a, b):\n    while b:\n        a, b = b, a % b\n    return a.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 420,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = int(input(\"Enter first number: \"))\nb = int(input(\"Enter second number: \"))\nprint(\"GCD:\", gcd(a, b))"
+    }
+  },
+  {
+    "id": "43",
+    "title": "43. Print multiplication table of a number",
+    "description": "Write a Python program to print multiplication table of a number.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 430,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a number: \"))\nprint(f\"\\nMultiplication Table of {num}:\")\nfor i in range(1, 11):\n    print(f\"{num} x {i} = {num * i}\")"
+    }
+  },
+  {
+    "id": "44",
+    "title": "44. Count vowels in a string",
+    "description": "Write a Python program to count vowels in a string.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 440,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "text = input(\"Enter a string: \")\nvowels = \"aeiouAEIOU\"\ncount = sum(1 for ch in text if ch in vowels)\nprint(\"Number of vowels:\", count)"
+    }
+  },
+  {
+    "id": "45",
+    "title": "45. Reverse a string",
+    "description": "Write a Python program to reverse a string.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 450,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "text = input(\"Enter a string: \")\nprint(\"Reversed string:\", text[::-1])"
+    }
+  },
+  {
+    "id": "46",
+    "title": "46. Check if string is palindrome",
+    "description": "Write a Python program to check if string is palindrome.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 460,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "text = input(\"Enter a string: \").lower().replace(\" \", \"\")\nif text == text[::-1]:\n    print(\"The string is a Palindrome\")\nelse:\n    print(\"The string is NOT a Palindrome\")"
+    }
+  },
+  {
+    "id": "47",
+    "title": "47. Count words in a sentence",
+    "description": "Write a Python program to count words in a sentence.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 470,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "sentence = input(\"Enter a sentence: \")\nwords = sentence.split()\nprint(\"Number of words:\", len(words))"
+    }
+  },
+  {
+    "id": "48",
+    "title": "48. Convert string to uppercase",
+    "description": "Write a Python program to convert string to uppercase.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 480,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "text = input(\"Enter a string: \")\nprint(\"Uppercase:\", text.upper())"
+    }
+  },
+  {
+    "id": "49",
+    "title": "49. Convert string to lowercase",
+    "description": "Write a Python program to convert string to lowercase.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 490,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "text = input(\"Enter a string: \")\nprint(\"Lowercase:\", text.lower())"
+    }
+  },
+  {
+    "id": "50",
+    "title": "50. Remove spaces from string",
+    "description": "Write a Python program to remove spaces from string.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 500,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "text = input(\"Enter a string: \")\nprint(\"String without spaces:\", text.replace(\" \", \"\"))"
+    }
+  },
+  {
+    "id": "51",
+    "title": "51. Find length of string without len()",
+    "description": "Write a Python program to find length of string without len().",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 510,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "text = input(\"Enter a string: \")\ncount = 0\nfor _ in text:\n    count += 1\nprint(\"Length of string:\", count)"
+    }
+  },
+  {
+    "id": "52",
+    "title": "52. Sort a list of numbers",
+    "description": "Write a Python program to sort a list of numbers.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 520,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers separated by space: \").split()))\nnums.sort()\nprint(\"Sorted list:\", nums)"
+    }
+  },
+  {
+    "id": "53",
+    "title": "53. Find maximum in list",
+    "description": "Write a Python program to find maximum in list.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 530,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers separated by space: \").split()))\nmax_num = nums[0]\nfor n in nums:\n    if n > max_num:\n        max_num = n\nprint(\"Maximum:\", max_num)"
+    }
+  },
+  {
+    "id": "54",
+    "title": "54. Find minimum in list",
+    "description": "Write a Python program to find minimum in list.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 540,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers separated by space: \").split()))\nmin_num = nums[0]\nfor n in nums:\n    if n < min_num:\n        min_num = n\nprint(\"Minimum:\", min_num)"
+    }
+  },
+  {
+    "id": "55",
+    "title": "55. Find second largest number",
+    "description": "Write a Python program to find second largest number.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 550,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers separated by space: \").split()))\nunique = list(set(nums))\nunique.sort()\nif len(unique) >= 2:\n    print(\"Second Largest:\", unique[-2])\nelse:\n    print(\"Not enough unique elements\")"
+    }
+  },
+  {
+    "id": "56",
+    "title": "56. Remove duplicates from list",
+    "description": "Write a Python program to remove duplicates from list.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 560,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers separated by space: \").split()))\nunique = list(dict.fromkeys(nums))\nprint(\"List without duplicates:\", unique)"
+    }
+  },
+  {
+    "id": "57",
+    "title": "57. Merge two lists",
+    "description": "Write a Python program to merge two lists.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 570,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "list1 = list(map(int, input(\"Enter first list (space-separated): \").split()))\nlist2 = list(map(int, input(\"Enter second list (space-separated): \").split()))\nmerged = list1 + list2\nprint(\"Merged List:\", merged)"
+    }
+  },
+  {
+    "id": "58",
+    "title": "58. Count frequency of elements in list",
+    "description": "Write a Python program to count frequency of elements in list.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 580,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers separated by space: \").split()))\nfreq = {}\nfor n in nums:\n    freq[n] = freq.get(n, 0) + 1\nprint(\"Frequency of elements:\")\nfor key, val in freq.items():\n    print(f\"  {key}: {val} time(s)\")"
+    }
+  },
+  {
+    "id": "59",
+    "title": "59. Check leap year",
+    "description": "Write a Python program to check leap year.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 590,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "year = int(input(\"Enter a year: \"))\nif (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):\n    print(year, \"is a Leap Year\")\nelse:\n    print(year, \"is NOT a Leap Year\")"
+    }
+  },
+  {
+    "id": "60",
+    "title": "60. Print pattern (right triangle star)",
+    "description": "Write a Python program to print pattern (right triangle star).",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 600,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "n = int(input(\"Enter number of rows: \"))\nfor i in range(1, n + 1):\n    print(\"* \" * i)"
+    }
+  },
+  {
+    "id": "61",
+    "title": "61. Print inverted star pattern",
+    "description": "Write a Python program to print inverted star pattern.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 610,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "n = int(input(\"Enter number of rows: \"))\nfor i in range(n, 0, -1):\n    print(\"* \" * i)"
+    }
+  },
+  {
+    "id": "62",
+    "title": "62. Sum of even numbers in list",
+    "description": "Write a Python program to sum of even numbers in list.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 620,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers separated by space: \").split()))\ntotal = sum(n for n in nums if n % 2 == 0)\nprint(\"Sum of even numbers:\", total)"
+    }
+  },
+  {
+    "id": "63",
+    "title": "63. Count positive numbers in list",
+    "description": "Write a Python program to count positive numbers in list.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 630,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(float, input(\"Enter numbers separated by space: \").split()))\ncount = sum(1 for n in nums if n > 0)\nprint(\"Count of positive numbers:\", count)"
+    }
+  },
+  {
+    "id": "64",
+    "title": "64. Create calculator using if-else",
+    "description": "Write a Python program to create calculator using if-else.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 640,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "a = float(input(\"Enter first number: \"))\nop = input(\"Enter operator (+, -, *, /): \")\nb = float(input(\"Enter second number: \"))\nif op == '+':\n    print(\"Result:\", a + b)\nelif op == '-':\n    print(\"Result:\", a - b)\nelif op == '*':\n    print(\"Result:\", a * b)\nelif op == '/':\n    if b != 0:\n        print(\"Result:\", a / b)\n    else:\n        print(\"Cannot divide by zero!\")\nelse:\n    print(\"Invalid operator\")"
+    }
+  },
+  {
+    "id": "65",
+    "title": "65. Check voting eligibility",
+    "description": "Write a Python program to check voting eligibility.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 650,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "age = int(input(\"Enter your age: \"))\nif age >= 18:\n    print(\"You are eligible to vote!\")\nelse:\n    print(\"You are NOT eligible to vote.\")"
+    }
+  },
+  {
+    "id": "66",
+    "title": "66. Convert decimal to binary",
+    "description": "Write a Python program to convert decimal to binary.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 660,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "num = int(input(\"Enter a decimal number: \"))\nprint(\"Binary:\", bin(num)[2:])"
+    }
+  },
+  {
+    "id": "67",
+    "title": "67. Convert binary to decimal",
+    "description": "Write a Python program to convert binary to decimal.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 670,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "binary = input(\"Enter a binary number: \")\ndecimal = int(binary, 2)\nprint(\"Decimal:\", decimal)"
+    }
+  },
+  {
+    "id": "68",
+    "title": "68. Find ASCII value of character",
+    "description": "Write a Python program to find ascii value of character.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 680,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "ch = input(\"Enter a character: \")\nprint(f\"ASCII value of '{ch}' is: {ord(ch[0])}\")"
+    }
+  },
+  {
+    "id": "69",
+    "title": "69. Check if character is vowel or consonant",
+    "description": "Write a Python program to check if character is vowel or consonant.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 690,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "ch = input(\"Enter a character: \").lower()\nif ch.isalpha():\n    if ch in \"aeiou\":\n        print(f\"'{ch}' is a Vowel\")\n    else:\n        print(f\"'{ch}' is a Consonant\")\nelse:\n    print(\"Not an alphabet character\")"
+    }
+  },
+  {
+    "id": "70",
+    "title": "70. Find sum of matrix elements",
+    "description": "Write a Python program to find sum of matrix elements.",
+    "module": "school",
+    "difficulty": "intermediate",
+    "points": 700,
+    "tags": [
+      "intermediate",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "rows = int(input(\"Enter number of rows: \"))\ncols = int(input(\"Enter number of columns: \"))\nmatrix = []\nprint(\"Enter matrix elements row by row:\")\nfor i in range(rows):\n    row = list(map(int, input(f\"Row {i+1}: \").split()))\n    matrix.append(row)\ntotal = sum(sum(row) for row in matrix)\nprint(\"Sum of all matrix elements:\", total)\n\n\n# ============================================================\n# \u00f0\u0178\u201d\u00b4"
+    }
+  },
+  {
+    "id": "71",
+    "title": "71. Transpose a matrix",
+    "description": "Write a Python program to transpose a matrix.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 710,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "rows = int(input(\"Enter number of rows: \"))\ncols = int(input(\"Enter number of columns: \"))\nmatrix = []\nprint(\"Enter matrix elements row by row:\")\nfor i in range(rows):\n    row = list(map(int, input(f\"Row {i+1}: \").split()))\n    matrix.append(row)\ntransposed = [[matrix[j][i] for j in range(rows)] for i in range(cols)]\nprint(\"Transposed Matrix:\")\nfor row in transposed:\n    print(row)"
+    }
+  },
+  {
+    "id": "72",
+    "title": "72. Add two matrices",
+    "description": "Write a Python program to add two matrices.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 720,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "rows = int(input(\"Enter rows: \"))\ncols = int(input(\"Enter columns: \"))\nprint(\"Enter first matrix:\")\nm1 = [list(map(int, input(f\"Row {i+1}: \").split())) for i in range(rows)]\nprint(\"Enter second matrix:\")\nm2 = [list(map(int, input(f\"Row {i+1}: \").split())) for i in range(rows)]\nresult = [[m1[i][j] + m2[i][j] for j in range(cols)] for i in range(rows)]\nprint(\"Sum Matrix:\")\nfor row in result:\n    print(row)"
+    }
+  },
+  {
+    "id": "73",
+    "title": "73. Multiply two matrices",
+    "description": "Write a Python program to multiply two matrices.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 730,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "r1 = int(input(\"Rows of matrix 1: \"))\nc1 = int(input(\"Columns of matrix 1: \"))\nprint(\"Enter Matrix 1:\")\nm1 = [list(map(int, input(f\"Row {i+1}: \").split())) for i in range(r1)]\nr2 = int(input(\"Rows of matrix 2: \"))\nc2 = int(input(\"Columns of matrix 2: \"))\nprint(\"Enter Matrix 2:\")\nm2 = [list(map(int, input(f\"Row {i+1}: \").split())) for i in range(r2)]\nif c1 != r2:\n    print(\"Matrix multiplication not possible!\")\n    return\nresult = [[sum(m1[i][k] * m2[k][j] for k in range(c1)) for j in range(c2)] for i in range(r1)]\nprint(\"Product Matrix:\")\nfor row in result:\n    print(row)"
+    }
+  },
+  {
+    "id": "74",
+    "title": "74. Find largest element in matrix",
+    "description": "Write a Python program to find largest element in matrix.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 740,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "rows = int(input(\"Enter rows: \"))\ncols = int(input(\"Enter columns: \"))\nprint(\"Enter matrix elements:\")\nmatrix = [list(map(int, input(f\"Row {i+1}: \").split())) for i in range(rows)]\nlargest = max(max(row) for row in matrix)\nprint(\"Largest element in matrix:\", largest)"
+    }
+  },
+  {
+    "id": "75",
+    "title": "75. Implement linear search",
+    "description": "Write a Python program to implement linear search.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 750,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter list elements (space-separated): \").split()))\ntarget = int(input(\"Enter element to search: \"))\nfor i, n in enumerate(nums):\n    if n == target:\n        print(f\"Element {target} found at index {i}\")\n        return\nprint(\"Element not found\")"
+    }
+  },
+  {
+    "id": "76",
+    "title": "76. Implement binary search",
+    "description": "Write a Python program to implement binary search.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 760,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = sorted(list(map(int, input(\"Enter sorted list (space-separated): \").split())))\ntarget = int(input(\"Enter element to search: \"))\nlow, high = 0, len(nums) - 1\nwhile low <= high:\n    mid = (low + high) // 2\n    if nums[mid] == target:\n        print(f\"Element {target} found at index {mid}\")\n        return\n    elif nums[mid] < target:\n        low = mid + 1\n    else:\n        high = mid - 1\nprint(\"Element not found\")"
+    }
+  },
+  {
+    "id": "77",
+    "title": "77. Implement bubble sort",
+    "description": "Write a Python program to implement bubble sort.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 770,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers (space-separated): \").split()))\nn = len(nums)\nfor i in range(n - 1):\n    for j in range(n - i - 1):\n        if nums[j] > nums[j + 1]:\n            nums[j], nums[j + 1] = nums[j + 1], nums[j]\nprint(\"Bubble Sorted:\", nums)"
+    }
+  },
+  {
+    "id": "78",
+    "title": "78. Implement selection sort",
+    "description": "Write a Python program to implement selection sort.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 780,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers (space-separated): \").split()))\nn = len(nums)\nfor i in range(n):\n    min_idx = i\n    for j in range(i + 1, n):\n        if nums[j] < nums[min_idx]:\n            min_idx = j\n    nums[i], nums[min_idx] = nums[min_idx], nums[i]\nprint(\"Selection Sorted:\", nums)"
+    }
+  },
+  {
+    "id": "79",
+    "title": "79. Implement insertion sort",
+    "description": "Write a Python program to implement insertion sort.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 790,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers (space-separated): \").split()))\nfor i in range(1, len(nums)):\n    key = nums[i]\n    j = i - 1\n    while j >= 0 and nums[j] > key:\n        nums[j + 1] = nums[j]\n        j -= 1\n    nums[j + 1] = key\nprint(\"Insertion Sorted:\", nums)"
+    }
+  },
+  {
+    "id": "80",
+    "title": "80. Find duplicates in list",
+    "description": "Write a Python program to find duplicates in list.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 800,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter numbers (space-separated): \").split()))\nseen = set()\nduplicates = set()\nfor n in nums:\n    if n in seen:\n        duplicates.add(n)\n    seen.add(n)\nif duplicates:\n    print(\"Duplicates found:\", sorted(duplicates))\nelse:\n    print(\"No duplicates found\")"
+    }
+  },
+  {
+    "id": "81",
+    "title": "81. Count occurrence of each word in sentence",
+    "description": "Write a Python program to count occurrence of each word in sentence.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 810,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "sentence = input(\"Enter a sentence: \").lower()\nwords = sentence.split()\nfreq = {}\nfor word in words:\n    word = word.strip(\".,!?;:\")\n    freq[word] = freq.get(word, 0) + 1\nprint(\"Word frequency:\")\nfor word, count in freq.items():\n    print(f\"  '{word}': {count}\")"
+    }
+  },
+  {
+    "id": "82",
+    "title": "82. Check if two strings are anagrams",
+    "description": "Write a Python program to check if two strings are anagrams.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 820,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "s1 = input(\"Enter first string: \").lower().replace(\" \", \"\")\ns2 = input(\"Enter second string: \").lower().replace(\" \", \"\")\nif sorted(s1) == sorted(s2):\n    print(\"The strings ARE anagrams\")\nelse:\n    print(\"The strings are NOT anagrams\")"
+    }
+  },
+  {
+    "id": "83",
+    "title": "83. Find common elements in two lists",
+    "description": "Write a Python program to find common elements in two lists.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 830,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "list1 = list(map(int, input(\"Enter first list (space-separated): \").split()))\nlist2 = list(map(int, input(\"Enter second list (space-separated): \").split()))\ncommon = list(set(list1) & set(list2))\nprint(\"Common elements:\", common)"
+    }
+  },
+  {
+    "id": "84",
+    "title": "84. Find missing number in list (1 to N)",
+    "description": "Write a Python program to find missing number in list (1 to n).",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 840,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "n = int(input(\"Enter N (list should have 1 to N with one missing): \"))\nnums = list(map(int, input(f\"Enter {n-1} numbers: \").split()))\nexpected_sum = n * (n + 1) // 2\nactual_sum = sum(nums)\nprint(\"Missing number:\", expected_sum - actual_sum)"
+    }
+  },
+  {
+    "id": "85",
+    "title": "85. Rotate list left by one position",
+    "description": "Write a Python program to rotate list left by one position.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 850,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter list elements (space-separated): \").split()))\nif nums:\n    rotated = nums[1:] + [nums[0]]\n    print(\"Left rotated list:\", rotated)"
+    }
+  },
+  {
+    "id": "86",
+    "title": "86. Rotate list right by one position",
+    "description": "Write a Python program to rotate list right by one position.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 860,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "nums = list(map(int, input(\"Enter list elements (space-separated): \").split()))\nif nums:\n    rotated = [nums[-1]] + nums[:-1]\n    print(\"Right rotated list:\", rotated)"
+    }
+  },
+  {
+    "id": "87",
+    "title": "87. Implement stack using list",
+    "description": "Write a Python program to implement stack using list.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 870,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "stack = []\nprint(\"Stack Operations: push / pop / peek / display / quit\")\nwhile True:\n    op = input(\"Enter operation: \").strip().lower()\n    if op == \"push\":\n        val = int(input(\"Enter value to push: \"))\n        stack.append(val)\n        print(\"Pushed:\", val)\n    elif op == \"pop\":\n        if stack:\n            print(\"Popped:\", stack.pop())\n        else:\n            print(\"Stack is empty!\")\n    elif op == \"peek\":\n        if stack:\n            print(\"Top element:\", stack[-1])\n        else:\n            print(\"Stack is empty!\")\n    elif op == \"display\":\n        print(\"Stack:\", stack)\n    elif op == \"quit\":\n        break\n    else:\n        print(\"Invalid operation\")"
+    }
+  },
+  {
+    "id": "88",
+    "title": "88. Implement queue using list",
+    "description": "Write a Python program to implement queue using list.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 880,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "queue = []\nprint(\"Queue Operations: enqueue / dequeue / front / display / quit\")\nwhile True:\n    op = input(\"Enter operation: \").strip().lower()\n    if op == \"enqueue\":\n        val = int(input(\"Enter value to enqueue: \"))\n        queue.append(val)\n        print(\"Enqueued:\", val)\n    elif op == \"dequeue\":\n        if queue:\n            print(\"Dequeued:\", queue.pop(0))\n        else:\n            print(\"Queue is empty!\")\n    elif op == \"front\":\n        if queue:\n            print(\"Front element:\", queue[0])\n        else:\n            print(\"Queue is empty!\")\n    elif op == \"display\":\n        print(\"Queue:\", queue)\n    elif op == \"quit\":\n        break\n    else:\n        print(\"Invalid operation\")"
+    }
+  },
+  {
+    "id": "89",
+    "title": "89. Check balanced parentheses",
+    "description": "Write a Python program to check balanced parentheses.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 890,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "expr = input(\"Enter an expression: \")\nstack = []\npairs = {')': '(', ']': '[', '}': '{'}\nfor ch in expr:\n    if ch in \"([{\":\n        stack.append(ch)\n    elif ch in \")]}\":\n        if not stack or stack[-1] != pairs[ch]:\n            print(\"Parentheses are NOT balanced\")\n            return\n        stack.pop()\nif not stack:\n    print(\"Parentheses are balanced!\")\nelse:\n    print(\"Parentheses are NOT balanced\")"
+    }
+  },
+  {
+    "id": "90",
+    "title": "90. Find longest word in sentence",
+    "description": "Write a Python program to find longest word in sentence.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 900,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "sentence = input(\"Enter a sentence: \")\nwords = sentence.split()\nlongest = max(words, key=len)\nprint(\"Longest word:\", longest, \"(length:\", len(longest), \")\")"
+    }
+  },
+  {
+    "id": "91",
+    "title": "91. Count uppercase and lowercase letters",
+    "description": "Write a Python program to count uppercase and lowercase letters.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 910,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "text = input(\"Enter a string: \")\nupper = sum(1 for ch in text if ch.isupper())\nlower = sum(1 for ch in text if ch.islower())\nprint(\"Uppercase letters:\", upper)\nprint(\"Lowercase letters:\", lower)"
+    }
+  },
+  {
+    "id": "92",
+    "title": "92. Generate random number and guess game",
+    "description": "Write a Python program to generate random number and guess game.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 920,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "import random\nsecret = random.randint(1, 100)\nattempts = 0\nprint(\"Guess the number between 1 and 100!\")\nwhile True:\n    guess = int(input(\"Your guess: \"))\n    attempts += 1\n    if guess < secret:\n        print(\"Too low!\")\n    elif guess > secret:\n        print(\"Too high!\")\n    else:\n        print(f\"Correct! You guessed it in {attempts} attempts!\")\n        break"
+    }
+  },
+  {
+    "id": "93",
+    "title": "93. Password validation program",
+    "description": "Write a Python program to password validation program.",
+    "module": "school",
+    "difficulty": "advanced",
+    "points": 930,
+    "tags": [
+      "advanced",
+      "python",
+      "school"
+    ],
+    "template_code": {
+      "python": "import re\npassword = input(\"Enter a password to validate: \")\nerrors = []\nif len(password) < 8:\n    errors.append(\"  - At least 8 characters required\")\nif not re.search(r\"[A-Z]\", password):\n    errors.append(\"  - At least one uppercase letter required\")\nif not re.search(r\"[a-z]\", password):\n    errors.append(\"  - At least one lowercase letter required\")\nif not re.search(r\"\\d\", password):\n    errors.append(\"  - At least one digit required\")\nif not re.search(r\"[!@#$%^&*(),.?\\\":{}|<>]\", password):\n    errors.append(\"  - At least one special character required\")\nif errors:\n    print(\"Password is WEAK. Issues:\")\n    for e in errors:\n        print(e)\nelse:\n    print(\"Password is STRONG! \u00e2\u0153\u2026\")\n\n\n# ============================================================\n# MAIN MENU \u00e2\u20ac\u201d Run any program by number\n# ============================================================\n\nprograms = {\n1: program_1, 2: program_2, 3: program_3, 4: program_4, 5: program_5,\n6: program_6, 7: program_7, 8: program_8, 9: program_9, 10: program_10,\n11: program_11, 12: program_12, 13: program_13, 14: program_14, 15: program_15,\n16: program_16, 17: program_17, 18: program_18, 19: program_19, 20: program_20,\n21: program_21, 22: program_22, 23: program_23, 24: program_24, 25: program_25,\n26: program_26, 27: program_27, 28: program_28, 29: program_29, 30: program_30,\n31: program_31, 32: program_32, 33: program_33, 34: program_34, 35: program_35,\n36: program_36, 37: program_37, 38: program_38, 39: program_39, 40: program_40,\n41: program_41, 42: program_42, 43: program_43, 44: program_44, 45: program_45,\n46: program_46, 47: program_47, 48: program_48, 49: program_49, 50: program_50,\n51: program_51, 52: program_52, 53: program_53, 54: program_54, 55: program_55,\n56: program_56, 57: program_57, 58: program_58, 59: program_59, 60: program_60,\n61: program_61, 62: program_62, 63: program_63, 64: program_64, 65: program_65,\n66: program_66, 67: program_67, 68: program_68, 69: program_69, 70: program_70,\n71: program_71, 72: program_72, 73: program_73, 74: program_74, 75: program_75,\n76: program_76, 77: program_77, 78: program_78, 79: program_79, 80: program_80,\n81: program_81, 82: program_82, 83: program_83, 84: program_84, 85: program_85,\n86: program_86, 87: program_87, 88: program_88, 89: program_89, 90: program_90,\n91: program_91, 92: program_92, 93: program_93,\n}\n\nif __name__ == \"__main__\":\nprint(\"=\" * 60)\nprint(\"   SCHOOL-LEVEL PYTHON PROGRAMS (1\u00e2\u20ac\u201c93)\")\nprint(\"   \u00f0\u0178\u0178\u00a2 Beginner: 1\u00e2\u20ac\u201c35 | \u00f0\u0178\u0178\u00a1 Intermediate: 36\u00e2\u20ac\u201c70 | \u00f0\u0178\u201d\u00b4 Advanced: 71\u00e2\u20ac\u201c93\")\nprint(\"=\" * 60)\nwhile True:\n    try:\n        choice = input(\"\\nEnter program number (1-93) or 0 to quit: \").strip()\n        if choice == \"0\":\n            print(\"Goodbye!\")\n            break\n        num = int(choice)\n        if num in programs:\n            print(f\"\\n--- Program {num} ---\")\n            programs[num]()\n        else:\n            print(\"Invalid number. Please enter 1\u00e2\u20ac\u201c93.\")\n    except ValueError:\n        print(\"Please enter a valid number.\")\n    except KeyboardInterrupt:\n        print(\"\\nExiting...\")\n        break"
+    }
+  }
+]

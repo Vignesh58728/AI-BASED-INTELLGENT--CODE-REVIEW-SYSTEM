@@ -1,0 +1,99 @@
+ AI / Intelligence
+ 
+Feature	Description
+Smart Auto-Fix	AI படிச்சு bug-ஐ automatically fix பண்ணும்
+Code Spell Detection	Anti-patterns, dead code detect பண்ணும்
+Plagiarism Checker	GitHub-ல இருந்து copy-paste detect பண்ணும்
+Multi-Language AI	Python, Java, C++, JS எல்லாத்துக்கும் review
+Natural Language → Code	"Sort a list" சொன்னா code generate ஆகும்
+📊 Analytics & Gamification
+Feature	Description
+Skill Gap Map	"Arrays weak, Trees strong" visualize
+Weekly Progress Report	Email-ல PDF report
+Streak Rewards	7-day streak → badge unlock
+Global Leaderboard	Top coders ranking
+XP System	Questions solve → XP earn → Level up
+💬 Social & Collaboration
+Feature	Description
+Peer Code Review	User-to-user review system
+Discussion Forum	Problem-specific Q&A
+Live Mock Interview	1v1 video + code session
+Team Challenges	Group coding competitions
+🎓 Learning Features
+Feature	Description
+Personalized Roadmap	Weakness-based learning path
+Video Explanation	Problem solution video link
+Interview Question Bank	Amazon, Google, Meta specific questions
+Resume Code Portfolio	Best submissions → auto portfolio
+🔧 Developer Experience
+Feature	Description
+VS Code Extension	IDE-ல directly AI review
+GitHub Integration	PR-ல automatic review comment
+Real Compiler	Browser-ல run + test cases check
+Dark/Light Mode	Theme toggle
+
+
+1. Smart Auto-Fix          ← Most impressive
+2. Skill Gap Map           ← Most useful  
+3. Real Compiler           ← Most practical
+4. GitHub Integration      ← Most marketable
+5. VS Code Extension       ← Professional grade
+
+
+Thought for <1s
+
+இந்த project-க்கு specifically தேவையான API keys இங்க இருக்கு:
+
+🔑 இப்போ உடனே தேவையானவை (Core)
+API Key	Service	எங்கிருந்து பெறலாம்
+GROQ_API_KEY	Groq (Llama 3.3 AI) ✅ Already using	console.groq.com — Free!
+SECRET_KEY	JWT Auth ✅ Already set	Just a random string — generate any
+🆕 Add பண்ண வேண்டியவை (Recommended)
+API Key	Purpose	Source
+MONGODB_URI	Chat history, user data store	mongodb.com/atlas — Free tier
+AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY	File uploads (S3), Secrets Manager	aws.amazon.com — Free tier
+OPENAI_API_KEY	GPT-4o direct (optional, Groq already does it)	platform.openai.com — Paid
+GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET	Google Social Login	console.cloud.google.com — Fr
+
+2 features (Teacher Creation Controls and Tamil language support) are currently missing and would require further development
+Undoubtedly, to make the AI Page fully functional and professional, we need a few more things in addition to the 6 API keys.
+
+Based on my audit and the current state of the code, here is what we need to tackle tomorrow:
+
+1. 🔑 The 6 API Keys
+Since your AI page currently lists several models, you'll likely need keys for:
+
+Groq (Already in 
+.env
+)
+OpenAI (for GPT-4o)
+Anthropic (for Claude 3.5)
+DeepSeek
+Google Gemini (Optional alternative)
+Perplexity (For web search capabilities)
+2. 🛢️ Database Connection (Priority #1)
+The AI page cannot "fully work" (save history, remember sessions) until the MongoDB Atlas connection is fixed.
+
+Action: Please whitelist your current IP Address in the MongoDB Atlas dashboard. Without this, the backend will keep timing out.
+3. 🧠 Multi-Model Backend Logic
+Currently, the backend mostly uses Groq. I need to:
+
+Create a Model Router that switches between different providers based on the user's selection in the frontend.
+Implement specialized System Prompts for each model so they act like expert reviewers.
+4. 📂 File/Code Context Uploads
+To make it a true "AI Code Reviewer," students should be able to upload a 
+.py
+ file or a snippet for the AI to analyze.
+
+Need: We might need some frontend logic to handle file reading and sending it to the AI.
+5. 🌐 Web Search Integration
+If you want the "Sources" section (like Perplexity) to work, we need an API that can browse the web (like Tavily or Serper).
+
+6. 🎨 Final UI Polish
+Connecting the "Ask anything" box to the real backend endpoints we fixed today.
+Implementing the Tamil/English toggle for the School level hints if you want to proceed with that feature.
+Recommendation: Tomorrow, once you have the API keys ready and the MongoDB IP whitelisted, we can start by wiring up the Multi-Model Support so the selector actually changes the AI's behavior.
+
+Should I prepare the 
+.env
+ template for you to fill in the keys tomorrow?

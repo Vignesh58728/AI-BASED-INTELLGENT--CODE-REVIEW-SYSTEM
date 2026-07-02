@@ -12,6 +12,7 @@ class UserBase(BaseModel):
     bio: Optional[str] = None
     lang: Optional[str] = "Python"
     photo: Optional[str] = None
+    resume_url: Optional[str] = None
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):

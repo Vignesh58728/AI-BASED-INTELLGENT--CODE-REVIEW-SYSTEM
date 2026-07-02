@@ -6,6 +6,7 @@ if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.session import init_db
 from app.core.config import settings
@@ -17,23 +18,29 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 @app.on_event("startup")
 async def startup_event():
-    print("Starting up CodeMentor AI API and connecting to MongoDB...")
+    print("Starting up AI CODE REVIEW SYSTEM API...")
     try:
-        print(f"Connecting to MongoDB at {settings.DATABASE_URL.split('@')[-1]}...") # Log host only for safety
         await init_db()
-        print("Successfully connected to MongoDB.")
+        print("Successfully initialized SQL backend.")
     except Exception as e:
-        print(f"CRITICAL: FAILED TO CONNECT TO MONGODB: {e}")
-        print("Possible causes: IP not whitelisted, invalid credentials, or network issues.")
-        print("Server starting without database connection. Some features will use static fallbacks.")
+        print(f"CRITICAL: FAILED TO INITIALIZE SQL DATABASE: {e}")
 
-# Configure CORS
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    # This ensures COOP headers are on ALL responses for Google Login
+    response = await call_next(request)
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+    return response
+
+# CORS MUST BE THE LAST ONE ADDED TO BE ON THE OUTSIDE OF THE RESPONSE CHAIN
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost", "http://127.0.0.1"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -59,7 +66,17 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    health = {"status": "healthy", "database": "unknown"}
+    try:
+        from app.db.session import engine
+        from sqlalchemy import text
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+        health["database"] = "SQL - Connected"
+    except Exception as e:
+        health["database"] = "SQL - Disconnected"
+        health["error"] = str(e)
+    return health
 
 if __name__ == "__main__":
     import uvicorn

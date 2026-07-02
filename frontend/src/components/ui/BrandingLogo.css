@@ -1,0 +1,62 @@
+.branding-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.branding-svg {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  overflow: visible;
+}
+
+.text-line {
+  fill: none;
+  stroke-width: 0.8px;
+  stroke-linejoin: round;
+  font-family: 'Yesteryear', cursive;
+  font-size: 80px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.text-copy {
+  fill: none;
+  stroke-dasharray: 6% 29%;
+  stroke-width: 2px;
+  stroke: white;
+  animation: stroke-offset 5s infinite linear;
+}
+
+.text-copy:nth-child(1) {
+  stroke: #ffffff;
+  animation-delay: -1s;
+}
+
+.text-copy:nth-child(2) {
+  stroke: #ff0000;
+  animation-delay: -2s;
+}
+
+.text-copy:nth-child(3) {
+  stroke: #ffffff;
+  animation-delay: -3s;
+}
+
+.text-copy:nth-child(4) {
+  stroke: #ff0000;
+  animation-delay: -4s;
+}
+
+.text-copy:nth-child(5) {
+  stroke: #ffffff;
+  animation-delay: -5s;
+}
+
+@keyframes stroke-offset {
+  100% {
+    stroke-dashoffset: -35%;
+  }
+}

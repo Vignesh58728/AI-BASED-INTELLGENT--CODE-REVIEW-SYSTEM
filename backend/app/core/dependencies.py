@@ -3,10 +3,18 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from app.core.config import settings
 from app.models.user import User
+from app.db.session import SessionLocal, USE_SQL
+from app.crud import users as crud_users
 
 def get_db():
-    """Dummy generator to satisfy legacy SQLAlchemy imports."""
-    yield None
+    if USE_SQL:
+        db = SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+    else:
+        yield None # No session needed for Beanie
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/login"
@@ -18,7 +26,7 @@ async def get_current_user(
     # Resilient handling for the specific local environment
     if token == "offline-guest-token":
         # Create or fetch a mock guest user from DB if possible, or return a static mock
-        guest = await User.find_one(User.username == "guest_official")
+        guest = await crud_users.get_by_username(username="guest_official")
         if guest:
             return guest
         # Fallback if guest not in DB
@@ -45,7 +53,7 @@ async def get_current_user(
             detail=f"Could not validate credentials: {str(e)}",
         )
     
-    user = await User.get(user_id)
+    user = await crud_users.get(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

@@ -1,32 +1,26 @@
-from motor.motor_asyncio import AsyncIOMotorClient
-from beanie import init_beanie
-from app.core.config import settings
-from app.models.user import User
-from app.models.problem import Problem
-from app.models.submission import Submission
-from app.models.progress import Progress
-from app.models.skill_progress import SkillProgress
-from app.models.chat_history import ChatHistory
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from app.models.base import Base
+from app.models.sql_models import SQLUser, SQLProblem, SQLSubmission, SQLReview, SQLNotification, SQLProgress, SQLSkillProgress
+import os
 
-from app.models.review import Review
-from app.models.notification import Notification
+# SQL Connection Setup
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Global flag fixed to True for SQL-only backend
+USE_SQL = True
 
 async def init_db():
-    client = AsyncIOMotorClient(
-        settings.DATABASE_URL, 
-        tlsAllowInvalidCertificates=True,
-        serverSelectionTimeoutMS=5000
-    )
-    await init_beanie(
-        database=client[settings.MONGODB_DB_NAME],
-        document_models=[
-            User,
-            Problem,
-            Submission,
-            Review,
-            Progress,
-            SkillProgress,
-            ChatHistory,
-            Notification
-        ]
-    )
+    print("INITIALIZING SQL DATABASE (SQLite)...")
+    # Initialize SQL tables
+    Base.metadata.create_all(bind=engine)
+    print("Local SQL database initialized successfully.")
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

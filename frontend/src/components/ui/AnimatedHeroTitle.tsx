@@ -3,8 +3,8 @@
 import { motion, Variants } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const wordsTop = ["AI", "BASED"];
-const wordsBottom = ["INTELLIGENCE", "CODE", "REVIEW", "SYSTEM"];
+const wordsTop = ["MIND"];
+const wordsBottom = ["ARC"];
 
 export function AnimatedHeroTitle() {
    const [showLightning, setShowLightning] = useState(false);
@@ -78,7 +78,7 @@ export function AnimatedHeroTitle() {
             animate="visible"
             className="relative z-20 flex flex-col items-center gap-4"
          >
-            {/* Top Row: AI BASED */}
+            {/* Top Row: MIND */}
             <div className="flex gap-4 md:gap-10">
                {wordsTop.map((word, i) => (
                   <motion.span
@@ -92,7 +92,7 @@ export function AnimatedHeroTitle() {
                ))}
             </div>
 
-            {/* Bottom Row: INTELLIGENCE CODE REVIEW SYSTEM */}
+            {/* Bottom Row: ARC */}
             <div className="flex flex-wrap justify-center gap-4 md:gap-8 mt-6">
                {wordsBottom.map((word, i) => (
                   <motion.span

@@ -345,7 +345,7 @@ function HeaderSection() {
    return (
       <div className="flex flex-col items-center mb-10">
          <h1 className="text-xl md:text-2xl font-bold text-black tracking-[0.2em] uppercase text-center" style={{ fontFamily: "'Syncopate', sans-serif" }}>
-            AI BASED CODE REVIEW SYSTEM
+            MIND ARC
          </h1>
       </div>
    );

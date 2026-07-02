@@ -61,7 +61,12 @@ async def read_school_problems(skip: int = 0, limit: int = 100) -> Any:
     try:
         db_problems = await crud_problems.get_multi_by_module(module=ProblemModule.SCHOOL, skip=skip, limit=limit)
         if db_problems:
-            return db_problems
+            res = []
+            for dp in db_problems:
+                d = dp.dict() if hasattr(dp, "dict") else dp.model_dump()
+                d["id"] = str(dp.id)
+                res.append(d)
+            return res
     except Exception as e:
         print(f"Database error in read_school_problems: {e}")
     
@@ -73,7 +78,15 @@ async def read_school_problems(skip: int = 0, limit: int = 100) -> Any:
 async def read_college_problems(skip: int = 0, limit: int = 100) -> Any:
     """Retrieve problems for the College Module."""
     try:
-        return await crud_problems.get_multi_by_module(module=ProblemModule.COLLEGE, skip=skip, limit=limit)
+        db_problems = await crud_problems.get_multi_by_module(module=ProblemModule.COLLEGE, skip=skip, limit=limit)
+        if db_problems:
+            res = []
+            for dp in db_problems:
+                d = dp.dict() if hasattr(dp, "dict") else dp.model_dump()
+                d["id"] = str(dp.id)
+                res.append(d)
+            return res
+        return []
     except Exception as e:
         print(f"DATABASE ERROR in read_college_problems: {e}")
         return []
@@ -82,7 +95,15 @@ async def read_college_problems(skip: int = 0, limit: int = 100) -> Any:
 async def read_it_problems(skip: int = 0, limit: int = 100) -> Any:
     """Retrieve problems for the IT Module."""
     try:
-        return await crud_problems.get_multi_by_module(module=ProblemModule.IT, skip=skip, limit=limit)
+        db_problems = await crud_problems.get_multi_by_module(module=ProblemModule.IT, skip=skip, limit=limit)
+        if db_problems:
+            res = []
+            for dp in db_problems:
+                d = dp.dict() if hasattr(dp, "dict") else dp.model_dump()
+                d["id"] = str(dp.id)
+                res.append(d)
+            return res
+        return []
     except Exception as e:
         print(f"DATABASE ERROR in read_it_problems: {e}")
         return []
@@ -93,13 +114,14 @@ async def list_leetcode_problems(skip: int = 0, limit: int = 100) -> Any:
     try:
         bank = get_leetcode_bank()
         all_probs = []
-        for slug, q in bank.items():
-            all_probs.append({
-                "title": q["title"],
-                "titleSlug": q["problem_slug"],
-                "difficulty": q["difficulty"],
-                "topics": q.get("topics", [])
-            })
+        if bank:
+            for slug, q in bank.items():
+                all_probs.append({
+                    "title": q["title"],
+                    "titleSlug": q["problem_slug"],
+                    "difficulty": q["difficulty"],
+                    "topics": q.get("topics", [])
+                })
         all_probs.sort(key=lambda x: x["title"])
         return all_probs[skip : skip + limit]
     except Exception as e:
@@ -128,7 +150,9 @@ async def read_problem(problem_id: str) -> Any:
                     existing = await ProblemModel.find_one({"tags": tag_name})
                 
                 if existing:
-                    return existing
+                    d = existing.dict() if hasattr(existing, "dict") else existing.model_dump()
+                    d["id"] = str(existing.id)
+                    return d
             except Exception as e:
                 print(f"DEBUG: Skipping DB lookup for {problem_id} (DB likely down): {e}")
             
@@ -198,8 +222,10 @@ async def read_problem(problem_id: str) -> Any:
             PydanticObjectId(problem_id)
             db_problem = await crud_problems.get(id=problem_id)
             if db_problem:
-                return db_problem
-        except Exception:
+                d = db_problem.dict() if hasattr(db_problem, "dict") else db_problem.model_dump()
+                d["id"] = str(db_problem.id)
+                return d
+        except Exception as e:
             pass
 
         # 3. Static fallback check

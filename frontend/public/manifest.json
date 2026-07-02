@@ -1,0 +1,22 @@
+{
+  "name": "MindArc AI",
+  "short_name": "MindArc",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "description": "MindArc AI - Intelligent AI-Based Code Review and Learning System.",
+  "icons": [
+    {
+      "src": "/artificial-intelligence.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/artificial-intelligence.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

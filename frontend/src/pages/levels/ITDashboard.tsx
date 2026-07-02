@@ -35,7 +35,7 @@ export function ITDashboard() {
          icon: Layout,
          color: "text-blue-500",
          path: "/it/fullstack",
-         stats: progress?.scores?.it?.beginner !== undefined ? `${progress.scores.it.beginner}% Done` : "Level 1",
+         stats: "0% Done",
          isLocked: false,
          reqText: ""
       },
@@ -45,8 +45,8 @@ export function ITDashboard() {
          icon: Cloud,
          color: "text-sky-500",
          path: "/it/cloud",
-         stats: progress?.scores?.it?.intermediate !== undefined ? `${progress.scores.it.intermediate}% Done` : "Level 2",
-         isLocked: (progress?.scores?.it?.beginner || 0) < 100,
+         stats: "0% Done",
+         isLocked: true,
          reqText: "Finish Full Stack (100%) to unlock"
       },
       {
@@ -55,8 +55,8 @@ export function ITDashboard() {
          icon: Shield,
          color: "text-red-500",
          path: "/it/security",
-         stats: progress?.scores?.it?.advanced !== undefined ? `${progress.scores.it.advanced}% Done` : "Level 3",
-         isLocked: (progress?.scores?.it?.intermediate || 0) < 100,
+         stats: "0% Done",
+         isLocked: true,
          reqText: "Finish Cloud Computing (100%) to unlock"
       },
       {
@@ -66,7 +66,7 @@ export function ITDashboard() {
          color: "text-green-500",
          path: "/it/devops",
          stats: "Assessment",
-         isLocked: (progress?.scores?.it?.advanced || 0) < 100,
+         isLocked: true,
          reqText: "Finish Cyber Security (100%) to unlock"
       }
    ];
@@ -88,7 +88,7 @@ export function ITDashboard() {
             </div>
             <div className="bg-white px-4 py-2 rounded-xl border border-zinc-200">
                <span className="text-xs font-bold uppercase tracking-widest text-black">Industry Readiness: </span>
-               <span className="text-black font-bold">{(progress?.scores?.it?.beginner || 0)}%</span>
+               <span className="text-black font-bold">0%</span>
             </div>
          </div>
 

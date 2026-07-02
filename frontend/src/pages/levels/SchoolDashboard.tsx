@@ -36,7 +36,7 @@ export function SchoolDashboard() {
          desc: "35 Foundational Programs",
          icon: pythonIcon,
          path: "/school/beginner",
-         stats: progress?.scores?.school?.beginner !== undefined ? `${progress.scores.school.beginner}% Done` : "Level 1",
+         stats: "0% Done",
          isLocked: false,
          reqText: ""
       },
@@ -45,8 +45,8 @@ export function SchoolDashboard() {
          desc: "Level Up your Skills",
          icon: intermediateIcon,
          path: "/school/intermediate",
-         stats: progress?.scores?.school?.intermediate !== undefined ? `${progress.scores.school.intermediate}% Done` : "Level 2",
-         isLocked: (progress?.scores?.school?.beginner || 0) < 100,
+         stats: "0% Done",
+         isLocked: true,
          reqText: "Complete Beginner to Unlock"
       },
       {
@@ -54,8 +54,8 @@ export function SchoolDashboard() {
          desc: "Master Complex Logic",
          icon: advancedIcon,
          path: "/school/advanced",
-         stats: progress?.scores?.school?.advanced !== undefined ? `${progress.scores.school.advanced}% Done` : "Level 3",
-         isLocked: (progress?.scores?.school?.intermediate || 0) < 100,
+         stats: "0% Done",
+         isLocked: true,
          reqText: "Complete Intermediate to Unlock"
       },
       {
@@ -64,7 +64,7 @@ export function SchoolDashboard() {
          icon: careerIcon,
          path: "/school/exams",
          stats: "Assessment",
-         isLocked: (progress?.scores?.school?.advanced || 0) < 100,
+         isLocked: true,
          reqText: "Complete Advanced to Unlock"
       }
    ];
@@ -78,7 +78,7 @@ export function SchoolDashboard() {
             </div>
             <div className="bg-white px-4 py-2 rounded-xl border border-zinc-200">
                <span className="text-xs font-bold uppercase tracking-widest text-black">Global Progress: </span>
-               <span className="text-black font-bold">{(progress?.scores?.school?.beginner || 0)}%</span>
+               <span className="text-black font-bold">0%</span>
             </div>
          </div>
 

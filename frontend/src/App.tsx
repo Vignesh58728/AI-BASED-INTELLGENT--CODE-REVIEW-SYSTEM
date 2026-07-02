@@ -41,6 +41,7 @@ import { AIPage } from '@/pages/shared/AIPage';
 import { AIPracticePage } from '@/pages/shared/AIPracticePage';
 import { NotificationsPage } from '@/pages/shared/NotificationsPage';
 import { SettingsPage } from '@/pages/shared/SettingsPage';
+import { SolutionsPage } from '@/pages/shared/SolutionsPage';
 
 
 import { ReactNode } from 'react';
@@ -73,6 +74,7 @@ function App() {
                            <Route path="/admin" element={<AdminPanel />} />
                            <Route path="/notifications" element={<NotificationsPage />} />
                            <Route path="/settings" element={<SettingsPage />} />
+                           <Route path="/solutions" element={<SolutionsPage />} />
 
 
                            <Route path="/school" element={<SchoolDashboard />} />

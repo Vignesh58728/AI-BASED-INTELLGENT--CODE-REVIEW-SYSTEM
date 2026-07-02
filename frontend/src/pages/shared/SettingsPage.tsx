@@ -1,250 +1,125 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { 
-   User, 
-   Settings as SettingsIcon, 
-   ShieldCheck, 
-   Bell, 
-   Mail, 
-   Palette, 
-   CreditCard,
-   Camera,
-   Github,
-   Linkedin,
-   Globe,
-   Save
-} from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import React from 'react';
 
 export function SettingsPage() {
-   const { user, updateProfile } = useAuth();
-   const [activeTab, setActiveTab] = useState('profile');
-   
-   const [formData, setFormData] = useState({
-      name: user?.full_name || '',
-      email: user?.email || '',
-      bio: '',
-      website: '',
-      github: '',
-      linkedin: ''
-   });
+    return (
+        <div className="bg-background text-on-background min-h-screen relative satisfy-font-override selection:bg-tertiary-container selection:text-on-tertiary-container">
+            <style>{`
+                .material-symbols-outlined {
+                    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+                }
+                .satisfy-font-override,
+                .satisfy-font-override * {
+                    font-family: 'Satisfy', cursive !important;
+                }
+                .satisfy-font-override .material-symbols-outlined {
+                    font-family: 'Material Symbols Outlined' !important;
+                }
+            `}</style>
+            <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-   const navItems = [
-      { id: 'profile', label: 'Public Profile', icon: User },
-      { id: 'account', label: 'Account', icon: SettingsIcon },
-      { id: 'security', label: 'Security', icon: ShieldCheck },
-      { id: 'notifications', label: 'Notifications', icon: Bell },
-      { id: 'emails', label: 'Emails', icon: Mail },
-      { id: 'appearance', label: 'Appearance', icon: Palette },
-   ];
+            <div className="flex max-w-[1920px] mx-auto min-h-screen">
+                {/* Fixed SideNavBar */}
+                <aside className="h-screen w-72 sticky top-0 left-0 hidden lg:flex flex-col p-6 gap-4 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl text-sm font-medium border-r border-slate-200 dark:border-slate-800" style={{ fontFamily: "'Spectral', serif" }}>
+                    <div className="flex flex-col gap-4 mb-6">
+                        <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center">
+                            <span className="material-symbols-outlined text-4xl text-on-surface-variant">person</span>
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Alex Rivera</h2>
+                            <p className="text-slate-500 dark:text-slate-400">Senior Data Architect</p>
+                        </div>
+                        <button className="w-full py-2 bg-primary text-on-primary rounded-md font-semibold hover:bg-primary-dim transition-all duration-200 scale-95 active:scale-90">View Resume</button>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/profile">
+                            <span className="material-symbols-outlined">dashboard</span> Overview
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/solutions">
+                            <span className="material-symbols-outlined">code</span> Solutions
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/discuss">
+                            <span className="material-symbols-outlined">forum</span> Discussions
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/skill-analysis">
+                            <span className="material-symbols-outlined">bar_chart</span> Stats
+                        </a>
+                        <a className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg shadow-sm font-semibold hover:translate-x-1 transition-all duration-200 border-b border-slate-200 dark:border-slate-800 pb-4 mb-2" href="/settings">
+                            <span className="material-symbols-outlined">settings</span> Settings
+                        </a>
+                    </div>
+                </aside>
 
-   const handleSave = async (e: React.FormEvent) => {
-      e.preventDefault();
-      // Implement save logic here
-      console.log('Saving settings:', formData);
-   };
+                {/* Main Content */}
+                <main className="flex-1 p-8 bg-surface overflow-y-auto">
+                    <div className="max-w-5xl mx-auto space-y-8">
+                        <header>
+                            <h1 className="text-4xl font-black tracking-tight text-on-surface mb-2">Account Settings</h1>
+                            <p className="text-on-surface-variant text-lg">Manage your personal information, privacy, and system preferences.</p>
+                        </header>
 
-   return (
-      <div className="min-h-screen bg-white font-['Poppins']">
-         <main className="max-w-7xl mx-auto px-6 py-12">
-            <div className="flex flex-col lg:flex-row gap-12">
-               
-               {/* Left Sidebar */}
-               <aside className="w-full lg:w-64 flex-shrink-0">
-                  <div className="sticky top-24">
-                     <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 px-4 font-['Syncopate']">Settings</h2>
-                     <nav className="space-y-2">
-                        {navItems.map((item) => {
-                           const ItemIcon = item.icon;
-                           return (
-                              <button
-                                 key={item.id}
-                                 onClick={() => setActiveTab(item.id)}
-                                 className={`w-full flex items-center gap-3 px-6 py-4 text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all font-['Syncopate'] ${
-                                    activeTab === item.id 
-                                    ? 'bg-black text-white shadow-xl shadow-black/10' 
-                                    : 'text-zinc-400 hover:bg-zinc-50 hover:text-black'
-                                 }`}
-                              >
-                                 <ItemIcon size={16} className={activeTab === item.id ? 'text-white' : 'text-black'} />
-                                 {item.label}
-                              </button>
-                           );
-                        })}
-                     </nav>
-                  </div>
-               </aside>
-
-               {/* Right Content */}
-               <section className="flex-grow max-w-3xl">
-                  <motion.div
-                     key={activeTab}
-                     initial={{ opacity: 0, y: 10 }}
-                     animate={{ opacity: 1, y: 0 }}
-                     className="space-y-8"
-                  >
-                     {/* Header */}
-                     <div>
-                        <h1 className="text-2xl font-black text-black tracking-[0.1em] mb-2 font-['Syncopate'] uppercase">
-                           {navItems.find(i => i.id === activeTab)?.label}
-                        </h1>
-                     </div>
-
-                     <div className="bg-white border border-zinc-100 rounded-[32px] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.02)]">
-                        {activeTab === 'profile' && (
-                           <form onSubmit={handleSave} className="space-y-10">
-                              {/* Avatar Section */}
-                              <div className="flex flex-col sm:flex-row items-center gap-8 pb-10 border-b border-zinc-50">
-                                 <div className="relative group">
-                                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-zinc-50 p-1 bg-white">
-                                       <img 
-                                          src={user?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'U')}&background=f3f4f6&color=000&bold=true`} 
-                                          alt="Avatar" 
-                                          className="w-full h-full object-cover rounded-full"
-                                       />
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div className="lg:col-span-8 space-y-8">
+                                <div className="bg-surface-container-lowest p-8 rounded-3xl border border-outline-variant/10 shadow-sm">
+                                    <h3 className="text-xl font-bold mb-6">Profile Settings</h3>
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Username</label>
+                                                <input type="text" value="alex_rivera" className="w-full bg-surface-container-low p-3 rounded-2xl border-none font-bold text-sm" readOnly />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Full Name</label>
+                                                <input type="text" value="Alex Rivera" className="w-full bg-surface-container-low p-3 rounded-2xl border-none font-bold text-sm" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant ml-1">Bio</label>
+                                            <textarea className="w-full bg-surface-container-low p-3 rounded-2xl border-none font-bold text-sm h-24 resize-none">Senior Data Architect with a focus on scalable systems and algorithmic efficiency.</textarea>
+                                        </div>
+                                        <button className="px-6 py-2 bg-primary text-on-primary rounded-xl font-black uppercase text-xs tracking-widest hover:bg-primary-dim transition-all">Save Profile</button>
                                     </div>
-                                    <button type="button" className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                                       <Camera className="text-white w-6 h-6" />
-                                    </button>
-                                 </div>
-                                 <div className="flex flex-col items-center sm:items-start gap-4">
-                                    <div>
-                                       <h3 className="text-lg font-black text-black tracking-tight">Profile Picture</h3>
+                                </div>
+
+                                <div className="bg-surface-container-lowest p-8 rounded-3xl border border-outline-variant/10 shadow-sm">
+                                    <h3 className="text-xl font-bold mb-6">System Preferences</h3>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl">
+                                            <div>
+                                                <p className="font-bold">Privacy Mode</p>
+                                                <p className="text-xs text-on-surface-variant">Hide your global ranking from other users.</p>
+                                            </div>
+                                            <div className="w-12 h-6 bg-tertiary-container rounded-full relative cursor-pointer shadow-inner">
+                                                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl">
+                                            <div>
+                                                <p className="font-bold">Dark Mode</p>
+                                                <p className="text-xs text-on-surface-variant">Switch to the high-contrast dark interface.</p>
+                                            </div>
+                                            <div className="w-12 h-6 bg-surface-container-highest rounded-full relative cursor-pointer shadow-inner">
+                                                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex gap-4">
-                                       <button type="button" className="px-6 py-3 bg-black text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-zinc-800 transition-all shadow-xl shadow-black/10 active:scale-95 font-['Syncopate']">
-                                          Change Photo
-                                       </button>
-                                       <button type="button" className="px-6 py-3 bg-white text-zinc-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-xl border border-zinc-100 hover:bg-zinc-50 hover:text-black transition-all font-['Syncopate']">
-                                          Remove
-                                       </button>
-                                    </div>
-                                 </div>
-                              </div>
+                                </div>
+                            </div>
 
-                              {/* Form Fields */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                 <div className="space-y-3">
-                                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 ml-1 font-['Syncopate']">Full Name</label>
-                                    <input 
-                                       type="text" 
-                                       value={formData.name}
-                                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                       className="w-full px-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-sm font-bold text-black placeholder:text-zinc-300"
-                                       placeholder="Enter your name"
-                                    />
-                                 </div>
-
-                                 <div className="space-y-3">
-                                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 ml-1 font-['Syncopate']">Public Email</label>
-                                    <input 
-                                       type="email" 
-                                       value={formData.email}
-                                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                                       className="w-full px-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-sm font-bold text-black placeholder:text-zinc-300"
-                                       placeholder="you@example.com"
-                                    />
-                                 </div>
-
-                                 <div className="col-span-full space-y-3">
-                                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 ml-1 font-['Syncopate']">Bio</label>
-                                    <textarea 
-                                       rows={4}
-                                       value={formData.bio}
-                                       onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                                       className="w-full px-5 py-4 bg-zinc-50 border-none rounded-[24px] focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-sm font-bold text-black placeholder:text-zinc-300 resize-none"
-                                       placeholder="Tell us a bit about yourself..."
-                                    />
-                                 </div>
-
-                                 <div className="space-y-3">
-                                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 ml-1 font-['Syncopate']">Website</label>
-                                    <div className="relative">
-                                       <div className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-300">
-                                          <Globe size={16} />
-                                       </div>
-                                       <input 
-                                          type="text" 
-                                          value={formData.website}
-                                          onChange={(e) => setFormData({...formData, website: e.target.value})}
-                                          className="w-full pl-12 pr-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-sm font-bold text-black placeholder:text-zinc-300"
-                                          placeholder="alexrivera.io"
-                                       />
-                                    </div>
-                                 </div>
-
-                                 <div className="space-y-3">
-                                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 ml-1 font-['Syncopate']">Twitter Username</label>
-                                    <input 
-                                       type="text" 
-                                       className="w-full px-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-sm font-bold text-black placeholder:text-zinc-300"
-                                       placeholder="arivera"
-                                    />
-                                 </div>
-
-                                 <div className="space-y-3">
-                                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 ml-1 font-['Syncopate']">GitHub</label>
-                                    <div className="relative">
-                                       <div className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-300">
-                                          <Github size={16} />
-                                       </div>
-                                       <input 
-                                          type="text" 
-                                          value={formData.github}
-                                          onChange={(e) => setFormData({...formData, github: e.target.value})}
-                                          className="w-full pl-12 pr-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-sm font-bold text-black placeholder:text-zinc-300"
-                                          placeholder="arivera"
-                                       />
-                                    </div>
-                                 </div>
-
-                                 <div className="space-y-3">
-                                    <label className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 ml-1 font-['Syncopate']">LinkedIn</label>
-                                    <div className="relative">
-                                       <div className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-300">
-                                          <Linkedin size={16} />
-                                       </div>
-                                       <input 
-                                          type="text" 
-                                          value={formData.linkedin}
-                                          onChange={(e) => setFormData({...formData, linkedin: e.target.value})}
-                                          className="w-full pl-12 pr-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-sm font-bold text-black placeholder:text-zinc-300"
-                                          placeholder="arivera"
-                                       />
-                                    </div>
-                                 </div>
-                              </div>
-
-                               <div className="pt-10 flex justify-end">
-                                  <button 
-                                     type="submit"
-                                     className="flex items-center gap-4 px-10 py-5 bg-black text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-zinc-800 transition-all shadow-xl shadow-black/10 active:scale-95 font-['Syncopate']"
-                                  >
-                                     <Save size={16} />
-                                     Save Changes
-                                  </button>
-                               </div>
-                           </form>
-                        )}
-
-                        {activeTab !== 'profile' && (
-                           <div className="py-20 text-center space-y-4">
-                              <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto text-zinc-300">
-                                 {(() => {
-                                    const ActiveIcon = navItems.find((i) => i.id === activeTab)?.icon;
-                                    return ActiveIcon ? <ActiveIcon size={32} /> : null;
-                                 })()}
-                              </div>
-                              <div>
-                                 <h3 className="text-lg font-black text-black">Under Development</h3>
-                              </div>
-                           </div>
-                        )}
-                     </div>
-                  </motion.div>
-               </section>
+                            <div className="lg:col-span-4 space-y-6">
+                                <div className="bg-secondary-container p-8 rounded-3xl relative overflow-hidden">
+                                    <h4 className="text-xl font-black text-on-secondary-container mb-2">Account Status</h4>
+                                    <p className="text-sm text-on-secondary-container/80">Pro Member since March 2024. Your account is in good standing.</p>
+                                    <span className="material-symbols-outlined absolute -bottom-4 -right-4 text-8xl text-on-secondary-container opacity-10">verified_user</span>
+                                </div>
+                                <button className="w-full py-4 text-error font-black uppercase tracking-widest text-xs border border-error/20 rounded-3xl hover:bg-error-container hover:text-on-error transition-all">Deactivate Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
-         </main>
-      </div>
-   );
+        </div>
+    );
 }
+
+export default SettingsPage;

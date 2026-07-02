@@ -35,7 +35,7 @@ export function CollegeDashboard() {
          icon: Code,
          color: "text-blue-500",
          path: "/college/ds",
-         stats: progress?.scores?.college?.beginner !== undefined ? `${progress.scores.college.beginner}% Done` : "Ready",
+         stats: "0% Done",
          isLocked: false,
          reqText: ""
       },
@@ -45,8 +45,8 @@ export function CollegeDashboard() {
          icon: Terminal,
          color: "text-green-500",
          path: "/college/algorithms",
-         stats: progress?.scores?.college?.intermediate !== undefined ? `${progress.scores.college.intermediate}% Done` : "Level 2",
-         isLocked: (progress?.scores?.college?.beginner || 0) < 100,
+         stats: "0% Done",
+         isLocked: true,
          reqText: "Finish Data Structures (100%) to unlock"
       },
       {
@@ -55,8 +55,8 @@ export function CollegeDashboard() {
          icon: BookOpen,
          color: "text-purple-500",
          path: "/college/core",
-         stats: progress?.scores?.college?.advanced !== undefined ? `${progress.scores.college.advanced}% Done` : "Level 3",
-         isLocked: (progress?.scores?.college?.intermediate || 0) < 100,
+         stats: "0% Done",
+         isLocked: true,
          reqText: "Finish Algorithms (100%) to unlock"
       },
    ];
@@ -155,7 +155,7 @@ export function CollegeDashboard() {
             </div>
             <div className="bg-white px-4 py-2 rounded-none border-2 border-black">
                <span className="text-xs font-bold uppercase tracking-widest text-black">Overall Progress: </span>
-               <span className="text-black font-bold">{(progress?.scores?.college?.beginner || 0)}%</span>
+               <span className="text-black font-bold">0%</span>
             </div>
          </div>
 

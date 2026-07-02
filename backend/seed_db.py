@@ -165,17 +165,36 @@ async def seed():
         }
     ]
 
+    from app.db.session import USE_SQL, SessionLocal
+    from app.models.sql_models import SQLProblem
+
     for p_data in problems:
-        existing = await Problem.find_one(Problem.title == p_data["title"])
-        if existing:
-            # Update existing problem
-            for key, value in p_data.items():
-                setattr(existing, key, value)
-            await existing.save()
+        if USE_SQL:
+            db = SessionLocal()
+            try:
+                existing = db.query(SQLProblem).filter(SQLProblem.title == p_data["title"]).first()
+                if existing:
+                    for key, value in p_data.items():
+                        setattr(existing, key, value)
+                    db.commit()
+                else:
+                    db_obj = SQLProblem(**p_data)
+                    db.add(db_obj)
+                    db.commit()
+            finally:
+                db.close()
         else:
-            await Problem(**p_data).insert()
+            existing = await Problem.find_one(Problem.title == p_data["title"])
+            if existing:
+                # Update existing problem
+                for key, value in p_data.items():
+                    setattr(existing, key, value)
+                await existing.save()
+            else:
+                await Problem(**p_data).insert()
     
-    print(f"Successfully seeded/updated {len(problems)} problems into MongoDB")
+    db_type = "SQL (SQLite)" if USE_SQL else "MongoDB"
+    print(f"Successfully seeded/updated {len(problems)} problems into {db_type}")
 
 if __name__ == "__main__":
     asyncio.run(seed())

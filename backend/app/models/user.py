@@ -18,6 +18,7 @@ class User(Document):
     bio: Optional[str] = None
     lang: Optional[str] = "Python"
     photo: Optional[str] = None
+    resume_url: Optional[str] = None
     
     # Gamification
     streak_count: int = 0

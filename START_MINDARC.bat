@@ -1,5 +1,5 @@
 @echo off
-TITLE Aiviso AI Management System
+TITLE MindArc AI Management System
 echo ==========================================
 echo Starting AI BASED INTELLIGENT CODE REVIEW
 echo ==========================================

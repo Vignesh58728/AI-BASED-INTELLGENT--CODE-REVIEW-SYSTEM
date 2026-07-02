@@ -315,11 +315,11 @@ export function AIPracticePage() {
                </div>
             </div>
 
-            {/* ── Right Pane: AI Assistant ── */}
+            {/* ── Right Pane: Mind Arc ── */}
             <div className="flex-1 min-w-[350px] bg-white border border-zinc-100 shadow-sm flex flex-col">
                <div className="h-[40px] px-4 border-b border-[#eee] flex items-center justify-between bg-white shrink-0">
                   <div className="flex items-center gap-2">
-                     <span className="text-[14px] font-bold text-slate-800 font-['Outfit'] uppercase tracking-wider">AI CODE REVIEW SYSTEM</span>
+                     <span className="text-[14px] font-bold text-slate-800 font-['Outfit'] uppercase tracking-wider">MIND ARC</span>
                   </div>
                </div>
 

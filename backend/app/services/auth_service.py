@@ -5,8 +5,10 @@ from app.core.config import settings
 from app.crud import users as crud_users
 from app.models.user import User
 
-async def authenticate_user(email: str, password: str) -> Optional[User]:
-    return await crud_users.authenticate(email=email, password=password)
+async def authenticate_user(username_or_email: str = None, password: str = None, email: str = None) -> Optional[User]:
+    # Support both 'username_or_email' and 'email' parameter for flexibility
+    lookup = username_or_email or email
+    return await crud_users.authenticate(username_or_email=lookup, password=password)
 
 def create_user_token(user: User) -> str:
     print(f"DEBUG: Creating token for user type: {type(user)}, data: {user}")

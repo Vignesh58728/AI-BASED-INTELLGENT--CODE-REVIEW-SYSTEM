@@ -52,14 +52,14 @@ export function Header() {
                {user ? (
                   <div className="flex items-center gap-3">
                      <Link to="/notifications">
-                        <Button variant="ghost" size="icon" className="relative h-10 w-10 text-black hover:bg-zinc-100 rounded-lg">
+                        <Button variant="ghost" size="icon" className="relative h-10 w-10 text-black hover:bg-zinc-100 rounded-full">
                            <Bell className="h-5 w-5" />
                            <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-[#2192ff] ring-2 ring-white" />
                         </Button>
                      </Link>
 
                      <div className="relative group">
-                        <Button variant="ghost" size="icon" className="rounded-lg h-10 w-10 text-black hover:bg-zinc-100 border border-zinc-100 overflow-hidden p-0">
+                        <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 text-black hover:bg-zinc-100 border border-zinc-100 overflow-hidden p-0">
                            {user.photo ? (
                               <img src={user.photo} alt={user.name} className="w-full h-full object-cover" />
                            ) : (
@@ -69,22 +69,22 @@ export function Header() {
                         <div className="absolute right-0 top-full hidden pt-3 group-hover:block w-56 z-50">
                            <div className="rounded-2xl border border-zinc-100 bg-white text-black p-2 shadow-2xl mt-2 backdrop-blur-xl">
                               <div className="px-4 py-3 border-b border-zinc-50 mb-1">
-                                 <p className="text-sm font-bold" style={{ fontFamily: "'Poppins', sans-serif" }}>{user.name}</p>
-                                 <p className="text-[11px] text-zinc-500 uppercase tracking-widest font-bold" style={{ fontFamily: "'Poppins', sans-serif" }}>Member</p>
+                                 <p className="text-sm font-bold" style={{ fontFamily: "'Spectral', serif" }}>{user.name}</p>
+                                 <p className="text-[11px] text-zinc-500 uppercase tracking-widest font-bold" style={{ fontFamily: "'Spectral', serif" }}>Member</p>
                               </div>
-                              <Link to="/profile" className="flex items-center gap-3 px-4 py-2 hover:bg-zinc-50 text-sm font-medium rounded-xl transition-colors" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              <Link to="/profile" className="flex items-center gap-3 px-4 py-2 hover:bg-zinc-50 text-sm font-medium rounded-xl transition-colors" style={{ fontFamily: "'Spectral', serif" }}>
                                  <User className="h-4 w-4" /> Profile
                               </Link>
-                              <Link to="/skill-analysis" className="flex items-center gap-3 px-4 py-2 hover:bg-zinc-50 text-sm font-medium rounded-xl transition-colors" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              <Link to="/skill-analysis" className="flex items-center gap-3 px-4 py-2 hover:bg-zinc-50 text-sm font-medium rounded-xl transition-colors" style={{ fontFamily: "'Spectral', serif" }}>
                                  <Activity className="h-4 w-4" /> Skill Analysis
                               </Link>
-                              <Link to="/settings" className="flex items-center gap-3 px-4 py-2 hover:bg-zinc-50 text-sm font-medium rounded-xl transition-colors" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              <Link to="/settings" className="flex items-center gap-3 px-4 py-2 hover:bg-zinc-50 text-sm font-medium rounded-xl transition-colors" style={{ fontFamily: "'Spectral', serif" }}>
                                  <Settings className="h-4 w-4" /> Settings
                               </Link>
                               <button
                                  onClick={handleLogout}
                                  className="w-full text-left px-4 py-2 hover:bg-red-50/50 text-sm font-bold rounded-xl text-red-500 flex items-center gap-3 transition-colors mt-1"
-                                 style={{ fontFamily: "'Poppins', sans-serif" }}
+                                 style={{ fontFamily: "'Spectral', serif" }}
                               >
                                  <LogOut className="h-4 w-4" /> Logout
                               </button>
@@ -98,16 +98,16 @@ export function Header() {
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate('/login')}
-                        className="text-sm font-bold text-black hover:bg-zinc-100 rounded-lg px-4 h-10"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        className="text-sm font-bold text-black hover:bg-zinc-100 rounded-full px-4 h-10"
+                        style={{ fontFamily: "'Spectral', serif" }}
                      >
                         Log In
                      </Button>
                      <Button
                         size="sm"
                         onClick={() => navigate('/register')}
-                        className="text-sm font-bold bg-[#2192ff] text-white hover:bg-[#2192ff]/90 rounded-lg px-6 h-10 shadow-md transition-all active:scale-95"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        className="text-sm font-bold bg-[#2192ff] text-white hover:bg-[#2192ff]/90 rounded-full px-6 h-10 shadow-md transition-all active:scale-95"
+                        style={{ fontFamily: "'Spectral', serif" }}
                      >
                         Join Us
                      </Button>

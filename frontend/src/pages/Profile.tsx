@@ -1,361 +1,240 @@
-import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-   Terminal,
-   Flame,
-   Globe,
-   Github,
-   Linkedin,
-   TrendingUp,
-   CheckCircle,
-   Award,
-   Calendar,
-   Camera,
-   Clock,
-   X,
-   Upload,
-   ZoomIn,
-   ZoomOut,
-   RefreshCw,
-   Save,
-   Crop as CropIcon,
-   User as UserIcon
-} from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import Cropper from "react-easy-crop";
-import type { Area as CropArea } from "react-easy-crop";
-
-// ── Canvas helper: extract cropped pixels ─────────────────────────────────────
-async function getCroppedImg(imageSrc: string, pixelCrop: CropArea): Promise<string> {
-   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const img = new Image();
-      img.addEventListener("load", () => resolve(img));
-      img.addEventListener("error", reject);
-      img.src = imageSrc;
-   });
-
-   // Target size for profile photo (downsampling to prevent large base64)
-   const targetSize = 128;
-   const canvas = document.createElement("canvas");
-   canvas.width = targetSize;
-   canvas.height = targetSize;
-   const ctx = canvas.getContext("2d")!;
-
-   // High quality scaling
-   ctx.imageSmoothingQuality = 'high';
-
-   ctx.drawImage(
-      image,
-      pixelCrop.x, pixelCrop.y,
-      pixelCrop.width, pixelCrop.height,
-      0, 0,
-      targetSize, targetSize,
-   );
-   
-   // Efficient profile photo size (typically ~10-15KB)
-   return canvas.toDataURL("image/jpeg", 0.75);
-}
+import React from 'react';
 
 export function Profile() {
-   const { user, updateProfile } = useAuth();
-   const [rawSrc, setRawSrc] = useState<string | null>(null);
-   const [crop, setCrop] = useState({ x: 0, y: 0 });
-   const [zoom, setZoom] = useState(1);
-   const [croppedAreaPixels, setCroppedAreaPixels] = useState<CropArea | null>(null);
-   const [isUpdating, setIsUpdating] = useState(false);
-   const fileInputRef = useRef<HTMLInputElement>(null);
+    // To implement the heatmap dynamically
+    const heatmapCells = Array.from({ length: 350 }).map((_, i) => {
+        return <div key={i} className="heatmap-cell rounded-sm bg-surface-container-highest opacity-40"></div>;
+    });
 
-   // Stats reset to 0 as requested
-   const solvedStats = [
-      { label: 'Easy', solved: 0, total: 820, color: 'text-emerald-500', bg: 'bg-emerald-500' },
-      { label: 'Medium', solved: 0, total: 1640, color: 'text-amber-500', bg: 'bg-amber-500' },
-      { label: 'Hard', solved: 0, total: 710, color: 'text-rose-500', bg: 'bg-rose-500' },
-   ];
+    return (
+        <div className="bg-background text-on-background min-h-screen relative satisfy-font-override selection:bg-tertiary-container selection:text-on-tertiary-container">
+            <style>{`
+                .material-symbols-outlined {
+                    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+                }
+                .satisfy-font-override,
+                .satisfy-font-override * {
+                    font-family: 'Satisfy', cursive !important;
+                }
+                .satisfy-font-override .material-symbols-outlined {
+                    font-family: 'Material Symbols Outlined' !important;
+                }
+                .heatmap-cell { width: 10px; height: 10px; }
+                @media (min-width: 1024px) {
+                    .heatmap-cell { width: 12px; height: 12px; }
+                }
+            `}</style>
+            <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-   const gridCells = Array.from({ length: 52 * 7 });
-   const intensities = ['', 'bg-orange-500/20', 'bg-orange-500/40', 'bg-orange-500/70', 'bg-orange-500'];
-
-   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-         const reader = new FileReader();
-         reader.onload = () => setRawSrc(reader.result as string);
-         reader.readAsDataURL(file);
-      }
-   };
-
-   const handleCropComplete = useCallback((_: CropArea, px: CropArea) => {
-      setCroppedAreaPixels(px);
-   }, []);
-
-   const applyCrop = async () => {
-      if (!rawSrc || !croppedAreaPixels) return;
-      setIsUpdating(true);
-      try {
-         const croppedBase64 = await getCroppedImg(rawSrc, croppedAreaPixels);
-         await updateProfile({ photo: croppedBase64 });
-         setRawSrc(null);
-         // SUCCESS FEEDBACK
-         alert("Profile photo updated successfully!");
-      } catch (error: any) {
-         console.error("Failed to update profile photo:", error);
-         const detail = error.response?.data?.detail 
-            ? (typeof error.response.data.detail === 'string' ? error.response.data.detail : JSON.stringify(error.response.data.detail))
-            : (error.message || "Connection refused");
-         
-         alert(`Database sync failed: ${detail}. The image might be too large for the current server configuration.`);
-      } finally {
-         setIsUpdating(false);
-      }
-   };
-
-   return (
-      <div className="min-h-screen bg-white text-slate-900 font-sans">
-         {/* Crop Modal */}
-         <AnimatePresence>
-            {rawSrc && (
-               <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                  <motion.div
-                     initial={{ opacity: 0, scale: 0.9 }}
-                     animate={{ opacity: 1, scale: 1 }}
-                     exit={{ opacity: 0, scale: 0.9 }}
-                     className="bg-white w-full max-w-lg rounded-[32px] overflow-hidden shadow-2xl"
-                  >
-                     <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
-                        <h2 className="text-sm font-black uppercase tracking-widest text-black">Crop Profile Photo</h2>
-                        <button onClick={() => setRawSrc(null)} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
-                           <X size={20} />
-                        </button>
-                     </div>
-
-                     <div className="relative h-80 bg-zinc-900">
-                        <Cropper
-                           image={rawSrc}
-                           crop={crop}
-                           zoom={zoom}
-                           aspect={1}
-                           cropShape="round"
-                           onCropChange={setCrop}
-                           onZoomChange={setZoom}
-                           onCropComplete={handleCropComplete}
-                        />
-                     </div>
-
-                     <div className="p-8 space-y-8">
-                        <div className="flex items-center gap-4">
-                           <ZoomOut size={16} className="text-zinc-400" />
-                           <input
-                              type="range"
-                              value={zoom}
-                              min={1}
-                              max={3}
-                              step={0.1}
-                              onChange={(e) => setZoom(Number(e.target.value))}
-                              className="flex-1 accent-black h-1 rounded-full appearance-none bg-zinc-100"
-                           />
-                           <ZoomIn size={16} className="text-zinc-400" />
+            <div className="flex max-w-[1920px] mx-auto min-h-screen">
+                {/* SideNavBar Implementation */}
+                <aside className="h-screen w-72 sticky top-0 left-0 hidden lg:flex flex-col p-6 gap-4 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl text-sm font-medium border-r border-slate-200 dark:border-slate-800" style={{ fontFamily: "'Spectral', serif" }}>
+                    {/* Profile Header */}
+                    <div className="flex flex-col gap-4 mb-6">
+                        <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center">
+                            <span className="material-symbols-outlined text-4xl text-on-surface-variant">person</span>
                         </div>
-
-                        <div className="flex gap-4">
-                           <button
-                              onClick={() => setRawSrc(null)}
-                              className="flex-1 py-4 text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-black transition-colors"
-                           >
-                              Cancel
-                           </button>
-                           <button
-                              onClick={applyCrop}
-                              disabled={isUpdating}
-                              className="flex-1 py-4 bg-black text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg active:scale-95 transition-all disabled:opacity-50"
-                           >
-                              {isUpdating ? 'Uploading...' : 'Save Photo'}
-                           </button>
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Alex Rivera</h2>
+                            <p className="text-slate-500 dark:text-slate-400">Senior Data Architect</p>
                         </div>
-                     </div>
-                  </motion.div>
-               </div>
-            )}
-         </AnimatePresence>
+                        <button className="w-full py-2 bg-primary text-on-primary rounded-md font-semibold hover:bg-primary-dim transition-all duration-200 scale-95 active:scale-90">View Resume</button>
+                    </div>
+                    {/* Nav Links */}
+                    <div className="flex flex-col gap-1">
+                        <a className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg shadow-sm font-semibold hover:translate-x-1 transition-all duration-200" href="/profile">
+                            <span className="material-symbols-outlined">dashboard</span> Overview
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/solutions">
+                            <span className="material-symbols-outlined">code</span> Solutions
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/discuss">
+                            <span className="material-symbols-outlined">forum</span> Discussions
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/skill-analysis">
+                            <span className="material-symbols-outlined">bar_chart</span> Stats
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200 border-b border-slate-200 dark:border-slate-800 pb-4 mb-2" href="/settings">
+                            <span className="material-symbols-outlined">settings</span> Settings
+                        </a>
+                    </div>
+                    {/* Social Links */}
+                    <div className="mt-4 flex flex-col gap-3">
 
-         <main className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex flex-col lg:flex-row gap-8">
-
-               {/* Left Sidebar */}
-               <aside className="w-full lg:w-80 flex flex-col gap-6">
-                  <motion.div
-                     initial={{ opacity: 0, x: -20 }}
-                     animate={{ opacity: 1, x: 0 }}
-                     className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100"
-                  >
-                     <div className="flex flex-col items-center text-center">
-                        <div
-                           className="relative group cursor-pointer mb-6"
-                           onClick={() => fileInputRef.current?.click()}
-                        >
-                           <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-orange-500/10 p-1">
-                              <img
-                                 src={user?.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'U')}&background=f3f4f6&color=000&bold=true`}
-                                 alt="Profile"
-                                 className="w-full h-full object-cover rounded-full transition-transform duration-500 group-hover:scale-110"
-                              />
-                           </div>
-                           <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Camera className="text-white w-8 h-8" />
-                           </div>
-                           <input
-                              type="file"
-                              ref={fileInputRef}
-                              className="hidden"
-                              accept="image/*"
-                              onChange={handleFileChange}
-                           />
+                        <div className="flex items-center gap-2 text-on-surface-variant">
+                            <span className="material-symbols-outlined text-lg">link</span>
+                            <a className="text-xs hover:text-primary" href="#">github.com/alex_dev</a>
                         </div>
-
-                        <h1 className="text-2xl font-black text-black tracking-tight">{user?.full_name || 'Saivignesh 1'}</h1>
-                        <p className="text-slate-400 font-medium text-sm">@{user?.username || 'saivignesh475@'}</p>
-
-                        <div className="mt-8 flex flex-col gap-4 w-full">
-                           <div className="flex justify-between items-center py-3 border-b border-slate-50">
-                              <span className="text-slate-400 text-sm font-bold uppercase tracking-wider">Global Rank</span>
-                              <span className="font-black text-black">unranked</span>
-                           </div>
-                           <div className="flex justify-between items-center py-3 border-b border-slate-50">
-                              <span className="text-slate-400 text-sm font-bold uppercase tracking-wider">Points</span>
-                              <span className="font-black text-black">0</span>
-                           </div>
-                        </div>
-
-                        <button
-                           onClick={() => fileInputRef.current?.click()}
-                           className="mt-8 w-full py-3 bg-black text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-800 transition-all shadow-lg active:scale-95"
-                        >
-                           Update Photo
-                        </button>
-                        <button
-                           onClick={() => window.open(`${import.meta.env.VITE_API_URL}/reporting/weekly-report`, '_blank')}
-                           className="mt-3 w-full py-3 bg-white text-black border border-black font-black uppercase tracking-widest text-xs rounded-xl hover:bg-zinc-50 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
-                        >
-                           <Calendar className="w-4 h-4" /> Weekly Report (PDF)
-                        </button>
-                     </div>
-                  </motion.div>
-
-                  {/* Social Links */}
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Connectivity</h3>
-                     <div className="flex flex-col gap-4">
-                        {[
-                           { icon: Globe, label: 'website.io', href: '#' },
-                           { icon: Github, label: 'github.com', href: '#' },
-                           { icon: Linkedin, label: 'linkedin.com', href: '#' }
-                        ].map((social, idx) => (
-                           <a key={idx} href={social.href} className="flex items-center gap-4 text-sm font-bold text-slate-600 hover:text-black transition-colors group">
-                              <social.icon className="w-4 h-4 text-slate-300 group-hover:text-black" />
-                              {social.label}
-                           </a>
-                        ))}
-                     </div>
-                  </div>
-               </aside>
-
-               {/* Right Content */}
-               <div className="flex-1 flex flex-col gap-8">
-
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100"
-                     >
-                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-black mb-8">Performance Reset</h3>
-                        <div className="flex flex-col sm:flex-row items-center gap-10">
-                           <div className="relative w-36 h-36 flex items-center justify-center">
-                              <svg className="w-full h-full transform -rotate-90">
-                                 <circle className="text-slate-50" cx="72" cy="72" r="64" fill="transparent" stroke="currentColor" strokeWidth="12" />
-                                 <circle className="text-orange-500" cx="72" cy="72" r="64" fill="transparent" stroke="currentColor" strokeWidth="12" strokeDasharray="402" strokeDashoffset="402" strokeLinecap="round" />
-                              </svg>
-                              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                 <span className="text-4xl font-black text-black leading-none">0</span>
-                                 <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-1">Total</span>
-                              </div>
-                           </div>
-
-                           <div className="flex-1 w-full space-y-6">
-                              {solvedStats.map(stat => (
-                                 <div key={stat.label} className="space-y-2">
-                                    <div className="flex justify-between items-end">
-                                       <span className={`text-[10px] font-black uppercase tracking-widest ${stat.color}`}>{stat.label}</span>
-                                       <span className="text-xs font-black text-black">0 <span className="text-slate-300">/ {stat.total}</span></span>
+                    </div>
+                    {/* Footer Links */}
+                    <div className="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800">
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg" href="#">
+                            <span className="material-symbols-outlined">help</span> Help
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg" href="#">
+                            <span className="material-symbols-outlined">logout</span> Logout
+                        </a>
+                    </div>
+                </aside>
+                {/* Main Content Canvas */}
+                <main className="flex-1 p-8 bg-surface overflow-y-auto">
+                    <div className="max-w-5xl mx-auto space-y-8">
+                        {/* Hero Stats / Solved Problems */}
+                        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-1 bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-transparent">
+                                <h3 className="text-on-surface-variant text-sm font-bold uppercase tracking-wider mb-6">Solved Problems</h3>
+                                <div className="flex flex-col items-center gap-8">
+                                    <div className="relative w-40 h-40">
+                                        <svg className="w-full h-full transform -rotate-90">
+                                            <circle className="text-surface-container-high" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" strokeWidth="8"></circle>
+                                            <circle className="text-tertiary" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" strokeDasharray="440" strokeDashoffset="440" strokeWidth="8"></circle>
+                                        </svg>
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span className="text-4xl font-black text-on-surface">0</span>
+                                            <span className="text-xs text-on-surface-variant font-medium">Solved</span>
+                                        </div>
                                     </div>
-                                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                       <div className="bg-zinc-200 h-full w-0" />
+                                    <div className="w-full space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm font-medium text-on-surface-variant">Easy</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-bold">0/620</span>
+                                                <div className="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                                                    <div className="h-full bg-tertiary w-0 rounded-full"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm font-medium text-on-surface-variant">Medium</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-bold">0/1200</span>
+                                                <div className="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                                                    <div className="h-full bg-secondary w-0 rounded-full"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm font-medium text-on-surface-variant">Hard</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-bold">0/450</span>
+                                                <div className="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                                                    <div className="h-full bg-error w-0 rounded-full"></div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                 </div>
-                              ))}
-                           </div>
-                        </div>
-                     </motion.div>
-
-                     {/* Detail Stats */}
-                     <div className="grid grid-cols-2 gap-4">
-                        {[
-                           { label: 'Max Streak', value: `${user?.streak_count || 0} Days`, icon: Flame, color: 'text-orange-500' },
-                           { label: 'Rating', value: '0', icon: TrendingUp, color: 'text-blue-500' },
-                           { label: 'Accuracy', value: '0%', icon: CheckCircle, color: 'text-emerald-500' },
-                           { label: 'Ranking', value: 'N/A', icon: Award, color: 'text-purple-500' }
-                        ].map((stat, i) => (
-                           <motion.div
-                              key={i}
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: i * 0.1 }}
-                              className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col justify-between hover:bg-white transition-all group"
-                           >
-                              <div className="flex justify-between items-start">
-                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{stat.label}</span>
-                                 <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                              </div>
-                              <span className="text-xl font-black text-black mt-4">{stat.value}</span>
-                           </motion.div>
-                        ))}
-                     </div>
-                  </div>
-
-
-
-                  {/* Heatmap */}
-                  <motion.div
-                     initial={{ opacity: 0, y: 20 }}
-                     animate={{ opacity: 1, y: 0 }}
-                     className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100"
-                  >
-                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                        <h3 className="text-sm font-black uppercase tracking-[0.1em] text-black">No submissions recorded yet</h3>
-                        <div className="flex items-center gap-3 text-[10px] font-bold text-slate-300">
-                           <span>LESS</span>
-                           <div className="flex gap-1">
-                              {intensities.map((bg, idx) => (
-                                 <div key={idx} className={`w-3 h-3 rounded-sm ${bg || 'bg-slate-100'}`} />
-                              ))}
-                           </div>
-                           <span>MORE</span>
-                        </div>
-                     </div>
-
-                     <div className="overflow-x-auto no-scrollbar opacity-30">
-                        <div className="flex gap-1">
-                           <div className="grid grid-flow-col grid-rows-7 gap-1">
-                              {gridCells.map((_, i) => (
-                                 <div key={i} className="w-3 h-3 rounded-[2px] bg-slate-50" />
-                              ))}
-                           </div>
-                        </div>
-                     </div>
-                  </motion.div>
-               </div>
+                                </div>
+                            </div>
+                            {/* Submission Heatmap */}
+                            <div className="lg:col-span-2 bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Submission Activity</h3>
+                                    <div className="flex gap-2 text-xs font-bold text-on-surface-variant">
+                                        <span className="px-2 py-1 bg-surface-container rounded">Last Year</span>
+                                        <span className="px-2 py-1 hover:bg-surface-container rounded cursor-pointer">Last Month</span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-4 overflow-x-auto pb-4">
+                                    <div className="flex gap-[2px]">
+                                        <div className="flex flex-col gap-[2px]">
+                                            <div className="heatmap-cell bg-surface-container-highest rounded-sm"></div>
+                                            <div className="heatmap-cell bg-tertiary-container rounded-sm"></div>
+                                            <div className="heatmap-cell bg-surface-container-highest rounded-sm"></div>
+                                            <div className="heatmap-cell bg-surface-container-highest rounded-sm"></div>
+                                            <div className="heatmap-cell bg-tertiary rounded-sm"></div>
+                                            <div className="heatmap-cell bg-surface-container-highest rounded-sm"></div>
+                                            <div className="heatmap-cell bg-tertiary-dim rounded-sm"></div>
+                                        </div>
+                                        <div className="flex flex-wrap gap-[2px] flex-1">
+                                            {heatmapCells}
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[10px] text-on-surface-variant px-1 font-medium">
+                                        <span>0 Submissions in the past year</span>
+                                        <div className="flex items-center gap-1">
+                                            <span>Less</span>
+                                            <div className="heatmap-cell bg-surface-container-highest rounded-sm"></div>
+                                            <div className="heatmap-cell bg-tertiary-container rounded-sm"></div>
+                                            <div className="heatmap-cell bg-tertiary rounded-sm"></div>
+                                            <div className="heatmap-cell bg-tertiary-dim rounded-sm"></div>
+                                            <span>More</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        {/* Badges & Recent Submissions Grid */}
+                        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                            {/* Badges */}
+                            <div className="lg:col-span-1 bg-surface-container-low p-6 rounded-xl">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Badges</h3>
+                                    <span className="text-xs font-bold text-tertiary cursor-pointer">View All</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="group flex flex-col items-center gap-2 cursor-pointer">
+                                        <div className="w-16 h-16 bg-secondary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined text-on-secondary-container text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
+                                        </div>
+                                        <span className="text-[10px] text-center font-bold text-on-surface leading-tight">Top 100 Global</span>
+                                    </div>
+                                    <div className="group flex flex-col items-center gap-2 cursor-pointer">
+                                        <div className="w-16 h-16 bg-tertiary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined text-on-tertiary-container text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>calendar_today</span>
+                                        </div>
+                                        <span className="text-[10px] text-center font-bold text-on-surface leading-tight">50 Day Streak</span>
+                                    </div>
+                                    <div className="group flex flex-col items-center gap-2 cursor-pointer">
+                                        <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                            <span className="material-symbols-outlined text-on-primary-container text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>award_star</span>
+                                        </div>
+                                        <span className="text-[10px] text-center font-bold text-on-surface leading-tight">Nov 2023 Challenge</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Recent Submissions */}
+                            <div className="lg:col-span-2 bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+                                <h3 className="text-on-surface-variant text-sm font-bold uppercase tracking-wider mb-6">Recent Submissions</h3>
+                                <div className="py-12 flex flex-col items-center justify-center opacity-40">
+                                    <span className="material-symbols-outlined text-4xl mb-2">history</span>
+                                    <p className="text-sm font-medium">No recent activity detected</p>
+                                </div>
+                            </div>
+                        </section>
+                        {/* Bento Area for Skills and Notes */}
+                        <section className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-8">
+                            <div className="md:col-span-2 bg-gradient-to-br from-primary to-primary-dim p-8 rounded-xl text-on-primary relative overflow-hidden">
+                                <div className="relative z-10">
+                                    <h4 className="text-2xl font-black tracking-tight mb-2">Skill Overview</h4>
+                                    <p className="text-on-primary/80 text-sm leading-relaxed max-w-xs">Start solving problems to track your technical proficiency and growth.</p>
+                                    <div className="mt-8 flex gap-3">
+                                        <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest">Expertise</span>
+                                        <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest">Algorithms</span>
+                                    </div>
+                                </div>
+                                <span className="material-symbols-outlined absolute -bottom-4 -right-4 text-[120px] opacity-10">schema</span>
+                            </div>
+                            <div className="md:col-span-1 bg-secondary-container p-6 rounded-xl flex flex-col justify-between">
+                                <span className="material-symbols-outlined text-on-secondary-container text-4xl">local_fire_department</span>
+                                <div>
+                                    <span className="text-4xl font-black text-on-secondary-container">0</span>
+                                    <p className="text-xs font-bold text-on-secondary-container/70 uppercase">Current Streak</p>
+                                </div>
+                            </div>
+                            <div className="md:col-span-1 bg-tertiary-container p-6 rounded-xl flex flex-col justify-between">
+                                <span className="material-symbols-outlined text-on-tertiary-container text-4xl">trending_up</span>
+                                <div>
+                                    <span className="text-4xl font-black text-on-tertiary-container">0</span>
+                                    <p className="text-xs font-bold text-on-tertiary-container/70 uppercase">Contest Rating</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
             </div>
-         </main>
-      </div>
-   );
+        </div>
+    );
 }
+
+export default Profile;

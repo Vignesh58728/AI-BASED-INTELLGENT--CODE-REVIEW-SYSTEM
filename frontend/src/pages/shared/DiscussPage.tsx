@@ -1,91 +1,112 @@
-import { Card, CardContent } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { MessageSquare, Search, TrendingUp, MessageCircle } from "lucide-react";
+import React from 'react';
 
 export function DiscussPage() {
-   return (
-      <div className="container mx-auto py-8 px-4">
-         <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">Community Discussion</h1>
-            <Button className="gap-2">
-               <MessageSquare className="h-4 w-4" /> New Post
-            </Button>
-         </div>
+    const topics = [
+        { id: 1, title: 'Mastering Dynamic Programming | Comprehensive Guide', user: 'dp_wizard', time: '4 hours ago', comments: 156, views: '2.4k' },
+        { id: 2, title: 'Amazon OA Discussion | SDE-1 Role', user: 'interview_warrior', time: '12 hours ago', comments: 89, views: '1.8k' },
+        { id: 3, title: 'Rust vs Go for Backend Systems in 2024', user: 'system_design_pro', time: '1 day ago', comments: 245, views: '5.2k' },
+    ];
 
-         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3 space-y-4">
-               {/* Search bar */}
-               <div className="relative mb-6">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black" />
-                  <Input placeholder="Search discussions..." className="pl-10 h-10" />
-               </div>
+    return (
+        <div className="bg-background text-on-background min-h-screen relative satisfy-font-override selection:bg-tertiary-container selection:text-on-tertiary-container">
+            <style>{`
+                .material-symbols-outlined {
+                    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+                }
+                .satisfy-font-override,
+                .satisfy-font-override * {
+                    font-family: 'Satisfy', cursive !important;
+                }
+                .satisfy-font-override .material-symbols-outlined {
+                    font-family: 'Material Symbols Outlined' !important;
+                }
+            `}</style>
+            <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-               {/* Tags filter */}
-               <div className="flex flex-wrap gap-2 mb-6">
-                  {['Study Guide', 'General Discussion', 'Career Advice', 'Feedback'].map(tag => (
-                     <Badge key={tag} variant="secondary" className="cursor-pointer hover:bg-muted-foreground/20">
-                        {tag}
-                     </Badge>
-                  ))}
-               </div>
-
-               {/* Posts list */}
-               {[1, 2, 3, 4, 5].map(i => (
-                  <Card key={i} className="hover:border-primary/50 transition-colors cursor-pointer group">
-                     <CardContent className="p-4 flex gap-4">
-                        <div className="flex flex-col items-center justify-center min-w-[50px] bg-muted/30 rounded-lg p-2 h-fit">
-                           <TrendingUp className="h-4 w-4 text-orange-500 mb-1" />
-                           <span className="text-sm font-bold">245</span>
+            <div className="flex max-w-[1920px] mx-auto min-h-screen">
+                {/* Fixed SideNavBar */}
+                <aside className="h-screen w-72 sticky top-0 left-0 hidden lg:flex flex-col p-6 gap-4 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl text-sm font-medium border-r border-slate-200 dark:border-slate-800" style={{ fontFamily: "'Spectral', serif" }}>
+                    <div className="flex flex-col gap-4 mb-6">
+                        <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center">
+                            <span className="material-symbols-outlined text-4xl text-on-surface-variant">person</span>
                         </div>
-                        <div className="flex-1">
-                           <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">
-                              {i === 1 ? "Mastering Dynamic Programming | Comprehensive Guide" : `Question about Track ${i} | Help needed`}
-                           </h3>
-                           <p className="text-black text-sm line-clamp-1 mb-2">
-                              I recently interviewed with Amazon for an SDE-1 role. The process consisted of an OA followed by 3 virtual onsite rounds...
-                           </p>
-                           <div className="flex items-center gap-4 text-xs text-black">
-                              <span className="flex items-center gap-1 font-medium">
-                                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`} className="w-5 h-5 rounded-full" alt="avatar" />
-                                 user_{i * 123}
-                              </span>
-                              <span>•</span>
-                              <span>4 hours ago</span>
-                              <span className="flex items-center gap-1 ml-auto">
-                                 <MessageCircle className="h-4 w-4" /> 56 comments
-                              </span>
-                           </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Alex Rivera</h2>
+                            <p className="text-slate-500 dark:text-slate-400">Senior Data Architect</p>
                         </div>
-                     </CardContent>
-                  </Card>
-               ))}
-            </div>
+                        <button className="w-full py-2 bg-primary text-on-primary rounded-md font-semibold hover:bg-primary-dim transition-all duration-200 scale-95 active:scale-90">View Resume</button>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/profile">
+                            <span className="material-symbols-outlined">dashboard</span> Overview
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/solutions">
+                            <span className="material-symbols-outlined">code</span> Solutions
+                        </a>
+                        <a className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg shadow-sm font-semibold hover:translate-x-1 transition-all duration-200" href="/discuss">
+                            <span className="material-symbols-outlined">forum</span> Discussions
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200" href="/skill-analysis">
+                            <span className="material-symbols-outlined">bar_chart</span> Stats
+                        </a>
+                        <a className="flex items-center gap-3 p-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg hover:translate-x-1 transition-all duration-200 border-b border-slate-200 dark:border-slate-800 pb-4 mb-2" href="/settings">
+                            <span className="material-symbols-outlined">settings</span> Settings
+                        </a>
+                    </div>
+                </aside>
 
-            {/* Sidebar widgets */}
-            <div className="space-y-6">
-               <Card>
-                  <CardContent className="pt-6">
-                     <h3 className="font-bold mb-4 flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-orange-500" /> Hot Topics
-                     </h3>
-                     <ul className="space-y-3 text-sm">
-                        {[
-                           'How to master Graph algorithms?',
-                           'Google vs Meta: TC comparison',
-                           'My first 100 solved problems',
-                           'System Design roadmap 2024'
-                        ].map((link, i) => (
-                           <li key={i} className="hover:text-primary cursor-pointer transition-colors truncate">
-                              # {link}
-                           </li>
-                        ))}
-                     </ul>
-                  </CardContent>
-               </Card>
+                {/* Main Content */}
+                <main className="flex-1 p-8 bg-surface overflow-y-auto">
+                    <div className="max-w-5xl mx-auto space-y-8">
+                        <header className="flex justify-between items-end">
+                            <div>
+                                <h1 className="text-4xl font-black tracking-tight text-on-surface mb-2">Community Discussions</h1>
+                                <p className="text-on-surface-variant text-lg">Learn, share, and grow withfellow developers across the globe.</p>
+                            </div>
+                            <button className="px-6 py-3 bg-primary text-on-primary rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg hover:bg-primary-dim transition-all active:scale-95">New Discussion</button>
+                        </header>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div className="lg:col-span-8 space-y-4">
+                                {topics.map(topic => (
+                                    <div key={topic.id} className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/10 hover:shadow-xl hover:shadow-on-surface/5 transition-all group cursor-pointer">
+                                        <h3 className="text-xl font-bold text-on-surface group-hover:text-primary mb-3 transition-colors">{topic.title}</h3>
+                                        <div className="flex items-center gap-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+                                            <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">person</span> {topic.user}</span>
+                                            <span>•</span>
+                                            <span>{topic.time}</span>
+                                            <span className="ml-auto flex items-center gap-4">
+                                                <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">mode_comment</span> {topic.comments}</span>
+                                                <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">visibility</span> {topic.views}</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="lg:col-span-4 space-y-6">
+                                <div className="bg-tertiary-container p-8 rounded-3xl relative overflow-hidden">
+                                    <h4 className="text-xl font-black text-on-tertiary-container mb-2">Trending Now</h4>
+                                    <p className="text-sm text-on-tertiary-container/80">Graph theory discussions are peaking after the latest weekly challenge.</p>
+                                    <span className="material-symbols-outlined absolute -bottom-4 -right-4 text-8xl text-on-tertiary-container opacity-10">trending_up</span>
+                                </div>
+
+                                <div className="bg-surface-container-low p-6 rounded-3xl border border-outline-variant/10">
+                                    <h4 className="text-sm font-black uppercase tracking-widest mb-4">Popular Tags</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['Graphs', 'Interviews', 'Dynamic Programming', 'Rust', 'Career'].map(tag => (
+                                            <span key={tag} className="px-3 py-1 bg-surface-container-lowest border border-outline-variant/20 rounded-full text-[10px] font-bold uppercase hover:bg-primary hover:text-on-primary transition-all cursor-pointer">#{tag}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
-         </div>
-      </div>
-   );
+        </div>
+    );
 }
+
+export default DiscussPage;

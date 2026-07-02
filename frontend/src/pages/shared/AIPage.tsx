@@ -342,7 +342,7 @@ export function AIPage() {
          });
 
          // Slide Footer
-         slide.addText(`AIVISO Intelligence | ${topic}`, { 
+         slide.addText(`Mind Arc Intelligence | ${topic}`, { 
             x: 0.5, y: 5.2, w: 5, h: 0.3, 
             fontSize: 10, color: "cbd5e1", fontFace: "Poppins"
          });
@@ -733,8 +733,8 @@ export function AIPage() {
                              className="mb-12 relative z-10"
                           >
                              <h1 className="text-xl md:text-3xl lg:text-6xl font-black tracking-[-0.02em] text-black select-none font-['Syncopate'] uppercase drop-shadow-sm leading-tight max-w-4xl">
-                                 AI BASED INTELLIGENCE <br/>
-                                 <span className="text-zinc-400">CODE REVIEW SYSTEM</span>
+                                 MIND <br/>
+                                 <span className="text-zinc-400">ARC</span>
                              </h1>
                           </motion.div>
 
@@ -753,7 +753,7 @@ export function AIPage() {
                         <div className="w-full max-w-2xl group flex flex-col gap-8 relative z-20">
                            <div className="relative transform-gpu bg-white border-2 border-black shadow-none p-4 rounded-[32px] transition-all duration-500 focus-within:border-black focus-within:shadow-xl ring-2 ring-transparent focus-within:ring-black/5">
                               <textarea
-                                 placeholder={isListening ? "LISTENING..." : "ASK AIVISO ANYTHING..."}
+                                 placeholder={isListening ? "LISTENING..." : "ASK MIND ARC ANYTHING..."}
                                  value={searchValue}
                                  onChange={(e) => setSearchValue(e.target.value)}
                                  onKeyDown={handleKeyDown}
@@ -1097,7 +1097,7 @@ export function AIPage() {
                            <div className={`w-full max-w-3xl pointer-events-auto bg-white border-2 border-black shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[32px] p-3 flex flex-col transition-all duration-500 focus-within:shadow-[0_20px_60px_rgba(0,0,0,0.15)]`}>
                               <textarea
                                  rows={1}
-                                 placeholder={isListening ? "LISTENING..." : "ASK AIVISO ANYTHING..."}
+                                 placeholder={isListening ? "LISTENING..." : "ASK MIND ARC ANYTHING..."}
                                  value={searchValue}
                                  onChange={(e) => setSearchValue(e.target.value)}
                                  onKeyDown={handleKeyDown}
